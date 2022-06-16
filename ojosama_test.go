@@ -56,6 +56,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: わたしはわたくしに変換いたしますわ",
+			src:     "わたし",
+			want:    "わたくし",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

@@ -60,6 +60,19 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"わたし"},
+				},
+			},
+			Value: "わたくし",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
