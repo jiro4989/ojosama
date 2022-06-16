@@ -27,7 +27,7 @@ $ ojosama README.adoc
 
 Goのコードとして使う場合は以下のように使用します。
 
-[source,bash]
+[source,go]
 ----
 package main
 
