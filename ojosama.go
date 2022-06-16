@@ -34,6 +34,21 @@ var (
 )
 
 var (
+	excludeRules = []Converter{
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"お嬢様"},
+				},
+			},
+		},
+	}
+
 	convertRules = []Converter{
 		{
 			Conditions: []ConvertCondition{
@@ -255,6 +270,28 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 
 		// 英数字のみの単語の場合は何もしない
 		if alnumRegexp.MatchString(data.Surface) {
+			goto endLoop
+		}
+
+		// 特定条件は優先して無視する
+	excludeLoop:
+		for _, c := range excludeRules {
+			for _, cond := range c.Conditions {
+				switch cond.Type {
+				case ConvertTypeFeatures:
+					if !equalsFeatures(data.Features, cond.Value) {
+						continue excludeLoop
+					}
+				case ConvertTypeSurface:
+					if data.Surface != cond.Value[0] {
+						continue excludeLoop
+					}
+				case ConvertTypeReading:
+					if data.Reading != cond.Value[0] {
+						continue excludeLoop
+					}
+				}
+			}
 			goto endLoop
 		}
 
