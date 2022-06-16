@@ -1,7 +1,6 @@
 package ojosama
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -234,7 +233,6 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	for i, token := range tokens {
 		data := tokenizer.NewTokenData(token)
 		buf := data.Surface
-		fmt.Println(data.Features, buf)
 	converterLoop:
 		for _, c := range convertRules {
 			for _, cond := range c.Conditions {
