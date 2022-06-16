@@ -53,6 +53,17 @@ func main() {
 
 * https://twitter.com/1000000lome[壱百満天原サロメ - Twitter]
 
+== 開発
+
+以下のコマンドでビルドします。
+実行時に単体テストも実施します。
+
+[source,bash]
+----
+$ make
+$ ls -lah ./bin/ojosama
+----
+
 == 関連
 
 * https://wikiwiki.jp/nijisanji/%E5%A3%B1%E7%99%BE%E6%BA%80%E5%A4%A9%E5%8E%9F%E3%82%B5%E3%83%AD%E3%83%A1/%E8%A9%B3%E3%81%97%E3%81%8F%E7%9F%A5%E3%82%8A%E3%81%9F%E3%81%84[壱百満天原サロメ/詳しく知りたい]
