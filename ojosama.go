@@ -145,6 +145,32 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"助動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"まし"},
+				},
+			},
+			Value: "おりまし",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"た"},
+				},
+			},
+			Value: "たわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"形容詞", "自立"},
 				},
 				{

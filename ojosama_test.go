@@ -105,6 +105,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 「ました」は「おりました」ですの",
+			src:     "わたしも使ってました",
+			want:    "わたくしも使っておりましたわ",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
