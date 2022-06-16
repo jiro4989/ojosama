@@ -34,7 +34,84 @@ var (
 )
 
 var (
+	joinedWordRules = [][]Converter{
+		{
+			{
+				Conditions: []ConvertCondition{
+					{
+						Type:  ConvertTypeFeatures,
+						Value: []string{"名詞", "一般"},
+					},
+					{
+						Type:  ConvertTypeSurface,
+						Value: []string{"壱"},
+					},
+				},
+			},
+			{
+				Conditions: []ConvertCondition{
+					{
+						Type:  ConvertTypeFeatures,
+						Value: []string{"名詞", "数"},
+					},
+					{
+						Type:  ConvertTypeSurface,
+						Value: []string{"百"},
+					},
+				},
+			},
+			{
+				Conditions: []ConvertCondition{
+					{
+						Type:  ConvertTypeFeatures,
+						Value: []string{"名詞", "一般"},
+					},
+					{
+						Type:  ConvertTypeSurface,
+						Value: []string{"満天"},
+					},
+				},
+			},
+			{
+				Conditions: []ConvertCondition{
+					{
+						Type:  ConvertTypeFeatures,
+						Value: []string{"接頭詞", "名詞接続"},
+					},
+					{
+						Type:  ConvertTypeSurface,
+						Value: []string{"原"},
+					},
+				},
+			},
+			{
+				Conditions: []ConvertCondition{
+					{
+						Type:  ConvertTypeFeatures,
+						Value: []string{"名詞", "一般"},
+					},
+					{
+						Type:  ConvertTypeSurface,
+						Value: []string{"サロメ"},
+					},
+				},
+			},
+		},
+	}
+
 	excludeRules = []Converter{
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"お嬢様"},
+				},
+			},
+		},
 		{
 			Conditions: []ConvertCondition{
 				{
@@ -264,12 +341,47 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	tokens := t.Tokenize(src)
 	var result strings.Builder
 	var nounKeep bool
-	for i, token := range tokens {
+	for i := 0; i < len(tokens); i++ {
+		token := tokens[i]
 		data := tokenizer.NewTokenData(token)
 		buf := data.Surface
 
 		// 英数字のみの単語の場合は何もしない
 		if alnumRegexp.MatchString(data.Surface) {
+			goto endLoop
+		}
+
+		// 連結単語かどうかを判定
+	joinedLoop:
+		for _, rule := range joinedWordRules {
+			j := i
+			var s strings.Builder
+			for _, c := range rule {
+				if len(tokens) <= j {
+					continue joinedLoop
+				}
+				data := tokenizer.NewTokenData(tokens[j])
+				for _, cond := range c.Conditions {
+					switch cond.Type {
+					case ConvertTypeFeatures:
+						if !equalsFeatures(data.Features, cond.Value) {
+							continue joinedLoop
+						}
+					case ConvertTypeSurface:
+						if data.Surface != cond.Value[0] {
+							continue joinedLoop
+						}
+					case ConvertTypeReading:
+						if data.Reading != cond.Value[0] {
+							continue joinedLoop
+						}
+					}
+				}
+				j++
+				s.WriteString(data.Surface)
+			}
+			buf = s.String()
+			i = j - 1
 			goto endLoop
 		}
 
