@@ -84,6 +84,20 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 「臭い|くさい」のときは「くっせぇ」に変換いたしますわ",
+			src:     "臭いです",
+			want:    "くっせぇですわ",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: 「臭い|くさい」のときは「くっせぇ」に変換いたしますわ",
+			src:     "くさいです",
+			want:    "くっせぇですわ",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

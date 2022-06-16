@@ -154,6 +154,32 @@ var (
 			},
 			Value: "きったねぇ",
 		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"形容詞", "自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"臭い"},
+				},
+			},
+			Value: "くっせぇ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"形容詞", "自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"くさい"},
+				},
+			},
+			Value: "くっせぇ",
+		},
 	}
 )
 
