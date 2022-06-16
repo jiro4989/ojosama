@@ -63,6 +63,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 「ですか」のときは「ですの」に変換いたしますわ",
+			src:     "ビデオテープはどこで使うんですか",
+			want:    "おビデオテープはどちらで使うんですの",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

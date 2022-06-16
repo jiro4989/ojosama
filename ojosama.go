@@ -11,8 +11,9 @@ import (
 type ConvertOption struct{}
 
 type Converter struct {
-	Conditions []ConvertCondition
-	Value      string
+	Conditions            []ConvertCondition
+	AfterIgnoreConditions []ConvertCondition // 次のTokenで条件にマッチした場合は無視する
+	Value                 string
 }
 
 type ConvertType int
@@ -73,11 +74,30 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"どこ"},
+				},
+			},
+			Value: "どちら",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
 					Type:  ConvertTypeSurface,
 					Value: []string{"です"},
+				},
+			},
+			AfterIgnoreConditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
 				},
 			},
 			Value: "ですわ",
@@ -94,6 +114,19 @@ var (
 				},
 			},
 			Value: "いたしますわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"か"},
+				},
+			},
+			Value: "の",
 		},
 	}
 )
@@ -126,6 +159,27 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 				case ConvertTypeReading:
 					if data.Reading != cond.Value[0] {
 						continue converterLoop
+					}
+				}
+			}
+
+			// 除外条件
+			for _, cond := range c.AfterIgnoreConditions {
+				if i+1 < len(tokens) {
+					data := tokenizer.NewTokenData(tokens[i+1])
+					switch cond.Type {
+					case ConvertTypeFeatures:
+						if equalsFeatures(data.Features, cond.Value) {
+							break converterLoop
+						}
+					case ConvertTypeSurface:
+						if data.Surface == cond.Value[0] {
+							break converterLoop
+						}
+					case ConvertTypeReading:
+						if data.Reading == cond.Value[0] {
+							break converterLoop
+						}
 					}
 				}
 			}
