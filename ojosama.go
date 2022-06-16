@@ -132,6 +132,19 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "終助詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"わ"},
+				},
+			},
+			Value: "ですわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"形容詞", "自立"},
 				},
 				{
