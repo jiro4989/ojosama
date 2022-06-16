@@ -166,6 +166,19 @@ var (
 				},
 				{
 					Type:  ConvertTypeSurface,
+					Value: []string{"ます"},
+				},
+			},
+			Value: "ますわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
 					Value: []string{"た"},
 				},
 			},
