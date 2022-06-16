@@ -1,6 +1,7 @@
 package ojosama
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -55,6 +56,19 @@ var (
 			},
 			Value: "ですわ",
 		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"動詞", "自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"する"},
+				},
+			},
+			Value: "いたしますわ",
+		},
 	}
 )
 
@@ -67,10 +81,10 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	// tokenize
 	tokens := t.Tokenize(src)
 	var result strings.Builder
-	for _, token := range tokens {
+	for i, token := range tokens {
 		data := tokenizer.NewTokenData(token)
 		buf := data.Surface
-		// fmt.Println(data.Features, buf)
+		fmt.Println(data.Features, buf)
 	converterLoop:
 		for _, c := range converters {
 			for _, cond := range c.Conditions {
@@ -94,10 +108,20 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			break
 		}
 
-		// 名詞 一般の場合は手前に「お」をつける
+		// 名詞 一般の場合は手前に「お」をつける。
 		if equalsFeatures(data.Features, []string{"名詞", "一般"}) {
+			// ただし、直後に動詞 自立がくるときは「お」をつけない。
+			// 例: プレイする
+			if i+1 < len(tokens) {
+				data := tokenizer.NewTokenData(tokens[i+1])
+				if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
+					goto endLoop
+				}
+			}
 			buf = "お" + buf
 		}
+
+	endLoop:
 		result.WriteString(buf)
 	}
 	return result.String(), nil
