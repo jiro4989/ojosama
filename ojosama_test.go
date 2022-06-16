@@ -126,6 +126,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 名詞が連続する場合は最初の1つ目にだけ「お」を付けますわ",
+			src:     "一般女性。経年劣化。トップシークレット",
+			want:    "お一般女性。お経年劣化。おトップシークレット",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

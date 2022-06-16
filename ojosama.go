@@ -248,6 +248,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	// tokenize
 	tokens := t.Tokenize(src)
 	var result strings.Builder
+	var nounKeep bool
 	for i, token := range tokens {
 		data := tokenizer.NewTokenData(token)
 		buf := data.Surface
@@ -311,7 +312,14 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 					goto endLoop
 				}
 			}
-			buf = "お" + buf
+
+			// 名詞 一般が連続する場合は最初の1つ目にだけ「お」を付ける
+			if !nounKeep {
+				buf = "お" + buf
+				nounKeep = true
+			}
+		} else {
+			nounKeep = false
 		}
 
 	endLoop:
