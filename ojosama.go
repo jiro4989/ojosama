@@ -29,7 +29,7 @@ const (
 )
 
 var (
-	converters = []Converter{
+	convertRules = []Converter{
 		{
 			Conditions: []ConvertCondition{
 				{
@@ -86,7 +86,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf := data.Surface
 		fmt.Println(data.Features, buf)
 	converterLoop:
-		for _, c := range converters {
+		for _, c := range convertRules {
 			for _, cond := range c.Conditions {
 				switch cond.Type {
 				case ConvertTypeFeatures:
