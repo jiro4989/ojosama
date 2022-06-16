@@ -1,6 +1,7 @@
 package ojosama
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -26,6 +27,10 @@ const (
 	ConvertTypeSurface ConvertType = iota + 1
 	ConvertTypeReading
 	ConvertTypeFeatures
+)
+
+var (
+	alnumRegexp = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
 )
 
 var (
@@ -233,6 +238,12 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	for i, token := range tokens {
 		data := tokenizer.NewTokenData(token)
 		buf := data.Surface
+
+		// 英数字のみの単語の場合は何もしない
+		if alnumRegexp.MatchString(data.Surface) {
+			goto endLoop
+		}
+
 	converterLoop:
 		for _, c := range convertRules {
 			for _, cond := range c.Conditions {

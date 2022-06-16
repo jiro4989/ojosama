@@ -112,6 +112,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: アルファベット単語の場合は「お」をつけませんの",
+			src:     "これはgrassです。あれはabcdefg12345です",
+			want:    "これはgrassですわ。あれはabcdefg12345ですわ",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
