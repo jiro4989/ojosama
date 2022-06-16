@@ -7,15 +7,17 @@ import (
 )
 
 type CmdArgs struct {
-	Text string
-	Args []string
+	Text    string
+	OutFile string
+	Args    []string
 }
 
 func ParseArgs() (*CmdArgs, error) {
 	opts := CmdArgs{}
 
 	flag.Usage = flagHelpMessage
-	flag.StringVar(&opts.Text, "text", "", "Text")
+	flag.StringVar(&opts.Text, "t", "", "input text")
+	flag.StringVar(&opts.OutFile, "o", "", "output file")
 	flag.Parse()
 	opts.Args = flag.Args()
 
