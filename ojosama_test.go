@@ -70,6 +70,20 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 「汚い|きたない」のときは「きったねぇ」に変換いたしますわ",
+			src:     "汚いです",
+			want:    "きったねぇですわ",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: 「汚い|きたない」のときは「きったねぇ」に変換いたしますわ",
+			src:     "きたないです",
+			want:    "きったねぇですわ",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

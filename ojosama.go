@@ -128,6 +128,32 @@ var (
 			},
 			Value: "の",
 		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"形容詞", "自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"汚い"},
+				},
+			},
+			Value: "きったねぇ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"形容詞", "自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"きたない"},
+				},
+			},
+			Value: "きったねぇ",
+		},
 	}
 )
 
