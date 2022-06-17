@@ -359,25 +359,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// 特定条件は優先して無視する
-	excludeLoop:
-		for _, c := range excludeRules {
-			for _, cond := range c.Conditions {
-				switch cond.Type {
-				case ConvertTypeFeatures:
-					if !equalsFeatures(data.Features, cond.Value) {
-						continue excludeLoop
-					}
-				case ConvertTypeSurface:
-					if data.Surface != cond.Value[0] {
-						continue excludeLoop
-					}
-				case ConvertTypeReading:
-					if data.Reading != cond.Value[0] {
-						continue excludeLoop
-					}
-				}
-			}
-			goto endLoop
+		if matchExcludeRule(data) {
+			result.WriteString(buf)
+			continue
 		}
 
 	converterLoop:
@@ -451,8 +435,6 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 }
 
 func isProperNoun(tokens []tokenizer.Token, i int) (string, int, bool) {
-	var buf string
-	var ok bool
 properNounLoop:
 	for _, rule := range properNounRules {
 		j := i
@@ -481,12 +463,33 @@ properNounLoop:
 			j++
 			s.WriteString(data.Surface)
 		}
-		buf = s.String()
-		i = j - 1
-		ok = true
-		break
+		return s.String(), j - 1, true
 	}
-	return buf, i, ok
+	return "", -1, false
+}
+
+func matchExcludeRule(data tokenizer.TokenData) bool {
+excludeLoop:
+	for _, c := range excludeRules {
+		for _, cond := range c.Conditions {
+			switch cond.Type {
+			case ConvertTypeFeatures:
+				if !equalsFeatures(data.Features, cond.Value) {
+					continue excludeLoop
+				}
+			case ConvertTypeSurface:
+				if data.Surface != cond.Value[0] {
+					continue excludeLoop
+				}
+			case ConvertTypeReading:
+				if data.Reading != cond.Value[0] {
+					continue excludeLoop
+				}
+			}
+		}
+		return true
+	}
+	return false
 }
 
 func equalsFeatures(a, b []string) bool {
