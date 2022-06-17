@@ -352,37 +352,10 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// 固有名詞かどうかを判定
-	properNounLoop:
-		for _, rule := range properNounRules {
-			j := i
-			var s strings.Builder
-			for _, c := range rule {
-				if len(tokens) <= j {
-					continue properNounLoop
-				}
-				data := tokenizer.NewTokenData(tokens[j])
-				for _, cond := range c.Conditions {
-					switch cond.Type {
-					case ConvertTypeFeatures:
-						if !equalsFeatures(data.Features, cond.Value) {
-							continue properNounLoop
-						}
-					case ConvertTypeSurface:
-						if data.Surface != cond.Value[0] {
-							continue properNounLoop
-						}
-					case ConvertTypeReading:
-						if data.Reading != cond.Value[0] {
-							continue properNounLoop
-						}
-					}
-				}
-				j++
-				s.WriteString(data.Surface)
-			}
-			buf = s.String()
-			i = j - 1
-			goto endLoop
+		if s, n, ok := isProperNoun(tokens, i); ok {
+			i = n
+			result.WriteString(s)
+			continue
 		}
 
 		// 特定条件は優先して無視する
@@ -475,6 +448,45 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		result.WriteString(buf)
 	}
 	return result.String(), nil
+}
+
+func isProperNoun(tokens []tokenizer.Token, i int) (string, int, bool) {
+	var buf string
+	var ok bool
+properNounLoop:
+	for _, rule := range properNounRules {
+		j := i
+		var s strings.Builder
+		for _, c := range rule {
+			if len(tokens) <= j {
+				continue properNounLoop
+			}
+			data := tokenizer.NewTokenData(tokens[j])
+			for _, cond := range c.Conditions {
+				switch cond.Type {
+				case ConvertTypeFeatures:
+					if !equalsFeatures(data.Features, cond.Value) {
+						continue properNounLoop
+					}
+				case ConvertTypeSurface:
+					if data.Surface != cond.Value[0] {
+						continue properNounLoop
+					}
+				case ConvertTypeReading:
+					if data.Reading != cond.Value[0] {
+						continue properNounLoop
+					}
+				}
+			}
+			j++
+			s.WriteString(data.Surface)
+		}
+		buf = s.String()
+		i = j - 1
+		ok = true
+		break
+	}
+	return buf, i, ok
 }
 
 func equalsFeatures(a, b []string) bool {
