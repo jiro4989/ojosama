@@ -354,7 +354,6 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	tokens := t.Tokenize(src)
 	var result strings.Builder
 	var nounKeep bool
-baseLoop:
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
 		data := tokenizer.NewTokenData(token)
@@ -367,12 +366,10 @@ baseLoop:
 		}
 
 		// 特定の組み合わせが連続した時に変換
-		for _, mc := range multiConvertRules {
-			if s, n, ok := convertMulti(mc, tokens, i); ok {
-				i = n
-				result.WriteString(s)
-				continue baseLoop
-			}
+		if s, n, ok := convertMulti(tokens, i); ok {
+			i = n
+			result.WriteString(s)
+			continue
 		}
 
 		// 特定条件は優先して無視する
@@ -394,36 +391,38 @@ baseLoop:
 	return result.String(), nil
 }
 
-func convertMulti(mc MultiConverter, tokens []tokenizer.Token, i int) (string, int, bool) {
-properNounLoop:
-	for _, rule := range mc.Conditions {
-		j := i
-		var s strings.Builder
-		for _, c := range rule {
-			if len(tokens) <= j {
-				continue properNounLoop
-			}
-			data := tokenizer.NewTokenData(tokens[j])
-			for _, cond := range c.Conditions {
-				switch cond.Type {
-				case ConvertTypeFeatures:
-					if !equalsFeatures(data.Features, cond.Value) {
-						continue properNounLoop
-					}
-				case ConvertTypeSurface:
-					if data.Surface != cond.Value[0] {
-						continue properNounLoop
-					}
-				case ConvertTypeReading:
-					if data.Reading != cond.Value[0] {
-						continue properNounLoop
+func convertMulti(tokens []tokenizer.Token, i int) (string, int, bool) {
+	for _, mc := range multiConvertRules {
+	properNounLoop:
+		for _, rule := range mc.Conditions {
+			j := i
+			var s strings.Builder
+			for _, c := range rule {
+				if len(tokens) <= j {
+					continue properNounLoop
+				}
+				data := tokenizer.NewTokenData(tokens[j])
+				for _, cond := range c.Conditions {
+					switch cond.Type {
+					case ConvertTypeFeatures:
+						if !equalsFeatures(data.Features, cond.Value) {
+							continue properNounLoop
+						}
+					case ConvertTypeSurface:
+						if data.Surface != cond.Value[0] {
+							continue properNounLoop
+						}
+					case ConvertTypeReading:
+						if data.Reading != cond.Value[0] {
+							continue properNounLoop
+						}
 					}
 				}
+				j++
+				s.WriteString(data.Surface)
 			}
-			j++
-			s.WriteString(data.Surface)
+			return mc.Value, j - 1, true
 		}
-		return mc.Value, j - 1, true
 	}
 	return "", -1, false
 }
