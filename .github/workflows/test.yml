@@ -1,0 +1,32 @@
+---
+
+name: test
+
+"on":
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - README*
+      - LICENSE
+  pull_request:
+    paths-ignore:
+      - README*
+      - LICENSE
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go:
+          - '1.18'
+          - '1.x'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+      - run: go build
+      - run: go install
+      - run: go test -cover ./...
