@@ -17,6 +17,12 @@ type Converter struct {
 	Value                        string
 }
 
+// FIXME: 型が不適当
+type MultiConverter struct {
+	Conditions [][]Converter
+	Value      string
+}
+
 type ConvertType int
 
 type ConvertCondition struct {
@@ -35,65 +41,70 @@ var (
 )
 
 var (
-	properNounRules = [][]Converter{
+	multiConvertRules = []MultiConverter{
 		{
-			{
-				Conditions: []ConvertCondition{
+			Value: "壱百満天原サロメ",
+			Conditions: [][]Converter{
+				{
 					{
-						Type:  ConvertTypeFeatures,
-						Value: []string{"名詞", "一般"},
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"名詞", "一般"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"壱"},
+							},
+						},
 					},
 					{
-						Type:  ConvertTypeSurface,
-						Value: []string{"壱"},
-					},
-				},
-			},
-			{
-				Conditions: []ConvertCondition{
-					{
-						Type:  ConvertTypeFeatures,
-						Value: []string{"名詞", "数"},
-					},
-					{
-						Type:  ConvertTypeSurface,
-						Value: []string{"百"},
-					},
-				},
-			},
-			{
-				Conditions: []ConvertCondition{
-					{
-						Type:  ConvertTypeFeatures,
-						Value: []string{"名詞", "一般"},
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"名詞", "数"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"百"},
+							},
+						},
 					},
 					{
-						Type:  ConvertTypeSurface,
-						Value: []string{"満天"},
-					},
-				},
-			},
-			{
-				Conditions: []ConvertCondition{
-					{
-						Type:  ConvertTypeFeatures,
-						Value: []string{"接頭詞", "名詞接続"},
-					},
-					{
-						Type:  ConvertTypeSurface,
-						Value: []string{"原"},
-					},
-				},
-			},
-			{
-				Conditions: []ConvertCondition{
-					{
-						Type:  ConvertTypeFeatures,
-						Value: []string{"名詞", "一般"},
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"名詞", "一般"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"満天"},
+							},
+						},
 					},
 					{
-						Type:  ConvertTypeSurface,
-						Value: []string{"サロメ"},
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"接頭詞", "名詞接続"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"原"},
+							},
+						},
+					},
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"名詞", "一般"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"サロメ"},
+							},
+						},
 					},
 				},
 			},
@@ -343,6 +354,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	tokens := t.Tokenize(src)
 	var result strings.Builder
 	var nounKeep bool
+baseLoop:
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
 		data := tokenizer.NewTokenData(token)
@@ -354,11 +366,13 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			continue
 		}
 
-		// 固有名詞かどうかを判定
-		if s, n, ok := isProperNoun(tokens, i); ok {
-			i = n
-			result.WriteString(s)
-			continue
+		// 特定の組み合わせが連続した時に変換
+		for _, mc := range multiConvertRules {
+			if s, n, ok := convertMulti(mc, tokens, i); ok {
+				i = n
+				result.WriteString(s)
+				continue baseLoop
+			}
 		}
 
 		// 特定条件は優先して無視する
@@ -380,9 +394,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	return result.String(), nil
 }
 
-func isProperNoun(tokens []tokenizer.Token, i int) (string, int, bool) {
+func convertMulti(mc MultiConverter, tokens []tokenizer.Token, i int) (string, int, bool) {
 properNounLoop:
-	for _, rule := range properNounRules {
+	for _, rule := range mc.Conditions {
 		j := i
 		var s strings.Builder
 		for _, c := range rule {
@@ -409,7 +423,7 @@ properNounLoop:
 			j++
 			s.WriteString(data.Surface)
 		}
-		return s.String(), j - 1, true
+		return mc.Value, j - 1, true
 	}
 	return "", -1, false
 }
