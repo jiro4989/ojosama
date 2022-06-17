@@ -109,6 +109,37 @@ var (
 				},
 			},
 		},
+		{
+			Value: "いたしますわ",
+			Conditions: [][]Converter{
+				{
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"動詞", "自立"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"し"},
+							},
+						},
+					},
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"助動詞"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"ます"},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	excludeRules = []Converter{

@@ -120,9 +120,9 @@ func TestConvert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			desc:    "正常系: 「ます」は「ますわ」に変換しますわ",
+			desc:    "正常系: 「します」は「いたしますわ」に変換しますわ",
 			src:     "使用します",
-			want:    "使用しますわ",
+			want:    "使用いたしますわ",
 			opt:     nil,
 			wantErr: false,
 		},
@@ -150,7 +150,7 @@ func TestConvert(t *testing.T) {
 		{
 			desc:    "正常系: 文の途中の「する」の場合は変換しませんわ",
 			src:     "テキストファイルをまるごと変換する場合は、以下のように実行します。",
-			want:    "おテキストファイルをまるごと変換する場合は、以下のように実行しますわ。",
+			want:    "おテキストファイルをまるごと変換する場合は、以下のように実行いたしますわ。",
 			opt:     nil,
 			wantErr: false,
 		},
