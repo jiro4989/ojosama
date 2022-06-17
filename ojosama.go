@@ -348,7 +348,8 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 
 		// 英数字のみの単語の場合は何もしない
 		if alnumRegexp.MatchString(data.Surface) {
-			goto endLoop
+			result.WriteString(buf)
+			continue
 		}
 
 		// 固有名詞かどうかを判定
@@ -368,26 +369,10 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf = convert(data, tokens, i, buf)
 
 		// 名詞 一般の場合は手前に「お」をつける。
-		if equalsFeatures(data.Features, []string{"名詞", "一般"}) {
-			// ただし、直後に動詞 自立がくるときは「お」をつけない。
-			// 例: プレイする
-			if i+1 < len(tokens) {
-				data := tokenizer.NewTokenData(tokens[i+1])
-				if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
-					goto endLoop
-				}
-			}
+		// ただし、直後に動詞 自立がくるときは「お」をつけない。
+		// 例: プレイする
+		buf, nounKeep = appendPrefix(data, tokens, i, buf, nounKeep)
 
-			// 名詞 一般が連続する場合は最初の1つ目にだけ「お」を付ける
-			if !nounKeep {
-				buf = "お" + buf
-				nounKeep = true
-			}
-		} else {
-			nounKeep = false
-		}
-
-	endLoop:
 		result.WriteString(buf)
 	}
 	return result.String(), nil
@@ -495,6 +480,23 @@ converterLoop:
 		return c.Value
 	}
 	return surface
+}
+
+func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool) (string, bool) {
+	if equalsFeatures(data.Features, []string{"名詞", "一般"}) {
+		if i+1 < len(tokens) {
+			data := tokenizer.NewTokenData(tokens[i+1])
+			if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
+				return surface, nounKeep
+			}
+		}
+
+		// 名詞 一般が連続する場合は最初の1つ目にだけ「お」を付ける
+		if !nounKeep {
+			return "お" + surface, true
+		}
+	}
+	return surface, false
 }
 
 func equalsFeatures(a, b []string) bool {
