@@ -40,7 +40,7 @@
 
 [source,bash]
 ----
-$ ojosama -t これは草です
+$ ojosama -t これはハーブです
 これはおハーブですわ
 ----
 
