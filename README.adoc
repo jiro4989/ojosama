@@ -103,7 +103,7 @@ $ go install github.com/jiro4989/ojosama/cmd/ojosama@latest
 本プログラムは、にじさんじ所属の壱百満天原サロメお嬢様のキャラクターを題材にした二次創作の一つです。
 故に、本プログラムは以下二次創作ガイドラインに従います。
 
-https://event.nijisanji.app/guidelines/[ANYCOLOR二次創作ガイドライン]
+* https://event.nijisanji.app/guidelines/[ANYCOLOR二次創作ガイドライン]
 
 本プログラムを使う場合も上記ガイドラインを守ってお使いください。
 
