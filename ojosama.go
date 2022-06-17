@@ -364,49 +364,8 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			continue
 		}
 
-	converterLoop:
-		for _, c := range convertRules {
-			for _, cond := range c.Conditions {
-				switch cond.Type {
-				case ConvertTypeFeatures:
-					if !equalsFeatures(data.Features, cond.Value) {
-						continue converterLoop
-					}
-				case ConvertTypeSurface:
-					if data.Surface != cond.Value[0] {
-						continue converterLoop
-					}
-				case ConvertTypeReading:
-					if data.Reading != cond.Value[0] {
-						continue converterLoop
-					}
-				}
-			}
-
-			// 除外条件
-			for _, cond := range c.AfterIgnoreConditions {
-				if i+1 < len(tokens) {
-					data := tokenizer.NewTokenData(tokens[i+1])
-					switch cond.Type {
-					case ConvertTypeFeatures:
-						if equalsFeatures(data.Features, cond.Value) {
-							break converterLoop
-						}
-					case ConvertTypeSurface:
-						if data.Surface == cond.Value[0] {
-							break converterLoop
-						}
-					case ConvertTypeReading:
-						if data.Reading == cond.Value[0] {
-							break converterLoop
-						}
-					}
-				}
-			}
-
-			buf = c.Value
-			break
-		}
+		// お嬢様言葉に変換
+		buf = convert(data, tokens, i, buf)
 
 		// 名詞 一般の場合は手前に「お」をつける。
 		if equalsFeatures(data.Features, []string{"名詞", "一般"}) {
@@ -490,6 +449,52 @@ excludeLoop:
 		return true
 	}
 	return false
+}
+
+func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
+converterLoop:
+	for _, c := range convertRules {
+		for _, cond := range c.Conditions {
+			switch cond.Type {
+			case ConvertTypeFeatures:
+				if !equalsFeatures(data.Features, cond.Value) {
+					continue converterLoop
+				}
+			case ConvertTypeSurface:
+				if data.Surface != cond.Value[0] {
+					continue converterLoop
+				}
+			case ConvertTypeReading:
+				if data.Reading != cond.Value[0] {
+					continue converterLoop
+				}
+			}
+		}
+
+		// 除外条件
+		for _, cond := range c.AfterIgnoreConditions {
+			if i+1 < len(tokens) {
+				data := tokenizer.NewTokenData(tokens[i+1])
+				switch cond.Type {
+				case ConvertTypeFeatures:
+					if equalsFeatures(data.Features, cond.Value) {
+						break converterLoop
+					}
+				case ConvertTypeSurface:
+					if data.Surface == cond.Value[0] {
+						break converterLoop
+					}
+				case ConvertTypeReading:
+					if data.Reading == cond.Value[0] {
+						break converterLoop
+					}
+				}
+			}
+		}
+
+		return c.Value
+	}
+	return surface
 }
 
 func equalsFeatures(a, b []string) bool {
