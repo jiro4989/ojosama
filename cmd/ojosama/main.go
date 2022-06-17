@@ -29,6 +29,9 @@ func main() {
 	if args.Version {
 		msg := fmt.Sprintf("ojosama %s (%s)", version, revision)
 		fmt.Println(msg)
+		fmt.Println("")
+		fmt.Println("author:     jiro")
+		fmt.Println("repository: https://github.com/jiro4989/ojosama")
 		os.Exit(exitStatusOK)
 	}
 
