@@ -174,19 +174,6 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
-					Value: []string{"名詞", "一般"},
-				},
-				{
-					Type:  ConvertTypeSurface,
-					Value: []string{"草"},
-				},
-			},
-			Value: "ハーブ",
-		},
-		{
-			Conditions: []ConvertCondition{
-				{
-					Type:  ConvertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{

@@ -15,23 +15,9 @@ func TestConvert(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			desc:    "正常系: 草はハーブに変換してお嬢様に変換するんですの",
-			src:     "草です",
-			want:    "おハーブですわ",
-			opt:     nil,
-			wantErr: false,
-		},
-		{
-			desc:    "正常系: 変換対象以外のTokenはそのまま残すのですわ",
-			src:     "これは草です",
-			want:    "これはおハーブですわ",
-			opt:     nil,
-			wantErr: false,
-		},
-		{
 			desc:    "正常系: 名詞の手前には「お」をお付けいたしますわ",
-			src:     "寿司",
-			want:    "お寿司",
+			src:     "これはハーブです",
+			want:    "これはおハーブですわ",
 			opt:     nil,
 			wantErr: false,
 		},
