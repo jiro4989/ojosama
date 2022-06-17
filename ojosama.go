@@ -34,7 +34,7 @@ var (
 )
 
 var (
-	joinedWordRules = [][]Converter{
+	properNounRules = [][]Converter{
 		{
 			{
 				Conditions: []ConvertCondition{
@@ -351,29 +351,29 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			goto endLoop
 		}
 
-		// 連結単語かどうかを判定
-	joinedLoop:
-		for _, rule := range joinedWordRules {
+		// 固有名詞かどうかを判定
+	properNounLoop:
+		for _, rule := range properNounRules {
 			j := i
 			var s strings.Builder
 			for _, c := range rule {
 				if len(tokens) <= j {
-					continue joinedLoop
+					continue properNounLoop
 				}
 				data := tokenizer.NewTokenData(tokens[j])
 				for _, cond := range c.Conditions {
 					switch cond.Type {
 					case ConvertTypeFeatures:
 						if !equalsFeatures(data.Features, cond.Value) {
-							continue joinedLoop
+							continue properNounLoop
 						}
 					case ConvertTypeSurface:
 						if data.Surface != cond.Value[0] {
-							continue joinedLoop
+							continue properNounLoop
 						}
 					case ConvertTypeReading:
 						if data.Reading != cond.Value[0] {
-							continue joinedLoop
+							continue properNounLoop
 						}
 					}
 				}
