@@ -30,8 +30,8 @@ func TestConvert(t *testing.T) {
 		},
 		{
 			desc:    "正常系: 名詞の手前には「お」をお付けいたしますわ",
-			src:     "バイオ",
-			want:    "おバイオ",
+			src:     "寿司",
+			want:    "お寿司",
 			opt:     nil,
 			wantErr: false,
 		},
