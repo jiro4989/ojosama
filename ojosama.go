@@ -11,9 +11,10 @@ import (
 type ConvertOption struct{}
 
 type Converter struct {
-	Conditions            []ConvertCondition
-	AfterIgnoreConditions []ConvertCondition // 次のTokenで条件にマッチした場合は無視する
-	Value                 string
+	Conditions                   []ConvertCondition
+	AfterIgnoreConditions        []ConvertCondition // 次のTokenで条件にマッチした場合は無視する
+	EnableWhenSentenceSeparation bool               // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
+	Value                        string
 }
 
 type ConvertType int
@@ -209,7 +210,8 @@ var (
 					Value: []string{"する"},
 				},
 			},
-			Value: "いたしますわ",
+			EnableWhenSentenceSeparation: true,
+			Value:                        "いたしますわ",
 		},
 		{
 			Conditions: []ConvertCondition{
@@ -477,6 +479,18 @@ converterLoop:
 			}
 		}
 
+		// 文の区切りか、文の終わりの時だけ有効にする。
+		if c.EnableWhenSentenceSeparation {
+			if i+1 < len(tokens) {
+				// 次のトークンが区切りではない場合は変換しない
+				data := tokenizer.NewTokenData(tokens[i+1])
+				if !isSentenceSeparation(data) {
+					break
+				}
+			}
+			// 次のトークンが存在しない場合は文の終わりなので変換する
+		}
+
 		return c.Value
 	}
 	return surface
@@ -520,4 +534,9 @@ func equalsFeatures(a, b []string) bool {
 	}
 
 	return true
+}
+
+func isSentenceSeparation(data tokenizer.TokenData) bool {
+	return equalsFeatures(data.Features, []string{"記号", "句点"}) ||
+		equalsFeatures(data.Features, []string{"記号", "読点"})
 }

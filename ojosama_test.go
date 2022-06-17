@@ -147,6 +147,20 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 文の途中の「する」の場合は変換しませんわ",
+			src:     "テキストファイルをまるごと変換する場合は、以下のように実行します。",
+			want:    "おテキストファイルをまるごと変換する場合は、以下のように実行しますわ。",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: 文の途中の「する」の場合は変換しませんわ",
+			src:     "以下のお嬢様を可能な限り再現するアルゴリズムを目指してます。",
+			want:    "以下のお嬢様を可能な限り再現するおアルゴリズムを目指してますわ。",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
