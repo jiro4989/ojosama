@@ -123,6 +123,7 @@ $ ojosama -t これはハーブです | ojosama
 
 * Go 1.18.2
 * Ubuntu 22.04 on Docker
+* make (なくてもいい)
 
 === ビルド
 
