@@ -141,7 +141,7 @@ func TestConvert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			desc:    "正常系: サロメお嬢様は一単語ですわ",
+			desc:    "正常系: サロメお嬢様は固有名詞ですわ",
 			src:     "わたしは壱百満天原サロメです",
 			want:    "わたくしは壱百満天原サロメですわ",
 			opt:     nil,
