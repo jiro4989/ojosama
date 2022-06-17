@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -8,6 +9,9 @@ import (
 )
 
 const (
+	version  = "dev"
+	revision = "dev"
+
 	exitStatusOK = iota
 	exitStatusCLIError
 	exitStatusConvertError
@@ -20,6 +24,12 @@ func main() {
 	if err != nil {
 		Err(err)
 		os.Exit(exitStatusCLIError)
+	}
+
+	if args.Version {
+		msg := fmt.Sprintf("ojosama %s (%s)", version, revision)
+		fmt.Println(msg)
+		os.Exit(exitStatusOK)
 	}
 
 	if args.Text != "" {
