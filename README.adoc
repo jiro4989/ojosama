@@ -48,6 +48,16 @@ image:./docs/demo.gif[]
 
 == 使い方
 
+=== Web
+
+Web版提供してます。特にツールのインストールは不要です。
+
+* https://ojosama.herokuapp.com
+
+Web版のソースコードは以下です。
+
+* https://github.com/jiro4989/ojosama-web
+
 === コマンド
 
 ワンライナーでテキストを変換する場合は、以下のように実行します。
