@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/jiro4989/ojosama"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 const (
@@ -45,7 +47,13 @@ func main() {
 	}
 
 	if len(args.Args) < 1 {
-		b, err := io.ReadAll(os.Stdin)
+		// SJIS指定の時だけSJISとして読み込む
+		var r io.Reader = os.Stdin
+		if args.CharCode == "sjis" {
+			r = transform.NewReader(os.Stdin, japanese.ShiftJIS.NewDecoder())
+		}
+
+		b, err := io.ReadAll(r)
 		if err != nil {
 			Err(err)
 			os.Exit(exitStatusInputFileError)
@@ -61,10 +69,17 @@ func main() {
 	}
 
 	for _, f := range args.Args {
-		r, err := os.Open(f)
+		f, err := os.Open(f)
 		if err != nil {
 			Err(err)
 			os.Exit(exitStatusOutputError)
+		}
+		defer f.Close()
+
+		// SJIS指定の時だけSJISとして読み込む
+		var r io.Reader = f
+		if args.CharCode == "sjis" {
+			r = transform.NewReader(f, japanese.ShiftJIS.NewDecoder())
 		}
 
 		b, err := io.ReadAll(r)
