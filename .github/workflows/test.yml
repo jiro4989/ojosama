@@ -14,6 +14,9 @@ name: test
       - README*
       - LICENSE
 
+env:
+  goversion: '1.18'
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -31,12 +34,28 @@ jobs:
       - run: go install
       - run: go test -cover ./...
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.goversion }}
+      - name: Check code format
+        run: |
+          go mod download
+          count="$(go fmt ./... | wc -l)"
+          if [[ "$count" -ne 0 ]]; then
+            echo "[ERR] please run 'go fmt ./...'" >&2
+            exit 1
+          fi
+
   coverage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.18'
+          go-version: ${{ env.goversion }}
       - run: go test -coverprofile=coverage.out ./...
       - uses: codecov/codecov-action@v3
