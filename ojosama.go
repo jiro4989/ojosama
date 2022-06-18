@@ -22,6 +22,7 @@ type forceAppendLongNote struct {
 
 type Converter struct {
 	Conditions                   []ConvertCondition
+	BeforeIgnoreConditions       []ConvertCondition // 前のTokenで条件にマッチした場合は無視する
 	AfterIgnoreConditions        []ConvertCondition // 次のTokenで条件にマッチした場合は無視する
 	EnableWhenSentenceSeparation bool               // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
 	AppendLongNote               bool               // 波線を追加する
@@ -688,6 +689,12 @@ var (
 					Value: []string{"ない"},
 				},
 			},
+			BeforeIgnoreConditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"動詞", "自立"},
+				},
+			},
 			Value: "ありません",
 		},
 		{
@@ -962,7 +969,28 @@ converterLoop:
 			}
 		}
 
-		// 除外条件
+		// 前に続く単語をみて変換を無視する
+		for _, cond := range c.BeforeIgnoreConditions {
+			if 0 < i {
+				data := tokenizer.NewTokenData(tokens[i-1])
+				switch cond.Type {
+				case ConvertTypeFeatures:
+					if equalsFeatures(data.Features, cond.Value) {
+						break converterLoop
+					}
+				case ConvertTypeSurface:
+					if data.Surface == cond.Value[0] {
+						break converterLoop
+					}
+				case ConvertTypeReading:
+					if data.Reading == cond.Value[0] {
+						break converterLoop
+					}
+				}
+			}
+		}
+
+		// 次に続く単語をみて変換を無視する
 		for _, cond := range c.AfterIgnoreConditions {
 			if i+1 < len(tokens) {
 				data := tokenizer.NewTokenData(tokens[i+1])
