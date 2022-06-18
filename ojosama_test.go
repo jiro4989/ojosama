@@ -147,6 +147,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: すでに直前に「お」が付与されている場合は、「お」を付与しませんわ",
+			src:     "お寿司。おハーブ",
+			want:    "お寿司。おハーブ",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

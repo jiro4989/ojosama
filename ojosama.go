@@ -538,6 +538,13 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 
 		// 名詞 一般が連続する場合は最初の1つ目にだけ「お」を付ける
 		if !nounKeep {
+			// 1つ手前にすでに「お」が付いている場合は付与しない
+			if 0 < i {
+				data := tokenizer.NewTokenData(tokens[i-1])
+				if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
+					return surface, false
+				}
+			}
 			return "お" + surface, true
 		}
 	}
