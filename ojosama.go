@@ -293,31 +293,34 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 		containsString([]string{"！", "!", "？", "?"}, data.Surface)
 }
 
+// appendLongNote は次の token が感嘆符か疑問符の場合に波線、感嘆符、疑問符をランダムに追加する。
 func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) string {
 	if i+1 < len(tokens) {
 		data := tokenizer.NewTokenData(tokens[i+1])
 		for _, s := range []string{"！", "？"} {
-			if data.Surface == s {
-				var (
-					w, e int
-				)
-				if opt != nil && opt.forceAppendLongNote.enable {
-					w = opt.forceAppendLongNote.wavyLineCount
-					e = opt.forceAppendLongNote.exclamationMarkCount
-				} else {
-					w = rand.Intn(3)
-					e = rand.Intn(3)
-				}
-				var suffix strings.Builder
-				for i := 0; i < w; i++ {
-					suffix.WriteString("～")
-				}
-				for i := 0; i < e-1; i++ {
-					suffix.WriteString(s)
-				}
-				src += suffix.String()
-				break
+			if data.Surface != s {
+				continue
 			}
+
+			var (
+				w, e int
+			)
+			if opt != nil && opt.forceAppendLongNote.enable {
+				w = opt.forceAppendLongNote.wavyLineCount
+				e = opt.forceAppendLongNote.exclamationMarkCount
+			} else {
+				w = rand.Intn(3)
+				e = rand.Intn(3)
+			}
+			var suffix strings.Builder
+			for i := 0; i < w; i++ {
+				suffix.WriteString("～")
+			}
+			for i := 0; i < e-1; i++ {
+				suffix.WriteString(s)
+			}
+			src += suffix.String()
+			break
 		}
 	}
 	return src
