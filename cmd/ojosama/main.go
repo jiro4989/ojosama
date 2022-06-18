@@ -10,10 +10,14 @@ import (
 	"golang.org/x/text/transform"
 )
 
-const (
+// CIでビルド時に値を埋め込む。
+// 埋め込む値の設定は .goreleaser.yaml を参照。
+var (
 	version  = "dev"
 	revision = "dev"
+)
 
+const (
 	exitStatusOK = iota
 	exitStatusCLIError
 	exitStatusConvertError

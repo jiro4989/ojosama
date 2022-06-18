@@ -10,7 +10,7 @@ builds:
       - windows
       - darwin
     ldflags:
-      - -w -s -X github.com/jiro4989/ojosama/cmd/ojosama.version={{.Version}} -X github.com/jiro4989/ojosama/cmd/ojosama.appRevision={{.ShortCommit}}
+      - -w -s -X main.version={{.Version}} -X main.revision={{.ShortCommit}}
 
 archives:
   - replacements:
