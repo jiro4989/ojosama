@@ -635,6 +635,12 @@ var (
 					Value: []string{"まし"},
 				},
 			},
+			BeforeIgnoreConditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"動詞", "自立"},
+				},
+			},
 			Value: "おりまし",
 		},
 		{
