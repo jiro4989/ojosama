@@ -104,19 +104,8 @@ func convertMulti(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, 
 				}
 				data := tokenizer.NewTokenData(tokens[j])
 				for _, cond := range c.Conditions {
-					switch cond.Type {
-					case ConvertTypeFeatures:
-						if !equalsFeatures(data.Features, cond.Value) {
-							continue properNounLoop
-						}
-					case ConvertTypeSurface:
-						if data.Surface != cond.Value[0] {
-							continue properNounLoop
-						}
-					case ConvertTypeReading:
-						if data.Reading != cond.Value[0] {
-							continue properNounLoop
-						}
+					if cond.notEqualsTokenData(data) {
+						continue properNounLoop
 					}
 				}
 				j++
@@ -138,19 +127,8 @@ func matchExcludeRule(data tokenizer.TokenData) bool {
 excludeLoop:
 	for _, c := range excludeRules {
 		for _, cond := range c.Conditions {
-			switch cond.Type {
-			case ConvertTypeFeatures:
-				if !equalsFeatures(data.Features, cond.Value) {
-					continue excludeLoop
-				}
-			case ConvertTypeSurface:
-				if data.Surface != cond.Value[0] {
-					continue excludeLoop
-				}
-			case ConvertTypeReading:
-				if data.Reading != cond.Value[0] {
-					continue excludeLoop
-				}
+			if cond.notEqualsTokenData(data) {
+				continue excludeLoop
 			}
 		}
 		return true
@@ -162,19 +140,8 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 converterLoop:
 	for _, c := range convertRules {
 		for _, cond := range c.Conditions {
-			switch cond.Type {
-			case ConvertTypeFeatures:
-				if !equalsFeatures(data.Features, cond.Value) {
-					continue converterLoop
-				}
-			case ConvertTypeSurface:
-				if data.Surface != cond.Value[0] {
-					continue converterLoop
-				}
-			case ConvertTypeReading:
-				if data.Reading != cond.Value[0] {
-					continue converterLoop
-				}
+			if cond.notEqualsTokenData(data) {
+				continue converterLoop
 			}
 		}
 
@@ -182,19 +149,8 @@ converterLoop:
 		for _, cond := range c.BeforeIgnoreConditions {
 			if 0 < i {
 				data := tokenizer.NewTokenData(tokens[i-1])
-				switch cond.Type {
-				case ConvertTypeFeatures:
-					if equalsFeatures(data.Features, cond.Value) {
-						break converterLoop
-					}
-				case ConvertTypeSurface:
-					if data.Surface == cond.Value[0] {
-						break converterLoop
-					}
-				case ConvertTypeReading:
-					if data.Reading == cond.Value[0] {
-						break converterLoop
-					}
+				if cond.equalsTokenData(data) {
+					break converterLoop
 				}
 			}
 		}
@@ -203,19 +159,8 @@ converterLoop:
 		for _, cond := range c.AfterIgnoreConditions {
 			if i+1 < len(tokens) {
 				data := tokenizer.NewTokenData(tokens[i+1])
-				switch cond.Type {
-				case ConvertTypeFeatures:
-					if equalsFeatures(data.Features, cond.Value) {
-						break converterLoop
-					}
-				case ConvertTypeSurface:
-					if data.Surface == cond.Value[0] {
-						break converterLoop
-					}
-				case ConvertTypeReading:
-					if data.Reading == cond.Value[0] {
-						break converterLoop
-					}
+				if cond.equalsTokenData(data) {
+					break converterLoop
 				}
 			}
 		}
@@ -293,31 +238,43 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 		containsString([]string{"！", "!", "？", "?"}, data.Surface)
 }
 
+// appendLongNote は次の token が感嘆符か疑問符の場合に波線、感嘆符、疑問符をランダムに追加する。
+//
+// 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与でき
+// るようにしている。
 func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) string {
 	if i+1 < len(tokens) {
 		data := tokenizer.NewTokenData(tokens[i+1])
 		for _, s := range []string{"！", "？"} {
-			if data.Surface == s {
-				var (
-					w, e int
-				)
-				if opt != nil && opt.forceAppendLongNote.enable {
-					w = opt.forceAppendLongNote.wavyLineCount
-					e = opt.forceAppendLongNote.exclamationMarkCount
-				} else {
-					w = rand.Intn(3)
-					e = rand.Intn(3)
-				}
-				var suffix strings.Builder
-				for i := 0; i < w; i++ {
-					suffix.WriteString("～")
-				}
-				for i := 0; i < e-1; i++ {
-					suffix.WriteString(s)
-				}
-				src += suffix.String()
-				break
+			if data.Surface != s {
+				continue
 			}
+
+			var (
+				w, e int
+			)
+			if opt != nil && opt.forceAppendLongNote.enable {
+				// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
+				w = opt.forceAppendLongNote.wavyLineCount
+				e = opt.forceAppendLongNote.exclamationMarkCount
+			} else {
+				w = rand.Intn(3)
+				e = rand.Intn(3)
+			}
+
+			var suffix strings.Builder
+			for i := 0; i < w; i++ {
+				suffix.WriteString("～")
+			}
+
+			// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しるため
+			// -1 して数を調整している。
+			for i := 0; i < e-1; i++ {
+				suffix.WriteString(s)
+			}
+
+			src += suffix.String()
+			break
 		}
 	}
 	return src
