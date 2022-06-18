@@ -549,6 +549,19 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "終助詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"な"},
+				},
+			},
+			Value: "ね",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"助詞", "接続助詞"},
 				},
 				{
@@ -557,6 +570,19 @@ var (
 				},
 			},
 			Value: "ので",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "接続助詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"し"},
+				},
+			},
+			Value: "ですし",
 		},
 		{
 			Conditions: []ConvertCondition{
@@ -804,6 +830,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		// 例: プレイする
 		buf, nounKeep = appendPrefix(data, tokens, i, buf, nounKeep)
 
+		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
+		buf = appendPoliteWord(data, tokens, i, buf)
+
 		result.WriteString(buf)
 	}
 	return result.String(), nil
@@ -961,6 +990,25 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 		}
 	}
 	return surface, false
+}
+
+// 丁寧語を差し込む
+func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
+	if equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
+		if i+1 < len(tokens) {
+			// 文の区切りのタイミングでは「ですわ」を差し込む
+			data := tokenizer.NewTokenData(tokens[i+1])
+			if isSentenceSeparation(data) {
+				return surface + "ですわ"
+			}
+
+			// // 次の単語が助動詞（です）出ない場合は「です」を差し込む
+			// if !equalsFeatures(data.Features, []string{"助動詞"}) {
+			// 	return surface + "です"
+			// }
+		}
+	}
+	return surface
 }
 
 func equalsFeatures(a, b []string) bool {
