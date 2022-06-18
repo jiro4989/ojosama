@@ -232,42 +232,6 @@ func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int,
 	return surface
 }
 
-func (c *ConvertCondition) equalsTokenData(data tokenizer.TokenData) bool {
-	switch c.Type {
-	case ConvertTypeFeatures:
-		if equalsFeatures(data.Features, c.Value) {
-			return true
-		}
-	case ConvertTypeSurface:
-		if data.Surface == c.Value[0] {
-			return true
-		}
-	case ConvertTypeReading:
-		if data.Reading == c.Value[0] {
-			return true
-		}
-	}
-	return false
-}
-
-func (c *ConvertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
-	switch c.Type {
-	case ConvertTypeFeatures:
-		if !equalsFeatures(data.Features, c.Value) {
-			return true
-		}
-	case ConvertTypeSurface:
-		if data.Surface != c.Value[0] {
-			return true
-		}
-	case ConvertTypeReading:
-		if data.Reading != c.Value[0] {
-			return true
-		}
-	}
-	return false
-}
-
 // isSentenceSeparation は data が文の区切りに使われる token かどうかを判定する。
 func isSentenceSeparation(data tokenizer.TokenData) bool {
 	return containsFeatures([][]string{{"記号", "句点"}, {"記号", "読点"}}, data.Features) ||

@@ -1,5 +1,7 @@
 package ojosama
 
+import "github.com/ikawaha/kagome/v2/tokenizer"
+
 type Converter struct {
 	Conditions                   []ConvertCondition
 	BeforeIgnoreConditions       []ConvertCondition // 前のTokenで条件にマッチした場合は無視する
@@ -854,3 +856,39 @@ var (
 		},
 	}
 )
+
+func (c *ConvertCondition) equalsTokenData(data tokenizer.TokenData) bool {
+	switch c.Type {
+	case ConvertTypeFeatures:
+		if equalsFeatures(data.Features, c.Value) {
+			return true
+		}
+	case ConvertTypeSurface:
+		if data.Surface == c.Value[0] {
+			return true
+		}
+	case ConvertTypeReading:
+		if data.Reading == c.Value[0] {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *ConvertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
+	switch c.Type {
+	case ConvertTypeFeatures:
+		if !equalsFeatures(data.Features, c.Value) {
+			return true
+		}
+	case ConvertTypeSurface:
+		if data.Surface != c.Value[0] {
+			return true
+		}
+	case ConvertTypeReading:
+		if data.Reading != c.Value[0] {
+			return true
+		}
+	}
+	return false
+}
