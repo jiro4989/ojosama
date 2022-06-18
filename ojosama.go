@@ -669,6 +669,7 @@ var (
 				},
 			},
 			EnableWhenSentenceSeparation: true,
+			AppendLongNote:               true,
 			Value:                        "たわ",
 		},
 		{

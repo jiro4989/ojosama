@@ -217,10 +217,16 @@ func TestConvert(t *testing.T) {
 		},
 
 		{
-			desc:    "正常系: ありましたはありましたのままですわ",
-			src:     "ハーブがありました",
-			want:    "おハーブがありましたわ",
-			opt:     nil,
+			desc: "正常系: ありましたはありましたのままですわ",
+			src:  "ハーブがありました！",
+			want: "おハーブがありましたわ～～！！！",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
 			wantErr: false,
 		},
 
