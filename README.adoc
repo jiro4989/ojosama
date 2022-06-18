@@ -130,7 +130,7 @@ $ go install github.com/jiro4989/ojosama/cmd/ojosama@latest
 
 == 既知のバグ
 
-変換済みの単語を更に変換すると変になります。
+変換済みの文を更に変換すると変になります。
 
 [source,bash]
 ----
