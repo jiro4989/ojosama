@@ -1,7 +1,8 @@
 bin/ojosama: go.* *.go cmd/*
 	make test
-	mkdir -p bin
+	go vet .
 	go fmt .
+	mkdir -p bin
 	go build -o bin/ojosama ./cmd/ojosama
 
 .PHONY: test
