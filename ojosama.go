@@ -182,19 +182,8 @@ converterLoop:
 		for _, cond := range c.BeforeIgnoreConditions {
 			if 0 < i {
 				data := tokenizer.NewTokenData(tokens[i-1])
-				switch cond.Type {
-				case ConvertTypeFeatures:
-					if equalsFeatures(data.Features, cond.Value) {
-						break converterLoop
-					}
-				case ConvertTypeSurface:
-					if data.Surface == cond.Value[0] {
-						break converterLoop
-					}
-				case ConvertTypeReading:
-					if data.Reading == cond.Value[0] {
-						break converterLoop
-					}
+				if cond.equalsTokenData(data) {
+					break converterLoop
 				}
 			}
 		}
@@ -203,19 +192,8 @@ converterLoop:
 		for _, cond := range c.AfterIgnoreConditions {
 			if i+1 < len(tokens) {
 				data := tokenizer.NewTokenData(tokens[i+1])
-				switch cond.Type {
-				case ConvertTypeFeatures:
-					if equalsFeatures(data.Features, cond.Value) {
-						break converterLoop
-					}
-				case ConvertTypeSurface:
-					if data.Surface == cond.Value[0] {
-						break converterLoop
-					}
-				case ConvertTypeReading:
-					if data.Reading == cond.Value[0] {
-						break converterLoop
-					}
+				if cond.equalsTokenData(data) {
+					break converterLoop
 				}
 			}
 		}
@@ -285,6 +263,24 @@ func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int,
 		}
 	}
 	return surface
+}
+
+func (c *ConvertCondition) equalsTokenData(data tokenizer.TokenData) bool {
+	switch c.Type {
+	case ConvertTypeFeatures:
+		if equalsFeatures(data.Features, c.Value) {
+			return true
+		}
+	case ConvertTypeSurface:
+		if data.Surface == c.Value[0] {
+			return true
+		}
+	case ConvertTypeReading:
+		if data.Reading == c.Value[0] {
+			return true
+		}
+	}
+	return false
 }
 
 // isSentenceSeparation は data が文の区切りに使われる token かどうかを判定する。
