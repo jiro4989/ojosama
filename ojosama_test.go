@@ -299,6 +299,27 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+    {
+      desc:    "正常系: お嬢様らしく短く笑いますわ",
+      src:     "うふふ",
+      want:    "おほほ",
+      opt:     nil,
+      wantErr: false,
+    },
+    {
+      desc:    "正常系: お嬢様らしくそこそこ笑いますわ",
+      src:     "うふふふふ",
+      want:    "おほほほほ",
+      opt:     nil,
+      wantErr: false,
+    },
+    {
+      desc:    "正常系: お嬢様らしく長く笑いますわ",
+      src:     "うふふふふふ",
+      want:    "おほほほほほ",
+      opt:     nil,
+      wantErr: false,
+    },
 	}
 
 	for _, tt := range tests {
