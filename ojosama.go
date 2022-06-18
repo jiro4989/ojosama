@@ -834,58 +834,58 @@ var (
 			},
 			Value: "くっせぇ",
 		},
-    {
-      Conditions: []ConvertCondition{
-        {
-          Type: ConvertTypeFeatures,
-          Value: []string{"感動詞"},
-        },
-        {
-          Type: ConvertTypeSurface,
-          Value: []string{"うふ"},
-        },
-      },
-      Value: "おほ",
-    },
-    {
-      Conditions: []ConvertCondition{
-        {
-          Type: ConvertTypeFeatures,
-          Value: []string{"感動詞"},
-        },
-        {
-          Type: ConvertTypeSurface,
-          Value: []string{"うふふ"},
-        },
-      },
-      Value: "おほほ",
-    },
-    {
-      Conditions: []ConvertCondition{
-        {
-          Type: ConvertTypeFeatures,
-          Value: []string{"感動詞"},
-        },
-        {
-          Type: ConvertTypeSurface,
-          Value: []string{"う"},
-        },
-      },
-      Value: "お",
-    },
-    {
-      Conditions: []ConvertCondition{
-        {
-          Type: ConvertTypeFeatures,
-          Value: []string{"感動詞"},
-        },
-        {
-          Type: ConvertTypeSurface,
-          Value: []string{"ふふふ"},
-        },
-      },
-      Value: "ほほほ",
-    },
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"感動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"うふ"},
+				},
+			},
+			Value: "おほ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"感動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"うふふ"},
+				},
+			},
+			Value: "おほほ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"感動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"う"},
+				},
+			},
+			Value: "お",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"感動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"ふふふ"},
+				},
+			},
+			Value: "ほほほ",
+		},
 	}
 )
 
