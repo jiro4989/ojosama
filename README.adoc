@@ -65,6 +65,14 @@ $ ojosama -t ハーブがありました！
 $ ojosama README.adoc
 ----
 
+ファイルの文字コードを指定する場合は `-charcode` オプションを指定します。
+現状 `sjis` と `utf8` のみサポートしています。（デフォルトでは `utf8`）
+
+[source,bash]
+----
+$ ojosama -charcode sjis testdata/sample1_sjis.txt
+----
+
 === ライブラリ
 
 Goのコードとして使う場合は以下のように使用します。
