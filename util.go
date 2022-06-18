@@ -30,10 +30,12 @@ func equalsFeatures(a, b []string) bool {
 	return true
 }
 
-// equalsAnyFeatures は a が b のどれか1つと一致する時 true を返す。
-func equalsAnyFeatures(a []string, b [][]string) bool {
-	for _, b2 := range b {
-		if equalsFeatures(a, b2) {
+// containsFeatures は a の中に b が含まれるかを判定する。
+//
+// features用。
+func containsFeatures(a [][]string, b []string) bool {
+	for _, a2 := range a {
+		if equalsFeatures(b, a2) {
 			return true
 		}
 	}

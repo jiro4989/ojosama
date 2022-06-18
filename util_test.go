@@ -42,30 +42,30 @@ func TestEqualsFeatures(t *testing.T) {
 	}
 }
 
-func TestEqualsAnyFeatures(t *testing.T) {
+func TestContainsFeatures(t *testing.T) {
 	tests := []struct {
 		desc string
-		a    []string
-		b    [][]string
+		a    [][]string
+		b    []string
 		want bool
 	}{
 		{
 			desc: "正常系: どれか1つと一致すればOKですわ",
-			a:    []string{"名詞", "一般", "*", "*", "*"},
-			b: [][]string{
+			a: [][]string{
 				{"名詞", "代名詞"},
 				{"名詞", "一般"},
 				{"名詞", "固有名詞"},
 			},
+			b:    []string{"名詞", "一般", "*", "*", "*"},
 			want: true,
 		},
 		{
 			desc: "正常系: 1つも一致しなければfalseですわ",
-			a:    []string{"名詞", "一般", "*", "*", "*"},
-			b: [][]string{
+			a: [][]string{
 				{"名詞", "代名詞"},
 				{"名詞", "固有名詞"},
 			},
+			b:    []string{"名詞", "一般", "*", "*", "*"},
 			want: false,
 		},
 	}
@@ -74,7 +74,7 @@ func TestEqualsAnyFeatures(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			assert := assert.New(t)
 
-			got := equalsAnyFeatures(tt.a, tt.b)
+			got := containsFeatures(tt.a, tt.b)
 			assert.Equal(tt.want, got)
 		})
 	}
