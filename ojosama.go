@@ -22,6 +22,7 @@ type forceAppendLongNote struct {
 
 type Converter struct {
 	Conditions                   []ConvertCondition
+	NextTokenCondition           []ConvertCondition // 次のTokenで条件にマッチした場合だけ変換する
 	AfterIgnoreConditions        []ConvertCondition // 次のTokenで条件にマッチした場合は無視する
 	EnableWhenSentenceSeparation bool               // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
 	AppendLongNote               bool               // 波線を追加する
@@ -426,6 +427,19 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "非自立", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"もん"},
+				},
+			},
+			Value: "もの",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
@@ -442,6 +456,25 @@ var (
 			AppendLongNote: true,
 			Value:          "ですわ",
 		},
+		// {
+		// 	Conditions: []ConvertCondition{
+		// 		{
+		// 			Type:  ConvertTypeFeatures,
+		// 			Value: []string{"助動詞"},
+		// 		},
+		// 		{
+		// 			Type:  ConvertTypeSurface,
+		// 			Value: []string{"だ"},
+		// 		},
+		// 	},
+		// 	NextTokenCondition: []ConvertCondition{
+		// 		{
+		// 			Type:  ConvertTypeFeatures,
+		// 			Value: []string{"助詞", "接続助詞"},
+		// 		},
+		// 	},
+		// 	Value: "です",
+		// },
 		{
 			Conditions: []ConvertCondition{
 				{
@@ -562,6 +595,19 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "終助詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"さ"},
+				},
+			},
+			Value: "",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"助詞", "接続助詞"},
 				},
 				{
@@ -570,6 +616,19 @@ var (
 				},
 			},
 			Value: "ので",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "接続助詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"けど"},
+				},
+			},
+			Value: "けれど",
 		},
 		{
 			Conditions: []ConvertCondition{
@@ -943,6 +1002,27 @@ converterLoop:
 				}
 			}
 		}
+
+		// // 次のトークンが条件を満たさないと変換しない
+		// for _, cond := range c.NextTokenCondition {
+		// 	if i+1 < len(tokens) {
+		// 		data := tokenizer.NewTokenData(tokens[i+1])
+		// 		switch cond.Type {
+		// 		case ConvertTypeFeatures:
+		// 			if !equalsFeatures(data.Features, cond.Value) {
+		// 				break converterLoop
+		// 			}
+		// 		case ConvertTypeSurface:
+		// 			if data.Surface != cond.Value[0] {
+		// 				break converterLoop
+		// 			}
+		// 		case ConvertTypeReading:
+		// 			if data.Reading != cond.Value[0] {
+		// 				break converterLoop
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		// 文の区切りか、文の終わりの時だけ有効にする。
 		if c.EnableWhenSentenceSeparation {
