@@ -2,6 +2,9 @@
 :toc: left
 :sectnums:
 
+image:https://github.com/jiro4989/ojosama/workflows/test/badge.svg[test, link=https://github.com/jiro4989/ojosama/actions]
+image:https://codecov.io/gh/jiro4989/ojosama/branch/main/graph/badge.svg[codecov, link=https://codecov.io/gh/jiro4989/ojosama]
+
 テキストを壱百満天原サロメお嬢様風の口調に変換して出力します。
 
 image:./docs/demo.gif[]
