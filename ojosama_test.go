@@ -207,6 +207,15 @@ func TestConvert(t *testing.T) {
 			},
 			wantErr: false,
 		},
+
+		// 一人称のテスト
+		{
+			desc:    "正常系: 一人称はすべて「私」に変換いたしますわ",
+			src:     "俺は。オレは。おれは。僕は。ボクは。ぼくは。あたしは。わたしは。",
+			want:    "私は。ワタクシは。わたくしは。私は。ワタクシは。わたくしは。わたくしは。わたくしは。",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

@@ -204,6 +204,97 @@ var (
 				},
 				{
 					Type:  ConvertTypeSurface,
+					Value: []string{"俺"},
+				},
+			},
+			Value: "私",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"オレ"},
+				},
+			},
+			Value: "ワタクシ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"おれ"},
+				},
+			},
+			Value: "わたくし",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"僕"},
+				},
+			},
+			Value: "私",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"ボク"},
+				},
+			},
+			Value: "ワタクシ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"ぼく"},
+				},
+			},
+			Value: "わたくし",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"あたし"},
+				},
+			},
+			Value: "わたくし",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  ConvertTypeSurface,
 					Value: []string{"わたし"},
 				},
 			},
