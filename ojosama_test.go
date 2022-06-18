@@ -208,12 +208,56 @@ func TestConvert(t *testing.T) {
 			wantErr: false,
 		},
 
-		// 一人称のテスト
 		{
 			desc:    "正常系: 一人称はすべて「私」に変換いたしますわ",
 			src:     "俺は。オレは。おれは。僕は。ボクは。ぼくは。あたしは。わたしは。",
 			want:    "私は。ワタクシは。わたくしは。私は。ワタクシは。わたくしは。わたくしは。わたくしは。",
 			opt:     nil,
+			wantErr: false,
+		},
+
+		// FIXME: 話しますわね、にしたいけれど「話す」で1単語と判定されているの
+		// で変換が難しい
+		{
+			desc: "正常系: 小説の一文をテストしますわ",
+			src:  "俺の体験した怖い話、聞いてくれるか？ありがとう。じゃぁ、話すよ。",
+			want: "私の体験した怖い話、聞いてくれますの？ありがとうございますわ。それでは、話すよ。",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
+			wantErr: false,
+		},
+
+		{
+			desc: "正常系: 小説の一文をテストしますわ",
+			src:  "俺の転職前の会社の頃の話だから、もう3年も前の話になる。",
+			want: "私の転職前のお会社の頃の話ですので、もう3年も前の話になりますわ。",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
+			wantErr: false,
+		},
+
+		// FIXME: 横断お歩道になってしまう
+		{
+			desc: "正常系: 小説の一文をテストしますわ",
+			src:  "通勤時に通る横断歩道の話なんだ。よくあるだろ、事故が多い横断歩道の話だよ。",
+			want: "通勤時に通る横断お歩道の話なんですの。よくありますでしょう、お事故が多い横断お歩道の話ですわ。",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
 			wantErr: false,
 		},
 	}

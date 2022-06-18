@@ -121,6 +121,7 @@ var (
 				},
 			},
 		},
+
 		{
 			Value:          "いたしますわ",
 			AppendLongNote: true,
@@ -147,6 +148,114 @@ var (
 							{
 								Type:  ConvertTypeSurface,
 								Value: []string{"ます"},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			Value: "ですので",
+			Conditions: [][]Converter{
+				{
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"助動詞"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"だ"},
+							},
+						},
+					},
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"助詞", "接続助詞"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"から"},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			Value: "なんですの",
+			Conditions: [][]Converter{
+				{
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"助動詞"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"な"},
+							},
+						},
+					},
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"名詞", "非自立", "一般"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"ん"},
+							},
+						},
+					},
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"助動詞"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"だ"},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			Value: "ですわ",
+			Conditions: [][]Converter{
+				{
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"助動詞"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"だ"},
+							},
+						},
+					},
+					{
+						Conditions: []ConvertCondition{
+							{
+								Type:  ConvertTypeFeatures,
+								Value: []string{"助詞", "終助詞"},
+							},
+							{
+								Type:  ConvertTypeSurface,
+								Value: []string{"よ"},
 							},
 						},
 					},
@@ -352,6 +461,34 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"動詞", "自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"なる"},
+				},
+			},
+			EnableWhenSentenceSeparation: true,
+			AppendLongNote:               true,
+			Value:                        "なりますわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"動詞", "自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"ある"},
+				},
+			},
+			Value: "あります",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
 				},
 				{
@@ -413,7 +550,21 @@ var (
 					Value: []string{"た"},
 				},
 			},
-			Value: "たわ",
+			EnableWhenSentenceSeparation: true,
+			Value:                        "たわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"だろ"},
+				},
+			},
+			Value: "でしょう",
 		},
 		{
 			Conditions: []ConvertCondition{
@@ -427,6 +578,58 @@ var (
 				},
 			},
 			Value: "くださいまし",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"感動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"ありがとう"},
+				},
+			},
+			Value: "ありがとうございますわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"感動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"じゃぁ"},
+				},
+			},
+			Value: "それでは",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"感動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"じゃあ"},
+				},
+			},
+			Value: "それでは",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"動詞", "非自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"くれる"},
+				},
+			},
+			Value: "くれます",
 		},
 		{
 			Conditions: []ConvertCondition{
