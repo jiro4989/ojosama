@@ -301,6 +301,13 @@ func TestConvert(t *testing.T) {
 		},
     {
       desc:    "正常系: お嬢様らしく短く笑いますわ",
+      src:     "うふ",
+      want:    "おほ",
+      opt:     nil,
+      wantErr: false,
+    },
+    {
+      desc:    "正常系: お嬢様らしく笑いますわ",
       src:     "うふふ",
       want:    "おほほ",
       opt:     nil,
@@ -317,6 +324,13 @@ func TestConvert(t *testing.T) {
       desc:    "正常系: お嬢様らしく長く笑いますわ",
       src:     "うふふふふふ",
       want:    "おほほほほほ",
+      opt:     nil,
+      wantErr: false,
+    },
+    {
+      desc:    "正常系: 切れ目があってもお嬢様らしく笑いますわ",
+      src:     "うふうふふふふふふふふ",
+      want:    "おほおほほほほほほほほ",
       opt:     nil,
       wantErr: false,
     },
