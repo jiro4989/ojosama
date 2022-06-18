@@ -113,8 +113,8 @@ $ go install github.com/jiro4989/ojosama/cmd/ojosama@latest
 
 [source,bash]
 ----
-$ ojosama -t これはハーブです | ojosama
-これはおおハーブですわですわ
+$ ojosama -t お願いします | ojosama
+お願いいたしますわですわ
 ----
 
 == 開発者向け
