@@ -256,18 +256,6 @@ var (
 				},
 			},
 		},
-		{
-			Conditions: []ConvertCondition{
-				{
-					Type:  ConvertTypeFeatures,
-					Value: []string{"名詞", "一般"},
-				},
-				{
-					Type:  ConvertTypeSurface,
-					Value: []string{"お嬢様"},
-				},
-			},
-		},
 	}
 
 	convertRules = []Converter{
