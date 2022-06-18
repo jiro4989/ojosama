@@ -311,6 +311,19 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"動詞", "非自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"ください"},
+				},
+			},
+			Value: "くださいまし",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"形容詞", "自立"},
 				},
 				{
