@@ -446,6 +446,26 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"助動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"だ"},
+				},
+			},
+			AfterIgnoreConditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
+				},
+			},
+			AppendLongNote: true,
+			Value:          "ですわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"動詞", "自立"},
 				},
 				{
@@ -489,6 +509,19 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "副助詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"じゃ"},
+				},
+			},
+			Value: "では",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
 				},
 				{
@@ -511,6 +544,19 @@ var (
 			},
 			AppendLongNote: true,
 			Value:          "ですわ",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"助詞", "接続助詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"から"},
+				},
+			},
+			Value: "ので",
 		},
 		{
 			Conditions: []ConvertCondition{
@@ -570,11 +616,37 @@ var (
 			Conditions: []ConvertCondition{
 				{
 					Type:  ConvertTypeFeatures,
+					Value: []string{"助動詞"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"ない"},
+				},
+			},
+			Value: "ありません",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
 					Value: []string{"動詞", "非自立"},
 				},
 				{
 					Type:  ConvertTypeSurface,
 					Value: []string{"ください"},
+				},
+			},
+			Value: "くださいまし",
+		},
+		{
+			Conditions: []ConvertCondition{
+				{
+					Type:  ConvertTypeFeatures,
+					Value: []string{"動詞", "非自立"},
+				},
+				{
+					Type:  ConvertTypeSurface,
+					Value: []string{"くれ"},
 				},
 			},
 			Value: "くださいまし",

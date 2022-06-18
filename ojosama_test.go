@@ -260,6 +260,21 @@ func TestConvert(t *testing.T) {
 			},
 			wantErr: false,
 		},
+
+		// FIXME: 横断お歩道になってしまう
+		{
+			desc: "正常系: 小説の一文をテストしますわ",
+			src:  "ただ内容は、偶然事故が多いって話じゃないから安心してくれ。実際に俺が体験した話だ。",
+			want: "ただお内容は、偶然お事故が多いって話ではありませんので安心してくださいまし。実際に私が体験した話ですわ。",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
