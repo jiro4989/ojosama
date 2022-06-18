@@ -10,10 +10,17 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
+// ConvertOption はお嬢様変換時のオプショナルな設定。
 type ConvertOption struct {
-	forceAppendLongNote forceAppendLongNote // 強制的に波線を追加する。（テスト用）
+	forceAppendLongNote forceAppendLongNote // 単体テスト用のパラメータ
 }
 
+// forceAppendLongNote は強制的に波線や感嘆符や疑問符を任意の数追加するための設定。
+//
+// 波線や感嘆符の付与には乱数が絡むため、単体テスト実行時に確実に等しい結果を得
+// ることが難しい。この問題を回避するために、このパラメータを差し込むことで乱数
+// の影響を受けないように制御する。単体テストでしか使うことを想定していないため、
+// パブリックにはしない。
 type forceAppendLongNote struct {
 	enable               bool
 	wavyLineCount        int
@@ -28,6 +35,13 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// Convert はテキストを壱百満天原サロメお嬢様風の口調に変換して返却する。
+//
+// 簡単に説明すると「ハーブですわ！」を「おハーブですわ～～！！！」と変換する。
+// それ以外にもいくつかバリエーションがある。
+//
+// opt は挙動を微調整するためのオプショナルなパラメータ。不要であれば nil を渡せ
+// ば良い。
 func Convert(src string, opt *ConvertOption) (string, error) {
 	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {

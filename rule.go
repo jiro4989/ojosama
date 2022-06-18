@@ -241,6 +241,8 @@ var (
 		},
 	}
 
+	// excludeRules は変換処理を無視するルール。
+	// このルールは convertRules よりも優先して評価される。
 	excludeRules = []Converter{
 		{
 			Conditions: []ConvertCondition{
