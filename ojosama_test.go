@@ -161,6 +161,52 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 「ください」は「くださいまし」に変換いたしますわ",
+			src:     "お使いください！",
+			want:    "お使いくださいまし！",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc: "正常系: 波線のばしを付与する場合がありますわ",
+			src:  "これはハーブです！",
+			want: "これはおハーブですわ～～！！！",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "正常系: 波線のばしを付与する場合がありますわ",
+			src:  "プレイします！",
+			want: "プレイいたしますわ～～！！！",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "正常系: 波線のばしを付与する場合がありますわ",
+			src:  "プレイする！",
+			want: "プレイいたしますわ～～！！！",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

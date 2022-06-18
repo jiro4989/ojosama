@@ -1,26 +1,38 @@
 package ojosama
 
 import (
+	"math/rand"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/ikawaha/kagome-dict/ipa"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
-type ConvertOption struct{}
+type ConvertOption struct {
+	forceAppendLongNote forceAppendLongNote // 強制的に波線を追加する。（テスト用）
+}
+
+type forceAppendLongNote struct {
+	enable               bool
+	wavyLineCount        int
+	exclamationMarkCount int
+}
 
 type Converter struct {
 	Conditions                   []ConvertCondition
 	AfterIgnoreConditions        []ConvertCondition // 次のTokenで条件にマッチした場合は無視する
 	EnableWhenSentenceSeparation bool               // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
+	AppendLongNote               bool               // 波線を追加する
 	Value                        string
 }
 
 // FIXME: 型が不適当
 type MultiConverter struct {
-	Conditions [][]Converter
-	Value      string
+	Conditions     [][]Converter
+	AppendLongNote bool
+	Value          string
 }
 
 type ConvertType int
@@ -110,7 +122,8 @@ var (
 			},
 		},
 		{
-			Value: "いたしますわ",
+			Value:          "いたしますわ",
+			AppendLongNote: true,
 			Conditions: [][]Converter{
 				{
 					{
@@ -226,7 +239,8 @@ var (
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
 				},
 			},
-			Value: "ですわ",
+			AppendLongNote: true,
+			Value:          "ですわ",
 		},
 		{
 			Conditions: []ConvertCondition{
@@ -240,6 +254,7 @@ var (
 				},
 			},
 			EnableWhenSentenceSeparation: true,
+			AppendLongNote:               true,
 			Value:                        "いたしますわ",
 		},
 		{
@@ -266,7 +281,8 @@ var (
 					Value: []string{"わ"},
 				},
 			},
-			Value: "ですわ",
+			AppendLongNote: true,
+			Value:          "ですわ",
 		},
 		{
 			Conditions: []ConvertCondition{
@@ -292,7 +308,8 @@ var (
 					Value: []string{"ます"},
 				},
 			},
-			Value: "ますわ",
+			AppendLongNote: true,
+			Value:          "ますわ",
 		},
 		{
 			Conditions: []ConvertCondition{
@@ -375,6 +392,10 @@ var (
 	}
 )
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 func Convert(src string, opt *ConvertOption) (string, error) {
 	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
@@ -397,7 +418,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// 特定の組み合わせが連続した時に変換
-		if s, n, ok := convertMulti(tokens, i); ok {
+		if s, n, ok := convertMulti(tokens, i, opt); ok {
 			i = n
 			result.WriteString(s)
 			continue
@@ -410,7 +431,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// お嬢様言葉に変換
-		buf = convert(data, tokens, i, buf)
+		buf = convert(data, tokens, i, buf, opt)
 
 		// 名詞 一般の場合は手前に「お」をつける。
 		// ただし、直後に動詞 自立がくるときは「お」をつけない。
@@ -422,7 +443,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	return result.String(), nil
 }
 
-func convertMulti(tokens []tokenizer.Token, i int) (string, int, bool) {
+func convertMulti(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
 	for _, mc := range multiConvertRules {
 	properNounLoop:
 		for _, rule := range mc.Conditions {
@@ -452,7 +473,12 @@ func convertMulti(tokens []tokenizer.Token, i int) (string, int, bool) {
 				j++
 				s.WriteString(data.Surface)
 			}
-			return mc.Value, j - 1, true
+			result := mc.Value
+			if mc.AppendLongNote {
+				n := i + len(mc.Conditions)
+				result = appendLongNote(result, tokens, n, opt)
+			}
+			return result, j - 1, true
 		}
 	}
 	return "", -1, false
@@ -482,7 +508,7 @@ excludeLoop:
 	return false
 }
 
-func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
+func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, opt *ConvertOption) string {
 converterLoop:
 	for _, c := range convertRules {
 		for _, cond := range c.Conditions {
@@ -535,7 +561,14 @@ converterLoop:
 			// 次のトークンが存在しない場合は文の終わりなので変換する
 		}
 
-		return c.Value
+		result := c.Value
+
+		// 波線伸ばしをランダムに追加する
+		if c.AppendLongNote {
+			result = appendLongNote(result, tokens, i, opt)
+		}
+
+		return result
 	}
 	return surface
 }
@@ -589,5 +622,39 @@ func equalsFeatures(a, b []string) bool {
 
 func isSentenceSeparation(data tokenizer.TokenData) bool {
 	return equalsFeatures(data.Features, []string{"記号", "句点"}) ||
-		equalsFeatures(data.Features, []string{"記号", "読点"})
+		equalsFeatures(data.Features, []string{"記号", "読点"}) ||
+		data.Surface == "！" ||
+		data.Surface == "!" ||
+		data.Surface == "？" ||
+		data.Surface == "?"
+}
+
+func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) string {
+	if i+1 < len(tokens) {
+		data := tokenizer.NewTokenData(tokens[i+1])
+		for _, s := range []string{"！", "？"} {
+			if data.Surface == s {
+				var (
+					w, e int
+				)
+				if opt != nil && opt.forceAppendLongNote.enable {
+					w = opt.forceAppendLongNote.wavyLineCount
+					e = opt.forceAppendLongNote.exclamationMarkCount
+				} else {
+					w = rand.Intn(3)
+					e = rand.Intn(3)
+				}
+				var suffix strings.Builder
+				for i := 0; i < w; i++ {
+					suffix.WriteString("～")
+				}
+				for i := 0; i < e-1; i++ {
+					suffix.WriteString(s)
+				}
+				src += suffix.String()
+				break
+			}
+		}
+	}
+	return src
 }
