@@ -30,17 +30,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
-      - run: go build
-      - run: go install
-      - run: go test -cover ./...
-
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.goversion }}
       - name: Check code format
         run: |
           go mod download
@@ -49,6 +38,11 @@ jobs:
             echo "[ERR] please run 'go fmt ./...'" >&2
             exit 1
           fi
+      - name: Static analysis
+        run: go vet .
+      - run: go build
+      - run: go install
+      - run: go test -cover ./...
 
   coverage:
     runs-on: ubuntu-latest
