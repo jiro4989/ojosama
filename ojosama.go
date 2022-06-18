@@ -287,6 +287,7 @@ func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int,
 	return surface
 }
 
+// isSentenceSeparation は data が文の区切りに使われる token かどうかを判定する。
 func isSentenceSeparation(data tokenizer.TokenData) bool {
 	return containsFeatures([][]string{{"記号", "句点"}, {"記号", "読点"}}, data.Features) ||
 		containsString([]string{"！", "!", "？", "?"}, data.Surface)
