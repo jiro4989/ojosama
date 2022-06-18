@@ -79,3 +79,34 @@ func TestEqualsAnyFeatures(t *testing.T) {
 		})
 	}
 }
+
+func TestConatinsString(t *testing.T) {
+	tests := []struct {
+		desc string
+		a    []string
+		b    string
+		want bool
+	}{
+		{
+			desc: "正常系: どれか1つと一致すればOKですわ",
+			a:    []string{"a", "b"},
+			b:    "b",
+			want: true,
+		},
+		{
+			desc: "正常系: 1つも一致しなければfalseですわ",
+			a:    []string{"a", "b"},
+			b:    "c",
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			assert := assert.New(t)
+
+			got := containsString(tt.a, tt.b)
+			assert.Equal(tt.want, got)
+		})
+	}
+}

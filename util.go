@@ -39,3 +39,13 @@ func equalsAnyFeatures(a []string, b [][]string) bool {
 	}
 	return false
 }
+
+// containsString は a の中に b が含まれるかを判定する。
+func containsString(a []string, b string) bool {
+	for _, a2 := range a {
+		if a2 == b {
+			return true
+		}
+	}
+	return false
+}

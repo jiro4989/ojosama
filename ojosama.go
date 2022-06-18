@@ -289,10 +289,7 @@ func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int,
 
 func isSentenceSeparation(data tokenizer.TokenData) bool {
 	return equalsAnyFeatures(data.Features, [][]string{{"記号", "句点"}, {"記号", "読点"}}) ||
-		data.Surface == "！" ||
-		data.Surface == "!" ||
-		data.Surface == "？" ||
-		data.Surface == "?"
+		containsString([]string{"！", "!", "？", "?"}, data.Surface)
 }
 
 func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) string {
