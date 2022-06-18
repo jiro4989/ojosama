@@ -104,19 +104,8 @@ func convertMulti(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, 
 				}
 				data := tokenizer.NewTokenData(tokens[j])
 				for _, cond := range c.Conditions {
-					switch cond.Type {
-					case ConvertTypeFeatures:
-						if !equalsFeatures(data.Features, cond.Value) {
-							continue properNounLoop
-						}
-					case ConvertTypeSurface:
-						if data.Surface != cond.Value[0] {
-							continue properNounLoop
-						}
-					case ConvertTypeReading:
-						if data.Reading != cond.Value[0] {
-							continue properNounLoop
-						}
+					if cond.notEqualsTokenData(data) {
+						continue properNounLoop
 					}
 				}
 				j++
@@ -138,19 +127,8 @@ func matchExcludeRule(data tokenizer.TokenData) bool {
 excludeLoop:
 	for _, c := range excludeRules {
 		for _, cond := range c.Conditions {
-			switch cond.Type {
-			case ConvertTypeFeatures:
-				if !equalsFeatures(data.Features, cond.Value) {
-					continue excludeLoop
-				}
-			case ConvertTypeSurface:
-				if data.Surface != cond.Value[0] {
-					continue excludeLoop
-				}
-			case ConvertTypeReading:
-				if data.Reading != cond.Value[0] {
-					continue excludeLoop
-				}
+			if cond.notEqualsTokenData(data) {
+				continue excludeLoop
 			}
 		}
 		return true
@@ -162,19 +140,8 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 converterLoop:
 	for _, c := range convertRules {
 		for _, cond := range c.Conditions {
-			switch cond.Type {
-			case ConvertTypeFeatures:
-				if !equalsFeatures(data.Features, cond.Value) {
-					continue converterLoop
-				}
-			case ConvertTypeSurface:
-				if data.Surface != cond.Value[0] {
-					continue converterLoop
-				}
-			case ConvertTypeReading:
-				if data.Reading != cond.Value[0] {
-					continue converterLoop
-				}
+			if cond.notEqualsTokenData(data) {
+				continue converterLoop
 			}
 		}
 
@@ -277,6 +244,24 @@ func (c *ConvertCondition) equalsTokenData(data tokenizer.TokenData) bool {
 		}
 	case ConvertTypeReading:
 		if data.Reading == c.Value[0] {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *ConvertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
+	switch c.Type {
+	case ConvertTypeFeatures:
+		if !equalsFeatures(data.Features, c.Value) {
+			return true
+		}
+	case ConvertTypeSurface:
+		if data.Surface != c.Value[0] {
+			return true
+		}
+	case ConvertTypeReading:
+		if data.Reading != c.Value[0] {
 			return true
 		}
 	}
