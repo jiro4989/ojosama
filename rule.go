@@ -12,7 +12,7 @@ type convertRule struct {
 }
 
 // FIXME: 型が不適当
-type MultiConverter struct {
+type multiConvertRule struct {
 	Conditions     [][]convertRule
 	AppendLongNote bool
 	Value          string
@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	multiConvertRules = []MultiConverter{
+	multiConvertRules = []multiConvertRule{
 		{
 			Value: "壱百満天原サロメ",
 			Conditions: [][]convertRule{
