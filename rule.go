@@ -2,7 +2,7 @@ package ojosama
 
 import "github.com/ikawaha/kagome/v2/tokenizer"
 
-type Converter struct {
+type convertRule struct {
 	Conditions                   []ConvertCondition
 	BeforeIgnoreConditions       []ConvertCondition // 前のTokenで条件にマッチした場合は無視する
 	AfterIgnoreConditions        []ConvertCondition // 次のTokenで条件にマッチした場合は無視する
@@ -13,7 +13,7 @@ type Converter struct {
 
 // FIXME: 型が不適当
 type MultiConverter struct {
-	Conditions     [][]Converter
+	Conditions     [][]convertRule
 	AppendLongNote bool
 	Value          string
 }
@@ -34,7 +34,7 @@ var (
 	multiConvertRules = []MultiConverter{
 		{
 			Value: "壱百満天原サロメ",
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
 						Conditions: []ConvertCondition{
@@ -103,7 +103,7 @@ var (
 		{
 			Value:          "いたしますわ",
 			AppendLongNote: true,
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
 						Conditions: []ConvertCondition{
@@ -135,7 +135,7 @@ var (
 
 		{
 			Value: "ですので",
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
 						Conditions: []ConvertCondition{
@@ -167,7 +167,7 @@ var (
 
 		{
 			Value: "なんですの",
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
 						Conditions: []ConvertCondition{
@@ -211,7 +211,7 @@ var (
 
 		{
 			Value: "ですわ",
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
 						Conditions: []ConvertCondition{
@@ -244,7 +244,7 @@ var (
 
 	// excludeRules は変換処理を無視するルール。
 	// このルールは convertRules よりも優先して評価される。
-	excludeRules = []Converter{
+	excludeRules = []convertRule{
 		{
 			Conditions: []ConvertCondition{
 				{
@@ -259,7 +259,7 @@ var (
 		},
 	}
 
-	convertRules = []Converter{
+	convertRules = []convertRule{
 		{
 			Conditions: []ConvertCondition{
 				{
