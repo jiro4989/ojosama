@@ -381,6 +381,44 @@ var (
 			Conditions: []convertCondition{
 				{
 					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"パパ"},
+				},
+			},
+			AfterIgnoreConditions: []convertCondition{
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"上"},
+				},
+			},
+			Value: "パパ上",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"ママ"},
+				},
+			},
+			AfterIgnoreConditions: []convertCondition{
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"上"},
+				},
+			},
+			Value: "ママ上",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{

@@ -334,6 +334,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: パパはおパパ上、ママはおママ上とお呼びいたしますわ",
+			src:     "パパ、ママ、父様、母様、パパ上、ママ上",
+			want:    "おパパ上、おママ上、お父様、お母様、おパパ上、おママ上",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
