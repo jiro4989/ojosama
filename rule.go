@@ -2,96 +2,96 @@ package ojosama
 
 import "github.com/ikawaha/kagome/v2/tokenizer"
 
-type Converter struct {
-	Conditions                   []ConvertCondition
-	BeforeIgnoreConditions       []ConvertCondition // 前のTokenで条件にマッチした場合は無視する
-	AfterIgnoreConditions        []ConvertCondition // 次のTokenで条件にマッチした場合は無視する
+type convertRule struct {
+	Conditions                   []convertCondition
+	BeforeIgnoreConditions       []convertCondition // 前のTokenで条件にマッチした場合は無視する
+	AfterIgnoreConditions        []convertCondition // 次のTokenで条件にマッチした場合は無視する
 	EnableWhenSentenceSeparation bool               // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
 	AppendLongNote               bool               // 波線を追加する
 	Value                        string
 }
 
 // FIXME: 型が不適当
-type MultiConverter struct {
-	Conditions     [][]Converter
+type multiConvertRule struct {
+	Conditions     [][]convertRule
 	AppendLongNote bool
 	Value          string
 }
 
-type ConvertType int
+type convertType int
 
-type ConvertCondition struct {
-	Type  ConvertType
+type convertCondition struct {
+	Type  convertType
 	Value []string
 }
 
 const (
-	ConvertTypeSurface ConvertType = iota + 1
-	ConvertTypeFeatures
+	convertTypeSurface convertType = iota + 1
+	convertTypeFeatures
 )
 
 var (
-	multiConvertRules = []MultiConverter{
+	multiConvertRules = []multiConvertRule{
 		{
 			Value: "壱百満天原サロメ",
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"名詞", "一般"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"壱"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"名詞", "数"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"百"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"名詞", "一般"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"満天"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"接頭詞", "名詞接続"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"原"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"名詞", "一般"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"サロメ"},
 							},
 						},
@@ -103,28 +103,28 @@ var (
 		{
 			Value:          "いたしますわ",
 			AppendLongNote: true,
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"動詞", "自立"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"し"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"助動詞"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"ます"},
 							},
 						},
@@ -135,28 +135,28 @@ var (
 
 		{
 			Value: "ですので",
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"助動詞"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"だ"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"助詞", "接続助詞"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"から"},
 							},
 						},
@@ -167,40 +167,40 @@ var (
 
 		{
 			Value: "なんですの",
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"助動詞"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"な"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"名詞", "非自立", "一般"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"ん"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"助動詞"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"だ"},
 							},
 						},
@@ -211,28 +211,28 @@ var (
 
 		{
 			Value: "ですわ",
-			Conditions: [][]Converter{
+			Conditions: [][]convertRule{
 				{
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"助動詞"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"だ"},
 							},
 						},
 					},
 					{
-						Conditions: []ConvertCondition{
+						Conditions: []convertCondition{
 							{
-								Type:  ConvertTypeFeatures,
+								Type:  convertTypeFeatures,
 								Value: []string{"助詞", "終助詞"},
 							},
 							{
-								Type:  ConvertTypeSurface,
+								Type:  convertTypeSurface,
 								Value: []string{"よ"},
 							},
 						},
@@ -244,179 +244,179 @@ var (
 
 	// excludeRules は変換処理を無視するルール。
 	// このルールは convertRules よりも優先して評価される。
-	excludeRules = []Converter{
+	excludeRules = []convertRule{
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"お嬢様"},
 				},
 			},
 		},
 	}
 
-	convertRules = []Converter{
+	convertRules = []convertRule{
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"あなた"},
 				},
 			},
 			Value: "貴方",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"俺"},
 				},
 			},
 			Value: "私",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"オレ"},
 				},
 			},
 			Value: "ワタクシ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"おれ"},
 				},
 			},
 			Value: "わたくし",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"僕"},
 				},
 			},
 			Value: "私",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"ボク"},
 				},
 			},
 			Value: "ワタクシ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"ぼく"},
 				},
 			},
 			Value: "わたくし",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"あたし"},
 				},
 			},
 			Value: "わたくし",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"わたし"},
 				},
 			},
 			Value: "わたくし",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "代名詞", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"どこ"},
 				},
 			},
 			Value: "どちら",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "非自立", "一般"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"もん"},
 				},
 			},
 			Value: "もの",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"です"},
 				},
 			},
-			AfterIgnoreConditions: []ConvertCondition{
+			AfterIgnoreConditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
 				},
 			},
@@ -424,19 +424,19 @@ var (
 			Value:          "ですわ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"だ"},
 				},
 			},
-			AfterIgnoreConditions: []ConvertCondition{
+			AfterIgnoreConditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
 				},
 			},
@@ -444,13 +444,13 @@ var (
 			Value:          "ですわ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"する"},
 				},
 			},
@@ -459,13 +459,13 @@ var (
 			Value:                        "いたしますわ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"なる"},
 				},
 			},
@@ -474,52 +474,52 @@ var (
 			Value:                        "なりますわ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"ある"},
 				},
 			},
 			Value: "あります",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "副助詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"じゃ"},
 				},
 			},
 			Value: "では",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"か"},
 				},
 			},
 			Value: "の",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "終助詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"わ"},
 				},
 			},
@@ -527,97 +527,97 @@ var (
 			Value:          "ですわ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "終助詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"な"},
 				},
 			},
 			Value: "ね",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "終助詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"さ"},
 				},
 			},
 			Value: "",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "接続助詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"から"},
 				},
 			},
 			Value: "ので",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "接続助詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"けど"},
 				},
 			},
 			Value: "けれど",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "接続助詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"し"},
 				},
 			},
 			Value: "ですし",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"まし"},
 				},
 			},
-			BeforeIgnoreConditions: []ConvertCondition{
+			BeforeIgnoreConditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
 				},
 			},
 			Value: "おりまし",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"ます"},
 				},
 			},
@@ -625,13 +625,13 @@ var (
 			Value:          "ますわ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"た"},
 				},
 			},
@@ -640,214 +640,214 @@ var (
 			Value:                        "たわ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"だろ"},
 				},
 			},
 			Value: "でしょう",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"ない"},
 				},
 			},
-			BeforeIgnoreConditions: []ConvertCondition{
+			BeforeIgnoreConditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
 				},
 			},
 			Value: "ありません",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "非自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"ください"},
 				},
 			},
 			Value: "くださいまし",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "非自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"くれ"},
 				},
 			},
 			Value: "くださいまし",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"感動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"ありがとう"},
 				},
 			},
 			Value: "ありがとうございますわ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"感動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"じゃぁ"},
 				},
 			},
 			Value: "それでは",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"感動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"じゃあ"},
 				},
 			},
 			Value: "それでは",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "非自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"くれる"},
 				},
 			},
 			Value: "くれます",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"形容詞", "自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"汚い"},
 				},
 			},
 			Value: "きったねぇ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"形容詞", "自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"きたない"},
 				},
 			},
 			Value: "きったねぇ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"形容詞", "自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"臭い"},
 				},
 			},
 			Value: "くっせぇ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"形容詞", "自立"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"くさい"},
 				},
 			},
 			Value: "くっせぇ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"感動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"うふ"},
 				},
 			},
 			Value: "おほ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"感動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"うふふ"},
 				},
 			},
 			Value: "おほほ",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"感動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"う"},
 				},
 			},
 			Value: "お",
 		},
 		{
-			Conditions: []ConvertCondition{
+			Conditions: []convertCondition{
 				{
-					Type:  ConvertTypeFeatures,
+					Type:  convertTypeFeatures,
 					Value: []string{"感動詞"},
 				},
 				{
-					Type:  ConvertTypeSurface,
+					Type:  convertTypeSurface,
 					Value: []string{"ふふふ"},
 				},
 			},
@@ -856,13 +856,13 @@ var (
 	}
 )
 
-func (c *ConvertCondition) equalsTokenData(data tokenizer.TokenData) bool {
+func (c *convertCondition) equalsTokenData(data tokenizer.TokenData) bool {
 	switch c.Type {
-	case ConvertTypeFeatures:
+	case convertTypeFeatures:
 		if equalsFeatures(data.Features, c.Value) {
 			return true
 		}
-	case ConvertTypeSurface:
+	case convertTypeSurface:
 		if data.Surface == c.Value[0] {
 			return true
 		}
@@ -870,13 +870,13 @@ func (c *ConvertCondition) equalsTokenData(data tokenizer.TokenData) bool {
 	return false
 }
 
-func (c *ConvertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
+func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
 	switch c.Type {
-	case ConvertTypeFeatures:
+	case convertTypeFeatures:
 		if !equalsFeatures(data.Features, c.Value) {
 			return true
 		}
-	case ConvertTypeSurface:
+	case convertTypeSurface:
 		if data.Surface != c.Value[0] {
 			return true
 		}
