@@ -18,15 +18,15 @@ type multiConvertRule struct {
 	Value          string
 }
 
-type ConvertType int
+type convertType int
 
 type ConvertCondition struct {
-	Type  ConvertType
+	Type  convertType
 	Value []string
 }
 
 const (
-	ConvertTypeSurface ConvertType = iota + 1
+	ConvertTypeSurface convertType = iota + 1
 	ConvertTypeFeatures
 )
 
