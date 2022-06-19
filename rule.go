@@ -903,6 +903,19 @@ var (
 			},
 			Value: "ほほほ",
 		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"草"},
+				},
+			},
+			Value: "ハーブ",
+		},
 	}
 )
 
