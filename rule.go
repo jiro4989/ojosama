@@ -649,45 +649,9 @@ var (
 			},
 			Value: "くださいまし",
 		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"感動詞"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"ありがとう"},
-				},
-			},
-			Value: "ありがとうございますわ",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"感動詞"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"じゃぁ"},
-				},
-			},
-			Value: "それでは",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"感動詞"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"じゃあ"},
-				},
-			},
-			Value: "それでは",
-		},
+		newCondVerbs("ありがとう", "ありがとうございますわ"),
+		newCondVerbs("じゃぁ", "それでは"),
+		newCondVerbs("じゃあ", "それでは"),
 		{
 			Conditions: []convertCondition{
 				{
