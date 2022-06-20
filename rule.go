@@ -701,58 +701,10 @@ var (
 			},
 			Value: "くれます",
 		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"形容詞", "自立"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"汚い"},
-				},
-			},
-			Value: "きったねぇ",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"形容詞", "自立"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"きたない"},
-				},
-			},
-			Value: "きったねぇ",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"形容詞", "自立"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"臭い"},
-				},
-			},
-			Value: "くっせぇ",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"形容詞", "自立"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"くさい"},
-				},
-			},
-			Value: "くっせぇ",
-		},
+		newCondAdjectivesSelfSupporting("汚い", "きったねぇ"),
+		newCondAdjectivesSelfSupporting("きたない", "きったねぇ"),
+		newCondAdjectivesSelfSupporting("臭い", "くっせぇ"),
+		newCondAdjectivesSelfSupporting("くさい", "くっせぇ"),
 		{
 			Conditions: []convertCondition{
 				{
@@ -837,9 +789,10 @@ func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
 }
 
 var (
-	pronounGeneral     = []string{"名詞", "代名詞", "一般"}
-	nounsGeneral       = []string{"名詞", "一般"}
-	adnominalAdjective = []string{"連体詞"}
+	pronounGeneral           = []string{"名詞", "代名詞", "一般"}
+	nounsGeneral             = []string{"名詞", "一般"}
+	adnominalAdjective       = []string{"連体詞"}
+	adjectivesSelfSupporting = []string{"形容詞", "自立"}
 )
 
 func newCond(features []string, surface, value string) convertRule {
@@ -868,4 +821,8 @@ func newCondNounsGeneral(surface, value string) convertRule {
 
 func newCondAdnominalAdjective(surface, value string) convertRule {
 	return newCond(adnominalAdjective, surface, value)
+}
+
+func newCondAdjectivesSelfSupporting(surface, value string) convertRule {
+	return newCond(adjectivesSelfSupporting, surface, value)
 }
