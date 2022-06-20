@@ -287,111 +287,17 @@ var (
 			},
 			Value: "貴方",
 		},
+
 		// 一人称
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"俺"},
-				},
-			},
-			Value: "私",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"オレ"},
-				},
-			},
-			Value: "ワタクシ",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"おれ"},
-				},
-			},
-			Value: "わたくし",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"僕"},
-				},
-			},
-			Value: "私",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"ボク"},
-				},
-			},
-			Value: "ワタクシ",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"ぼく"},
-				},
-			},
-			Value: "わたくし",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"あたし"},
-				},
-			},
-			Value: "わたくし",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"わたし"},
-				},
-			},
-			Value: "わたくし",
-		},
+		newCondPronounGeneral("俺", "私"),
+		newCondPronounGeneral("オレ", "ワタクシ"),
+		newCondPronounGeneral("おれ", "わたくし"),
+		newCondPronounGeneral("僕", "私"),
+		newCondPronounGeneral("ボク", "ワタクシ"),
+		newCondPronounGeneral("ぼく", "わたくし"),
+		newCondPronounGeneral("あたし", "わたくし"),
+		newCondPronounGeneral("わたし", "わたくし"),
+		// TODO: AfterIgnore系も簡単に定義できるようにしたい
 		{
 			Conditions: []convertCondition{
 				{
@@ -945,6 +851,7 @@ func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
 
 var (
 	pronounGeneral     = []string{"名詞", "代名詞", "一般"}
+	nounsGeneral       = []string{"名詞", "一般"}
 	adnominalAdjective = []string{"連体詞"}
 )
 
@@ -966,6 +873,10 @@ func newCond(features []string, surface, value string) convertRule {
 
 func newCondPronounGeneral(surface, value string) convertRule {
 	return newCond(pronounGeneral, surface, value)
+}
+
+func newCondNounsGeneral(surface, value string) convertRule {
+	return newCond(nounsGeneral, surface, value)
 }
 
 func newCondAdnominalAdjective(surface, value string) convertRule {
