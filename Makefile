@@ -8,3 +8,7 @@ bin/ojosama: go.* *.go cmd/*
 .PHONY: test
 test:
 	go test -cover ./...
+
+.PHONY: install
+install: go.* *.go cmd/*
+	go install ./cmd/ojosama
