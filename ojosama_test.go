@@ -17,7 +17,7 @@ func TestConvert(t *testing.T) {
 		{
 			desc:    "正常系: 名詞の手前には「お」をお付けいたしますわ",
 			src:     "これはハーブです",
-			want:    "これはおハーブですわ",
+			want:    "こちらはおハーブですわ",
 			opt:     nil,
 			wantErr: false,
 		},
@@ -101,7 +101,7 @@ func TestConvert(t *testing.T) {
 		{
 			desc:    "正常系: アルファベット単語の場合は「お」をつけませんの",
 			src:     "これはgrassです。あれはabcdefg12345です",
-			want:    "これはgrassですわ。あれはabcdefg12345ですわ",
+			want:    "こちらはgrassですわ。あちらはabcdefg12345ですわ",
 			opt:     nil,
 			wantErr: false,
 		},
@@ -171,7 +171,7 @@ func TestConvert(t *testing.T) {
 		{
 			desc: "正常系: 波線のばしを付与する場合がありますわ",
 			src:  "これはハーブです！",
-			want: "これはおハーブですわ～～！！！",
+			want: "こちらはおハーブですわ～～！！！",
 			opt: &ConvertOption{
 				forceAppendLongNote: forceAppendLongNote{
 					enable:               true,
@@ -345,6 +345,34 @@ func TestConvert(t *testing.T) {
 			desc:    "正常系: 罵倒には「お」を付けませんのよ",
 			src:     "カス",
 			want:    "カス",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: こそあど言葉（こ）にも対応しておりましてよ",
+			src:     "これ、この、ここ、こちら、こう、こんな。",
+			want:    "こちら、こちらの、こちら、こちら、こう、このような。",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: こそあど言葉（そ）にも対応しておりましてよ",
+			src:     "それ、その、そこ、そちら、そう、そんな。",
+			want:    "そちら、そちらの、そちら、そちら、そう、そのような。",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: こそあど言葉（あ）にも対応しておりましてよ",
+			src:     "あれは、あの、あそこ、あちら、ああ、あんな。",
+			want:    "あちらは、あちらの、あちら、あちら、ああ、あのような。",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: こそあど言葉（ど）にも対応しておりましてよ",
+			src:     "どれ、どの、どこ、どちら、どう、どんな。",
+			want:    "どちら、どちらの、どちら、どちら、どう、どのような。",
 			opt:     nil,
 			wantErr: false,
 		},
