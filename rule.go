@@ -546,6 +546,59 @@ var (
 				},
 				{
 					Type:  convertTypeSurface,
+					Value: []string{"あれ"},
+				},
+			},
+			Value: "あちら",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"連体詞"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"あの"},
+				},
+			},
+			Value: "あちらの",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"あそこ"},
+				},
+			},
+			Value: "あちら",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"連体詞"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"あんな"},
+				},
+			},
+			Value: "あのような",
+		},
+
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
 					Value: []string{"どこ"},
 				},
 			},

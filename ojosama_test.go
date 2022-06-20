@@ -101,7 +101,7 @@ func TestConvert(t *testing.T) {
 		{
 			desc:    "正常系: アルファベット単語の場合は「お」をつけませんの",
 			src:     "これはgrassです。あれはabcdefg12345です",
-			want:    "こちらはgrassですわ。あれはabcdefg12345ですわ",
+			want:    "こちらはgrassですわ。あちらはabcdefg12345ですわ",
 			opt:     nil,
 			wantErr: false,
 		},
@@ -359,6 +359,13 @@ func TestConvert(t *testing.T) {
 			desc:    "正常系: こそあど言葉にも対応しておりましてよ",
 			src:     "それ、その、そこ、そちら、そう、そんな。",
 			want:    "そちら、そちらの、そちら、そちら、そう、そのような。",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: こそあど言葉にも対応しておりましてよ",
+			src:     "あれは、あの、あそこ、あちら、ああ、あんな。",
+			want:    "あちらは、あちらの、あちら、あちら、ああ、あのような。",
 			opt:     nil,
 			wantErr: false,
 		},
