@@ -272,7 +272,6 @@ var (
 	}
 
 	convertRules = []convertRule{
-		// 名詞、代名詞、一般
 		// 三人称
 		newCondPronounGeneral("あなた", "貴方"),
 
