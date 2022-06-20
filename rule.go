@@ -272,9 +272,6 @@ var (
 	}
 
 	convertRules = []convertRule{
-		// 三人称
-		newCondPronounGeneral("あなた", "貴方"),
-
 		// 一人称
 		newCondPronounGeneral("俺", "私"),
 		newCondPronounGeneral("オレ", "ワタクシ"),
@@ -284,6 +281,11 @@ var (
 		newCondPronounGeneral("ぼく", "わたくし"),
 		newCondPronounGeneral("あたし", "わたくし"),
 		newCondPronounGeneral("わたし", "わたくし"),
+
+		// 二人称
+		newCondPronounGeneral("あなた", "貴方"),
+
+		// 三人称
 		// TODO: AfterIgnore系も簡単に定義できるようにしたい
 		{
 			Conditions: []convertCondition{
