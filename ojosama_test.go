@@ -355,6 +355,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: こそあど言葉にも対応しておりましてよ",
+			src:     "それ、その、そこ、そちら、そう、そんな。",
+			want:    "そちら、そちらの、そちら、そちら、そう、そのような。",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

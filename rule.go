@@ -430,6 +430,7 @@ var (
 			},
 			Value: "ママ上",
 		},
+
 		// こそあど言葉
 		{
 			Conditions: []convertCondition{
@@ -483,6 +484,60 @@ var (
 			},
 			Value: "このような",
 		},
+
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"それ"},
+				},
+			},
+			Value: "そちら",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"連体詞"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"その"},
+				},
+			},
+			Value: "そちらの",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"そこ"},
+				},
+			},
+			Value: "そちら",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"連体詞"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"そんな"},
+				},
+			},
+			Value: "そのような",
+		},
+
 		{
 			Conditions: []convertCondition{
 				{
