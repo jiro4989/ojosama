@@ -272,6 +272,8 @@ var (
 	}
 
 	convertRules = []convertRule{
+		// 名詞、代名詞、一般
+		// 三人称
 		{
 			Conditions: []convertCondition{
 				{
@@ -285,6 +287,7 @@ var (
 			},
 			Value: "貴方",
 		},
+		// 一人称
 		{
 			Conditions: []convertCondition{
 				{
@@ -427,6 +430,59 @@ var (
 			},
 			Value: "ママ上",
 		},
+		// こそあど言葉
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"これ"},
+				},
+			},
+			Value: "こちら",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"連体詞"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"この"},
+				},
+			},
+			Value: "こちらの",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"ここ"},
+				},
+			},
+			Value: "こちら",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"連体詞"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"こんな"},
+				},
+			},
+			Value: "このような",
+		},
 		{
 			Conditions: []convertCondition{
 				{
@@ -440,6 +496,7 @@ var (
 			},
 			Value: "どちら",
 		},
+
 		{
 			Conditions: []convertCondition{
 				{
