@@ -705,58 +705,10 @@ var (
 		newCondAdjectivesSelfSupporting("きたない", "きったねぇ"),
 		newCondAdjectivesSelfSupporting("臭い", "くっせぇ"),
 		newCondAdjectivesSelfSupporting("くさい", "くっせぇ"),
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"感動詞"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"うふ"},
-				},
-			},
-			Value: "おほ",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"感動詞"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"うふふ"},
-				},
-			},
-			Value: "おほほ",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"感動詞"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"う"},
-				},
-			},
-			Value: "お",
-		},
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"感動詞"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"ふふふ"},
-				},
-			},
-			Value: "ほほほ",
-		},
+		newCondVerbs("うふ", "おほ"),
+		newCondVerbs("うふふ", "おほほ"),
+		newCondVerbs("う", "お"),
+		newCondVerbs("ふふふ", "ほほほ"),
 	}
 )
 
@@ -793,6 +745,7 @@ var (
 	nounsGeneral             = []string{"名詞", "一般"}
 	adnominalAdjective       = []string{"連体詞"}
 	adjectivesSelfSupporting = []string{"形容詞", "自立"}
+	verbs                    = []string{"感動詞"}
 )
 
 func newCond(features []string, surface, value string) convertRule {
@@ -825,4 +778,8 @@ func newCondAdnominalAdjective(surface, value string) convertRule {
 
 func newCondAdjectivesSelfSupporting(surface, value string) convertRule {
 	return newCond(adjectivesSelfSupporting, surface, value)
+}
+
+func newCondVerbs(surface, value string) convertRule {
+	return newCond(verbs, surface, value)
 }
