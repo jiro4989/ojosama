@@ -433,23 +433,23 @@ var (
 
 		// こそあど言葉
 		newCondPronounGeneral("これ", "こちら"),
-		newCondAdnominalAdjective("この", "こちらの"),
-		newCondPronounGeneral("ここ", "こちら"),
-		newCondAdnominalAdjective("こんな", "このような"),
-
 		newCondPronounGeneral("それ", "そちら"),
-		newCondAdnominalAdjective("その", "そちらの"),
-		newCondPronounGeneral("そこ", "そちら"),
-		newCondAdnominalAdjective("そんな", "そのような"),
-
 		newCondPronounGeneral("あれ", "あちら"),
-		newCondAdnominalAdjective("あの", "あちらの"),
-		newCondPronounGeneral("あそこ", "あちら"),
-		newCondAdnominalAdjective("あんな", "あのような"),
-
 		newCondPronounGeneral("どれ", "どちら"),
+
+		newCondAdnominalAdjective("この", "こちらの"),
+		newCondAdnominalAdjective("その", "そちらの"),
+		newCondAdnominalAdjective("あの", "あちらの"),
 		newCondAdnominalAdjective("どの", "どちらの"),
+
+		newCondPronounGeneral("ここ", "こちら"),
+		newCondPronounGeneral("そこ", "そちら"),
+		newCondPronounGeneral("あそこ", "あちら"),
 		newCondPronounGeneral("どこ", "どちら"),
+
+		newCondAdnominalAdjective("こんな", "このような"),
+		newCondAdnominalAdjective("そんな", "そのような"),
+		newCondAdnominalAdjective("あんな", "あのような"),
 		newCondAdnominalAdjective("どんな", "どのような"),
 
 		{
