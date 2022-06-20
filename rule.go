@@ -274,19 +274,7 @@ var (
 	convertRules = []convertRule{
 		// 名詞、代名詞、一般
 		// 三人称
-		{
-			Conditions: []convertCondition{
-				{
-					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "代名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"あなた"},
-				},
-			},
-			Value: "貴方",
-		},
+		newCondPronounGeneral("あなた", "貴方"),
 
 		// 一人称
 		newCondPronounGeneral("俺", "私"),
