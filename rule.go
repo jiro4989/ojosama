@@ -599,10 +599,49 @@ var (
 				},
 				{
 					Type:  convertTypeSurface,
+					Value: []string{"どれ"},
+				},
+			},
+			Value: "どちら",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"連体詞"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"どの"},
+				},
+			},
+			Value: "どちらの",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"名詞", "代名詞", "一般"},
+				},
+				{
+					Type:  convertTypeSurface,
 					Value: []string{"どこ"},
 				},
 			},
 			Value: "どちら",
+		},
+		{
+			Conditions: []convertCondition{
+				{
+					Type:  convertTypeFeatures,
+					Value: []string{"連体詞"},
+				},
+				{
+					Type:  convertTypeSurface,
+					Value: []string{"どんな"},
+				},
+			},
+			Value: "どのような",
 		},
 
 		{
