@@ -436,17 +436,14 @@ var (
 		newCondPronounGeneral("それ", "そちら"),
 		newCondPronounGeneral("あれ", "あちら"),
 		newCondPronounGeneral("どれ", "どちら"),
-
 		newCondAdnominalAdjective("この", "こちらの"),
 		newCondAdnominalAdjective("その", "そちらの"),
 		newCondAdnominalAdjective("あの", "あちらの"),
 		newCondAdnominalAdjective("どの", "どちらの"),
-
 		newCondPronounGeneral("ここ", "こちら"),
 		newCondPronounGeneral("そこ", "そちら"),
 		newCondPronounGeneral("あそこ", "あちら"),
 		newCondPronounGeneral("どこ", "どちら"),
-
 		newCondAdnominalAdjective("こんな", "このような"),
 		newCondAdnominalAdjective("そんな", "そのような"),
 		newCondAdnominalAdjective("あんな", "あのような"),
