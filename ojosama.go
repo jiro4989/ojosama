@@ -152,7 +152,13 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 		beforeTokenOK = true
 	}
 
-converterLoop:
+	var afterToken tokenizer.TokenData
+	var afterTokenOK bool
+	if i+1 < len(tokens) {
+		afterToken = tokenizer.NewTokenData(tokens[i+1])
+		afterTokenOK = true
+	}
+
 	for _, c := range convertRules {
 		if !c.Conditions.matchAllTokenData(data) {
 			continue
@@ -164,13 +170,8 @@ converterLoop:
 		}
 
 		// 次に続く単語をみて変換を無視する
-		for _, cond := range c.AfterIgnoreConditions {
-			if i+1 < len(tokens) {
-				data := tokenizer.NewTokenData(tokens[i+1])
-				if cond.equalsTokenData(data) {
-					break converterLoop
-				}
-			}
+		if afterTokenOK && c.AfterIgnoreConditions.matchAnyTokenData(afterToken) {
+			break
 		}
 
 		// 文の区切りか、文の終わりの時だけ有効にする。
