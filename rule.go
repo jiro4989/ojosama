@@ -11,7 +11,7 @@ type convertRule struct {
 	Value                        string
 }
 
-type convertContinuousConditionsRule struct {
+type continuousConditionsConvertRule struct {
 	Conditions     []convertConditions
 	AppendLongNote bool
 	Value          string
@@ -32,11 +32,11 @@ const (
 )
 
 var (
-	// convertContinuousConditionsRules は連続する条件がすべてマッチしたときに変換するルール。
+	// continuousConditionsConvertRules は連続する条件がすべてマッチしたときに変換するルール。
 	//
 	// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
 	// して初めて1つの意味になるような条件を定義する。
-	convertContinuousConditionsRules = []convertContinuousConditionsRule{
+	continuousConditionsConvertRules = []continuousConditionsConvertRule{
 		{
 			Value: "壱百満天原サロメ",
 			Conditions: []convertConditions{
