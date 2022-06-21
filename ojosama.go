@@ -121,10 +121,11 @@ ruleLoop:
 		}
 
 		result := mc.Value
+		n := j - 1
 		if mc.AppendLongNote {
-			result = appendLongNote(result, tokens, j-1, opt)
+			result = appendLongNote(result, tokens, n, opt)
 		}
-		return result, j - 1, true
+		return result, n, true
 	}
 	return "", -1, false
 }
