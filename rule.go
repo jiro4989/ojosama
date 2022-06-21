@@ -3,12 +3,14 @@ package ojosama
 import "github.com/ikawaha/kagome/v2/tokenizer"
 
 // convertRule は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
+//
+// 基本的な変換はこの型で定義する。
 type convertRule struct {
-	Conditions                   []convertCondition
-	BeforeIgnoreConditions       []convertCondition // 前のTokenで条件にマッチした場合は無視する
-	AfterIgnoreConditions        []convertCondition // 次のTokenで条件にマッチした場合は無視する
-	EnableWhenSentenceSeparation bool               // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
-	AppendLongNote               bool               // 波線を追加する
+	Conditions                   convertConditions
+	BeforeIgnoreConditions       convertConditions // 前のTokenで条件にマッチした場合は無視する
+	AfterIgnoreConditions        convertConditions // 次のTokenで条件にマッチした場合は無視する
+	EnableWhenSentenceSeparation bool              // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
+	AppendLongNote               bool              // 波線を追加する
 	Value                        string
 }
 
@@ -19,10 +21,15 @@ type continuousConditionsConvertRule struct {
 	Value          string
 }
 
+// convertConditions は変換条件のスライス。
+//
+// この型の評価をする側は、すべての条件が true の時に true として解釈する。
+// 一つでも false が混じったら false として解釈する。
 type convertConditions []convertCondition
 
 type convertType int
 
+// convertCondition は変換に使う条件。
 type convertCondition struct {
 	Type  convertType
 	Value []string
@@ -89,7 +96,7 @@ var (
 	// このルールは convertRules よりも優先して評価される。
 	excludeRules = []convertRule{
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "一般"},
@@ -101,7 +108,7 @@ var (
 			},
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "固有名詞", "一般"},
@@ -114,6 +121,9 @@ var (
 		},
 	}
 
+	// convertRules は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
+	//
+	// 基本的な変換はここに定義する。
 	convertRules = []convertRule{
 		// 一人称
 		newRulePronounGeneral("俺", "私"),
@@ -131,7 +141,7 @@ var (
 		// 三人称
 		// TODO: AfterIgnore系も簡単に定義できるようにしたい
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "一般"},
@@ -141,7 +151,7 @@ var (
 					Value: []string{"パパ"},
 				},
 			},
-			AfterIgnoreConditions: []convertCondition{
+			AfterIgnoreConditions: convertConditions{
 				{
 					Type:  convertTypeSurface,
 					Value: []string{"上"},
@@ -150,7 +160,7 @@ var (
 			Value: "パパ上",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "一般"},
@@ -160,7 +170,7 @@ var (
 					Value: []string{"ママ"},
 				},
 			},
-			AfterIgnoreConditions: []convertCondition{
+			AfterIgnoreConditions: convertConditions{
 				{
 					Type:  convertTypeSurface,
 					Value: []string{"上"},
@@ -188,7 +198,7 @@ var (
 		newRuleAdnominalAdjective("どんな", "どのような"),
 
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "非自立", "一般"},
@@ -201,7 +211,7 @@ var (
 			Value: "もの",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
@@ -211,7 +221,7 @@ var (
 					Value: []string{"です"},
 				},
 			},
-			AfterIgnoreConditions: []convertCondition{
+			AfterIgnoreConditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
@@ -221,7 +231,7 @@ var (
 			Value:          "ですわ",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
@@ -231,7 +241,7 @@ var (
 					Value: []string{"だ"},
 				},
 			},
-			AfterIgnoreConditions: []convertCondition{
+			AfterIgnoreConditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
@@ -241,7 +251,7 @@ var (
 			Value:          "ですわ",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
@@ -256,7 +266,7 @@ var (
 			Value:                        "いたしますわ",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
@@ -271,7 +281,7 @@ var (
 			Value:                        "なりますわ",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
@@ -284,7 +294,7 @@ var (
 			Value: "あります",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "副助詞"},
@@ -297,7 +307,7 @@ var (
 			Value: "では",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "副助詞／並立助詞／終助詞"},
@@ -310,7 +320,7 @@ var (
 			Value: "の",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "終助詞"},
@@ -324,7 +334,7 @@ var (
 			Value:          "ですわ",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "終助詞"},
@@ -337,7 +347,7 @@ var (
 			Value: "ね",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "終助詞"},
@@ -350,7 +360,7 @@ var (
 			Value: "",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "接続助詞"},
@@ -363,7 +373,7 @@ var (
 			Value: "ので",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "接続助詞"},
@@ -376,7 +386,7 @@ var (
 			Value: "けれど",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助詞", "接続助詞"},
@@ -389,7 +399,7 @@ var (
 			Value: "ですし",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
@@ -399,7 +409,7 @@ var (
 					Value: []string{"まし"},
 				},
 			},
-			BeforeIgnoreConditions: []convertCondition{
+			BeforeIgnoreConditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
@@ -408,7 +418,7 @@ var (
 			Value: "おりまし",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
@@ -422,7 +432,7 @@ var (
 			Value:          "ますわ",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
@@ -437,7 +447,7 @@ var (
 			Value:                        "たわ",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
@@ -450,7 +460,7 @@ var (
 			Value: "でしょう",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"助動詞"},
@@ -460,7 +470,7 @@ var (
 					Value: []string{"ない"},
 				},
 			},
-			BeforeIgnoreConditions: []convertCondition{
+			BeforeIgnoreConditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "自立"},
@@ -469,7 +479,7 @@ var (
 			Value: "ありません",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "非自立"},
@@ -482,7 +492,7 @@ var (
 			Value: "くださいまし",
 		},
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "非自立"},
@@ -498,7 +508,7 @@ var (
 		newRuleVerbs("じゃぁ", "それでは"),
 		newRuleVerbs("じゃあ", "それでは"),
 		{
-			Conditions: []convertCondition{
+			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
 					Value: []string{"動詞", "非自立"},
@@ -549,6 +559,7 @@ func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
 	return false
 }
 
+// matchAllTokenData は data がすべての c と一致した時に true を返す。
 func (c *convertConditions) matchAllTokenData(data tokenizer.TokenData) bool {
 	for _, cond := range *c {
 		if cond.notEqualsTokenData(data) {
@@ -556,6 +567,16 @@ func (c *convertConditions) matchAllTokenData(data tokenizer.TokenData) bool {
 		}
 	}
 	return true
+}
+
+// matchAnyTokenData は data がいずれかの c と一致した時に true を返す。
+func (c *convertConditions) matchAnyTokenData(data tokenizer.TokenData) bool {
+	for _, cond := range *c {
+		if cond.equalsTokenData(data) {
+			return true
+		}
+	}
+	return false
 }
 
 var (
@@ -581,7 +602,7 @@ func newCond(features []string, surface string) convertConditions {
 
 func newRule(features []string, surface, value string) convertRule {
 	return convertRule{
-		Conditions: []convertCondition{
+		Conditions: convertConditions{
 			{
 				Type:  convertTypeFeatures,
 				Value: features,

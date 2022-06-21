@@ -135,55 +135,50 @@ ruleLoop:
 func matchExcludeRule(data tokenizer.TokenData) bool {
 excludeLoop:
 	for _, c := range excludeRules {
-		for _, cond := range c.Conditions {
-			if cond.notEqualsTokenData(data) {
-				continue excludeLoop
-			}
+		if !c.Conditions.matchAllTokenData(data) {
+			continue excludeLoop
 		}
 		return true
 	}
 	return false
 }
 
+// convert は基本的な変換を行う。
 func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, opt *ConvertOption) string {
-converterLoop:
+	var beforeToken tokenizer.TokenData
+	var beforeTokenOK bool
+	if 0 < i {
+		beforeToken = tokenizer.NewTokenData(tokens[i-1])
+		beforeTokenOK = true
+	}
+
+	var afterToken tokenizer.TokenData
+	var afterTokenOK bool
+	if i+1 < len(tokens) {
+		afterToken = tokenizer.NewTokenData(tokens[i+1])
+		afterTokenOK = true
+	}
+
 	for _, c := range convertRules {
-		for _, cond := range c.Conditions {
-			if cond.notEqualsTokenData(data) {
-				continue converterLoop
-			}
+		if !c.Conditions.matchAllTokenData(data) {
+			continue
 		}
 
 		// 前に続く単語をみて変換を無視する
-		for _, cond := range c.BeforeIgnoreConditions {
-			if 0 < i {
-				data := tokenizer.NewTokenData(tokens[i-1])
-				if cond.equalsTokenData(data) {
-					break converterLoop
-				}
-			}
+		if beforeTokenOK && c.BeforeIgnoreConditions.matchAnyTokenData(beforeToken) {
+			break
 		}
 
 		// 次に続く単語をみて変換を無視する
-		for _, cond := range c.AfterIgnoreConditions {
-			if i+1 < len(tokens) {
-				data := tokenizer.NewTokenData(tokens[i+1])
-				if cond.equalsTokenData(data) {
-					break converterLoop
-				}
-			}
+		if afterTokenOK && c.AfterIgnoreConditions.matchAnyTokenData(afterToken) {
+			break
 		}
 
 		// 文の区切りか、文の終わりの時だけ有効にする。
-		if c.EnableWhenSentenceSeparation {
-			if i+1 < len(tokens) {
-				// 次のトークンが区切りではない場合は変換しない
-				data := tokenizer.NewTokenData(tokens[i+1])
-				if !isSentenceSeparation(data) {
-					break
-				}
-			}
-			// 次のトークンが存在しない場合は文の終わりなので変換する
+		// 次のトークンが存在して、且つ次のトークンが文を区切るトークンでない時
+		// は変換しない。
+		if c.EnableWhenSentenceSeparation && afterTokenOK && !isSentenceSeparation(afterToken) {
+			break
 		}
 
 		result := c.Value
@@ -198,6 +193,7 @@ converterLoop:
 	return surface
 }
 
+// appendPrefix は surface の前に「お」を付ける。
 func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool) (string, bool) {
 	if equalsFeatures(data.Features, []string{"名詞", "一般"}) || equalsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
 		if i+1 < len(tokens) {
@@ -222,7 +218,7 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 	return surface, false
 }
 
-// 丁寧語を差し込む
+// appendPoliteWord は丁寧語を追加する。
 func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
 	if equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
 		if i+1 < len(tokens) {
