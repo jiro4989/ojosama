@@ -99,18 +99,6 @@ var (
 			Conditions: convertConditions{
 				{
 					Type:  convertTypeFeatures,
-					Value: []string{"名詞", "一般"},
-				},
-				{
-					Type:  convertTypeSurface,
-					Value: []string{"お嬢様"},
-				},
-			},
-		},
-		{
-			Conditions: convertConditions{
-				{
-					Type:  convertTypeFeatures,
 					Value: []string{"名詞", "固有名詞", "一般"},
 				},
 				{

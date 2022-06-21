@@ -201,6 +201,11 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 		return surface, false
 	}
 
+	// 丁寧語の場合は「お」を付けない
+	if isPoliteWord(data) {
+		return surface, false
+	}
+
 	// 次のトークンが動詞の場合は「お」を付けない。
 	// 例: プレイする
 	if i+1 < len(tokens) {
@@ -292,4 +297,10 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		break
 	}
 	return src
+}
+
+// isPoliteWord は丁寧語かどうかを判定する。
+// 読みがオで始まる言葉も true になる。
+func isPoliteWord(data tokenizer.TokenData) bool {
+	return strings.HasPrefix(data.Reading, "オ")
 }
