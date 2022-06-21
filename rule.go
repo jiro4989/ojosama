@@ -33,7 +33,7 @@ const (
 )
 
 var (
-	multiConvertRules = []multiConvertRule{
+	convertContinuousConditionsRules = []multiConvertRule{
 		{
 			Value: "壱百満天原サロメ",
 			Conditions: []convertConditions{

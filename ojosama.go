@@ -94,7 +94,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 
 func convertMulti(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
 ruleLoop:
-	for _, mc := range multiConvertRules {
+	for _, mc := range convertContinuousConditionsRules {
 		j := i
 		var s strings.Builder
 
