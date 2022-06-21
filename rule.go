@@ -33,6 +33,10 @@ const (
 )
 
 var (
+	// convertContinuousConditionsRules は連続する条件がすべてマッチしたときに変換するルール。
+	//
+	// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
+	// して初めて1つの意味になるような条件を定義する。
 	convertContinuousConditionsRules = []multiConvertRule{
 		{
 			Value: "壱百満天原サロメ",

@@ -63,7 +63,6 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			continue
 		}
 
-		// 特定の組み合わせが連続した時に変換
 		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
 			i = n
 			result.WriteString(s)
@@ -92,6 +91,10 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	return result.String(), nil
 }
 
+// convertContinuousConditions は連続する条件がすべてマッチした時に変換する。
+//
+// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
+// して初めて1つの意味になるような条件をすべて満たした時に変換を行う。
 func convertContinuousConditions(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
 ruleLoop:
 	for _, mc := range convertContinuousConditionsRules {
