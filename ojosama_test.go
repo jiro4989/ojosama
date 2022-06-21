@@ -383,6 +383,20 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 二重丁寧語にはしませんの",
+			src:     "お嬢様、おにぎり、お腹、お寿司、おませさん、お利口さん",
+			want:    "お嬢様、おにぎり、お腹、お寿司、おませさん、お利口さん",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: 読みが「お」で始まる言葉には「お」を付けませんの",
+			src:     "追い剥ぎ、大型、大分、おろし金",
+			want:    "追い剥ぎ、大型、大分、おろし金",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
