@@ -2,6 +2,7 @@ package ojosama
 
 import "github.com/ikawaha/kagome/v2/tokenizer"
 
+// convertRule は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
 type convertRule struct {
 	Conditions                   []convertCondition
 	BeforeIgnoreConditions       []convertCondition // 前のTokenで条件にマッチした場合は無視する
@@ -11,6 +12,7 @@ type convertRule struct {
 	Value                        string
 }
 
+// continuousConditionsConvertRule は連続する条件がすべてマッチしたときに変換するルール。
 type continuousConditionsConvertRule struct {
 	Conditions     []convertConditions
 	AppendLongNote bool
