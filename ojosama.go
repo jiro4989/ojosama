@@ -145,6 +145,7 @@ excludeLoop:
 	return false
 }
 
+// convert は基本的な変換を行う。
 func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, opt *ConvertOption) string {
 converterLoop:
 	for _, c := range convertRules {
