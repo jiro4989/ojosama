@@ -69,7 +69,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			continue
 		}
 
-		if ok := c.convertContinuousConditions(opt); ok {
+		if s, n, ok := convertContinuousConditions(c.tokens.tokens, c.pos, opt); ok {
+			c.pos = n
+			c.result.WriteString(s)
 			continue
 		}
 
@@ -103,11 +105,11 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 //
 // 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
 // して初めて1つの意味になるような条件をすべて満たした時に変換を行う。
-func (c *converter) convertContinuousConditions(opt *ConvertOption) bool {
-	tokens := c.tokens.tokens
+func convertContinuousConditions(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
 ruleLoop:
 	for _, mc := range continuousConditionsConvertRules {
-		j := c.pos
+		j := i
+		var s strings.Builder
 
 		// conditionsのすべての評価がtrueの場合だけ変換する。
 		// マッチすると次のTokenにアクセスするために、ループカウンタを1進める。
@@ -126,6 +128,7 @@ ruleLoop:
 			if !conds.matchAllTokenData(data) {
 				continue ruleLoop
 			}
+			s.WriteString(data.Surface)
 			j++
 		}
 
@@ -133,12 +136,9 @@ ruleLoop:
 		if mc.AppendLongNote {
 			result = appendLongNote(result, tokens, j-1, opt)
 		}
-
-		c.pos = j - 1
-		c.result.WriteString(result)
-		return true
+		return result, j - 1, true
 	}
-	return false
+	return "", -1, false
 }
 
 // matchExcludeRule は除外ルールと一致するものが存在するかを判定する。
