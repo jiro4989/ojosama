@@ -197,25 +197,27 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 
 // appendPrefix は surface の前に「お」を付ける。
 func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool) (string, bool) {
-	if equalsFeatures(data.Features, []string{"名詞", "一般"}) || equalsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
-		if i+1 < len(tokens) {
-			data := tokenizer.NewTokenData(tokens[i+1])
-			if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
-				return surface, nounKeep
-			}
-		}
+	if !equalsFeatures(data.Features, []string{"名詞", "一般"}) && !equalsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
+		return surface, false
+	}
 
-		// 名詞 一般が連続する場合は最初の1つ目にだけ「お」を付ける
-		if !nounKeep {
-			// 1つ手前にすでに「お」が付いている場合は付与しない
-			if 0 < i {
-				data := tokenizer.NewTokenData(tokens[i-1])
-				if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
-					return surface, false
-				}
-			}
-			return "お" + surface, true
+	if i+1 < len(tokens) {
+		data := tokenizer.NewTokenData(tokens[i+1])
+		if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
+			return surface, nounKeep
 		}
+	}
+
+	// 名詞 一般が連続する場合は最初の1つ目にだけ「お」を付ける
+	if !nounKeep {
+		// 1つ手前にすでに「お」が付いている場合は付与しない
+		if 0 < i {
+			data := tokenizer.NewTokenData(tokens[i-1])
+			if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
+				return surface, false
+			}
+		}
+		return "お" + surface, true
 	}
 	return surface, false
 }
