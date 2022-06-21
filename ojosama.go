@@ -93,31 +93,37 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 }
 
 func convertMulti(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
+ruleLoop:
 	for _, mc := range multiConvertRules {
-	properNounLoop:
-		for _, rule := range mc.Conditions {
-			j := i
-			var s strings.Builder
-			for _, c := range rule {
-				if len(tokens) <= j {
-					continue properNounLoop
-				}
-				data := tokenizer.NewTokenData(tokens[j])
-				for _, cond := range c.Conditions {
-					if cond.notEqualsTokenData(data) {
-						continue properNounLoop
-					}
-				}
-				j++
-				s.WriteString(data.Surface)
+		j := i
+		var s strings.Builder
+
+		// conditionsのすべての評価がtrueの場合だけ変換する。
+		// マッチすると次のTokenにアクセスするために、ループカウンタを1進める。
+		//
+		// conditions が1つでも不一致の場合、
+		// そのruleの以降のconditionsは評価する意味が無い。
+		// よって conditions の評価ループを脱出し、次のruleの評価に移行する。
+		//
+		// 次のトークンが存在しない場合も評価する意味が無いので conditions 評価
+		// ループを脱出する。
+		for _, conds := range mc.Conditions {
+			if len(tokens) <= j {
+				continue ruleLoop
 			}
-			result := mc.Value
-			if mc.AppendLongNote {
-				n := i + len(mc.Conditions)
-				result = appendLongNote(result, tokens, n, opt)
+			data := tokenizer.NewTokenData(tokens[j])
+			if !conds.matchAllTokenData(data) {
+				continue ruleLoop
 			}
-			return result, j - 1, true
+			s.WriteString(data.Surface)
+			j++
 		}
+
+		result := mc.Value
+		if mc.AppendLongNote {
+			result = appendLongNote(result, tokens, j-1, opt)
+		}
+		return result, j - 1, true
 	}
 	return "", -1, false
 }
