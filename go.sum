@@ -6,8 +6,8 @@ github.com/ikawaha/kagome-dict v1.0.4 h1:sxRKBqQ5FiJKeQwhvUmtumFqCm+GvCYiKRVgA08
 github.com/ikawaha/kagome-dict v1.0.4/go.mod h1:s6LsRECNl13K4miPTTG3/n6Pt7v3ClQfohMbK7qitzo=
 github.com/ikawaha/kagome-dict/ipa v1.0.4 h1:+vXHnhfgwNdm/DU4KrPaiRHO4zUht0w0iK4EtkVfrL8=
 github.com/ikawaha/kagome-dict/ipa v1.0.4/go.mod h1:zpMcAFSLDYEq+UI3GnF3IcZE5a0rKB2J0rrKGY6HYW8=
-github.com/ikawaha/kagome/v2 v2.7.0 h1:8FSQwHKgDptbqpIPlLzYn1ekIAQwe2NJ6q6QfyXwlC4=
-github.com/ikawaha/kagome/v2 v2.7.0/go.mod h1:x7RC7TnFI5uOzxIPDcx9sJqV1vFE+3p+mJNcTVUGHjo=
+github.com/ikawaha/kagome/v2 v2.8.0 h1:4YhSr5gsIbmeglctyI9/29ekM8/tRNpB7697M29Zpds=
+github.com/ikawaha/kagome/v2 v2.8.0/go.mod h1:DSeT49bHcm+NLDqj3IKZ/WRcMiIK/ZuMjpu+mtb4wdw=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
