@@ -27,17 +27,6 @@ type forceAppendLongNote struct {
 	exclamationMarkCount int
 }
 
-type converter struct {
-	tokens
-	buf    string
-	result strings.Builder
-}
-
-type tokens struct {
-	tokens []tokenizer.Token
-	pos    int
-}
-
 var (
 	alnumRegexp = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
 )
@@ -54,37 +43,38 @@ func init() {
 // opt は挙動を微調整するためのオプショナルなパラメータ。不要であれば nil を渡せ
 // ば良い。
 func Convert(src string, opt *ConvertOption) (string, error) {
-	c, err := newConverter(src)
+	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
 		return "", err
 	}
 
+	// tokenize
+	tokens := t.Tokenize(src)
+	var result strings.Builder
 	var nounKeep bool
-	for ; c.continuable(); c.pos++ {
-		c.update()
+	for i := 0; i < len(tokens); i++ {
+		token := tokens[i]
+		data := tokenizer.NewTokenData(token)
+		buf := data.Surface
 
 		// 英数字のみの単語の場合は何もしない
-		if alnumRegexp.MatchString(c.buf) {
-			c.writeBuffer()
+		if alnumRegexp.MatchString(data.Surface) {
+			result.WriteString(buf)
 			continue
 		}
 
-		if s, n, ok := convertContinuousConditions(c.tokens.tokens, c.pos, opt); ok {
-			c.pos = n
-			c.result.WriteString(s)
+		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
+			i = n
+			result.WriteString(s)
 			continue
 		}
 
 		// 特定条件は優先して無視する
-		if matchExcludeRule(*c.tokenData()) {
-			c.result.WriteString(c.buf)
+		if matchExcludeRule(data) {
+			result.WriteString(buf)
 			continue
 		}
 
-		buf := c.buf
-		data := *c.tokenData()
-		tokens := c.tokens.tokens
-		i := c.pos
 		// お嬢様言葉に変換
 		buf = convert(data, tokens, i, buf, opt)
 
@@ -96,9 +86,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
 		buf = appendPoliteWord(data, tokens, i, buf)
 
-		c.result.WriteString(buf)
+		result.WriteString(buf)
 	}
-	return c.result.String(), nil
+	return result.String(), nil
 }
 
 // convertContinuousConditions は連続する条件がすべてマッチした時に変換する。
@@ -293,51 +283,4 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		}
 	}
 	return src
-}
-
-func newConverter(s string) (*converter, error) {
-	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
-	if err != nil {
-		return nil, err
-	}
-
-	c := &converter{
-		tokens: tokens{tokens: t.Tokenize(s)},
-	}
-	return c, nil
-}
-
-func (c *converter) update() {
-	data := c.tokenData()
-	c.buf = data.Surface
-}
-
-func (c *converter) writeBuffer() {
-	c.result.WriteString(c.buf)
-}
-
-func (t *tokens) continuable() bool {
-	return t.pos < len(t.tokens)
-}
-
-func (t *tokens) prevTokenData() *tokenizer.TokenData {
-	if 0 < t.pos {
-		data := tokenizer.NewTokenData(t.tokens[t.pos-1])
-		return &data
-	}
-	return nil
-}
-
-func (t *tokens) tokenData() *tokenizer.TokenData {
-	data := tokenizer.NewTokenData(t.tokens[t.pos])
-	return &data
-}
-
-func (t *tokens) nextTokenData() *tokenizer.TokenData {
-	i := t.pos + 1
-	if i < len(t.tokens) {
-		data := tokenizer.NewTokenData(t.tokens[i])
-		return &data
-	}
-	return nil
 }
