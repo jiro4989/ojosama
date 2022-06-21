@@ -63,8 +63,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			continue
 		}
 
-		// 特定の組み合わせが連続した時に変換
-		if s, n, ok := convertMulti(tokens, i, opt); ok {
+		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
 			i = n
 			result.WriteString(s)
 			continue
@@ -92,32 +91,42 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	return result.String(), nil
 }
 
-func convertMulti(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
-	for _, mc := range multiConvertRules {
-	properNounLoop:
-		for _, rule := range mc.Conditions {
-			j := i
-			var s strings.Builder
-			for _, c := range rule {
-				if len(tokens) <= j {
-					continue properNounLoop
-				}
-				data := tokenizer.NewTokenData(tokens[j])
-				for _, cond := range c.Conditions {
-					if cond.notEqualsTokenData(data) {
-						continue properNounLoop
-					}
-				}
-				j++
-				s.WriteString(data.Surface)
+// convertContinuousConditions は連続する条件がすべてマッチした時に変換する。
+//
+// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
+// して初めて1つの意味になるような条件をすべて満たした時に変換を行う。
+func convertContinuousConditions(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
+ruleLoop:
+	for _, mc := range convertContinuousConditionsRules {
+		j := i
+		var s strings.Builder
+
+		// conditionsのすべての評価がtrueの場合だけ変換する。
+		// マッチすると次のTokenにアクセスするために、ループカウンタを1進める。
+		//
+		// conditions が1つでも不一致の場合、
+		// そのruleの以降のconditionsは評価する意味が無い。
+		// よって conditions の評価ループを脱出し、次のruleの評価に移行する。
+		//
+		// 次のトークンが存在しない場合も評価する意味が無いので conditions 評価
+		// ループを脱出する。
+		for _, conds := range mc.Conditions {
+			if len(tokens) <= j {
+				continue ruleLoop
 			}
-			result := mc.Value
-			if mc.AppendLongNote {
-				n := i + len(mc.Conditions)
-				result = appendLongNote(result, tokens, n, opt)
+			data := tokenizer.NewTokenData(tokens[j])
+			if !conds.matchAllTokenData(data) {
+				continue ruleLoop
 			}
-			return result, j - 1, true
+			s.WriteString(data.Surface)
+			j++
 		}
+
+		result := mc.Value
+		if mc.AppendLongNote {
+			result = appendLongNote(result, tokens, j-1, opt)
+		}
+		return result, j - 1, true
 	}
 	return "", -1, false
 }

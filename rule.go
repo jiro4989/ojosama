@@ -13,10 +13,12 @@ type convertRule struct {
 
 // FIXME: 型が不適当
 type multiConvertRule struct {
-	Conditions     [][]convertRule
+	Conditions     []convertConditions
 	AppendLongNote bool
 	Value          string
 }
+
+type convertConditions []convertCondition
 
 type convertType int
 
@@ -31,70 +33,62 @@ const (
 )
 
 var (
-	multiConvertRules = []multiConvertRule{
+	// convertContinuousConditionsRules は連続する条件がすべてマッチしたときに変換するルール。
+	//
+	// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
+	// して初めて1つの意味になるような条件を定義する。
+	convertContinuousConditionsRules = []multiConvertRule{
 		{
 			Value: "壱百満天原サロメ",
-			Conditions: [][]convertRule{
+			Conditions: []convertConditions{
 				{
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"名詞", "一般"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"壱"},
-							},
-						},
+						Type:  convertTypeFeatures,
+						Value: []string{"名詞", "一般"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"名詞", "数"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"百"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"壱"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"名詞", "数"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"名詞", "一般"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"満天"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"百"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"名詞", "一般"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"接頭詞", "名詞接続"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"原"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"満天"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"接頭詞", "名詞接続"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"名詞", "一般"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"サロメ"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"原"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"名詞", "一般"},
+					},
+					{
+						Type:  convertTypeSurface,
+						Value: []string{"サロメ"},
 					},
 				},
 			},
@@ -103,31 +97,25 @@ var (
 		{
 			Value:          "いたしますわ",
 			AppendLongNote: true,
-			Conditions: [][]convertRule{
+			Conditions: []convertConditions{
 				{
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"動詞", "自立"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"し"},
-							},
-						},
+						Type:  convertTypeFeatures,
+						Value: []string{"動詞", "自立"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"助動詞"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"ます"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"し"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"助動詞"},
+					},
+					{
+						Type:  convertTypeSurface,
+						Value: []string{"ます"},
 					},
 				},
 			},
@@ -135,31 +123,25 @@ var (
 
 		{
 			Value: "ですので",
-			Conditions: [][]convertRule{
+			Conditions: []convertConditions{
 				{
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"助動詞"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"だ"},
-							},
-						},
+						Type:  convertTypeFeatures,
+						Value: []string{"助動詞"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"助詞", "接続助詞"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"から"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"だ"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"助詞", "接続助詞"},
+					},
+					{
+						Type:  convertTypeSurface,
+						Value: []string{"から"},
 					},
 				},
 			},
@@ -167,43 +149,35 @@ var (
 
 		{
 			Value: "なんですの",
-			Conditions: [][]convertRule{
+			Conditions: []convertConditions{
 				{
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"助動詞"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"な"},
-							},
-						},
+						Type:  convertTypeFeatures,
+						Value: []string{"助動詞"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"名詞", "非自立", "一般"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"ん"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"な"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"名詞", "非自立", "一般"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"助動詞"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"だ"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"ん"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"助動詞"},
+					},
+					{
+						Type:  convertTypeSurface,
+						Value: []string{"だ"},
 					},
 				},
 			},
@@ -211,31 +185,25 @@ var (
 
 		{
 			Value: "ですわ",
-			Conditions: [][]convertRule{
+			Conditions: []convertConditions{
 				{
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"助動詞"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"だ"},
-							},
-						},
+						Type:  convertTypeFeatures,
+						Value: []string{"助動詞"},
 					},
 					{
-						Conditions: []convertCondition{
-							{
-								Type:  convertTypeFeatures,
-								Value: []string{"助詞", "終助詞"},
-							},
-							{
-								Type:  convertTypeSurface,
-								Value: []string{"よ"},
-							},
-						},
+						Type:  convertTypeSurface,
+						Value: []string{"だ"},
+					},
+				},
+				{
+					{
+						Type:  convertTypeFeatures,
+						Value: []string{"助詞", "終助詞"},
+					},
+					{
+						Type:  convertTypeSurface,
+						Value: []string{"よ"},
 					},
 				},
 			},
@@ -704,6 +672,15 @@ func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
 		}
 	}
 	return false
+}
+
+func (c *convertConditions) matchAllTokenData(data tokenizer.TokenData) bool {
+	for _, cond := range *c {
+		if cond.notEqualsTokenData(data) {
+			return false
+		}
+	}
+	return true
 }
 
 var (
