@@ -99,7 +99,6 @@ func convertContinuousConditions(tokens []tokenizer.Token, i int, opt *ConvertOp
 ruleLoop:
 	for _, mc := range continuousConditionsConvertRules {
 		j := i
-		var s strings.Builder
 
 		// conditionsのすべての評価がtrueの場合だけ変換する。
 		// マッチすると次のTokenにアクセスするために、ループカウンタを1進める。
@@ -118,7 +117,6 @@ ruleLoop:
 			if !conds.matchAllTokenData(data) {
 				continue ruleLoop
 			}
-			s.WriteString(data.Surface)
 			j++
 		}
 
