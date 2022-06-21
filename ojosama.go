@@ -91,10 +91,15 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	return result.String(), nil
 }
 
-// convertContinuousConditions は連続する条件がすべてマッチした時に変換する。
+// convertContinuousConditions は連続する条件による変換ルールにマッチした変換結果を返す。
 //
 // 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
-// して初めて1つの意味になるような条件をすべて満たした時に変換を行う。
+// して初めて1つの意味になるような条件をすべて満たした時に結果を返す。
+//
+// 連続する条件にマッチした場合は tokenPos をその分だけ進める必要があるため、進
+// めた後の tokenPos を返却する。
+//
+// 第三引数は変換ルールにマッチしたかどうかを返す。
 func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *ConvertOption) (string, int, bool) {
 	for _, mc := range continuousConditionsConvertRules {
 		if !matchContinuousConditions(tokens, tokenPos, mc.Conditions) {
