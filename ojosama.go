@@ -222,20 +222,19 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 
 // appendPoliteWord は丁寧語を追加する。
 func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
-	if equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
-		if i+1 < len(tokens) {
-			// 文の区切りのタイミングでは「ですわ」を差し込む
-			data := tokenizer.NewTokenData(tokens[i+1])
-			if isSentenceSeparation(data) {
-				return surface + "ですわ"
-			}
-
-			// // 次の単語が助動詞（です）出ない場合は「です」を差し込む
-			// if !equalsFeatures(data.Features, []string{"助動詞"}) {
-			// 	return surface + "です"
-			// }
-		}
+	if !equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
+		return surface
 	}
+
+	if len(tokens) <= i+1 {
+		return surface
+	}
+
+	// 文の区切りのタイミングでは「ですわ」を差し込む
+	if isSentenceSeparation(tokenizer.NewTokenData(tokens[i+1])) {
+		return surface + "ですわ"
+	}
+
 	return surface
 }
 
