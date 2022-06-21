@@ -11,8 +11,7 @@ type convertRule struct {
 	Value                        string
 }
 
-// FIXME: 型が不適当
-type multiConvertRule struct {
+type convertContinuousConditionsRule struct {
 	Conditions     []convertConditions
 	AppendLongNote bool
 	Value          string
@@ -37,7 +36,7 @@ var (
 	//
 	// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
 	// して初めて1つの意味になるような条件を定義する。
-	convertContinuousConditionsRules = []multiConvertRule{
+	convertContinuousConditionsRules = []convertContinuousConditionsRule{
 		{
 			Value: "壱百満天原サロメ",
 			Conditions: []convertConditions{
