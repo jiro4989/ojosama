@@ -151,10 +151,11 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 		beforeToken = tokenizer.NewTokenData(tokens[i-1])
 		beforeTokenOK = true
 	}
+
 converterLoop:
 	for _, c := range convertRules {
 		if !c.Conditions.matchAllTokenData(data) {
-			continue converterLoop
+			continue
 		}
 
 		// 前に続く単語をみて変換を無視する
