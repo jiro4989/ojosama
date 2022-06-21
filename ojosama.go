@@ -145,6 +145,12 @@ excludeLoop:
 
 // convert は基本的な変換を行う。
 func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, opt *ConvertOption) string {
+	var beforeToken tokenizer.TokenData
+	var beforeTokenOK bool
+	if 0 < i {
+		beforeToken = tokenizer.NewTokenData(tokens[i-1])
+		beforeTokenOK = true
+	}
 converterLoop:
 	for _, c := range convertRules {
 		if !c.Conditions.matchAllTokenData(data) {
@@ -152,13 +158,8 @@ converterLoop:
 		}
 
 		// 前に続く単語をみて変換を無視する
-		for _, cond := range c.BeforeIgnoreConditions {
-			if 0 < i {
-				data := tokenizer.NewTokenData(tokens[i-1])
-				if cond.equalsTokenData(data) {
-					break converterLoop
-				}
-			}
+		if beforeTokenOK && c.BeforeIgnoreConditions.matchAnyTokenData(beforeToken) {
+			break
 		}
 
 		// 次に続く単語をみて変換を無視する
