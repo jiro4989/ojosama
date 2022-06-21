@@ -201,6 +201,8 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 		return surface, false
 	}
 
+	// 次のトークンが動詞の場合は「お」を付けない。
+	// 例: プレイする
 	if i+1 < len(tokens) {
 		data := tokenizer.NewTokenData(tokens[i+1])
 		if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
@@ -208,18 +210,20 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 		}
 	}
 
-	// 名詞 一般が連続する場合は最初の1つ目にだけ「お」を付ける
-	if !nounKeep {
-		// 1つ手前にすでに「お」が付いている場合は付与しない
-		if 0 < i {
-			data := tokenizer.NewTokenData(tokens[i-1])
-			if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
-				return surface, false
-			}
-		}
-		return "お" + surface, true
+	// すでに「お」を付与されているので、「お」を付与しない
+	if nounKeep {
+		return surface, false
 	}
-	return surface, false
+
+	// 手前のトークンが「お」の場合は付与しない
+	if 0 < i {
+		data := tokenizer.NewTokenData(tokens[i-1])
+		if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
+			return surface, false
+		}
+	}
+
+	return "お" + surface, true
 }
 
 // appendPoliteWord は丁寧語を追加する。
