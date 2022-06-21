@@ -97,7 +97,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 // して初めて1つの意味になるような条件をすべて満たした時に変換を行う。
 func convertContinuousConditions(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
 ruleLoop:
-	for _, mc := range convertContinuousConditionsRules {
+	for _, mc := range continuousConditionsConvertRules {
 		j := i
 		var s strings.Builder
 

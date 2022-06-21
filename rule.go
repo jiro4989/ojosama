@@ -2,6 +2,7 @@ package ojosama
 
 import "github.com/ikawaha/kagome/v2/tokenizer"
 
+// convertRule は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
 type convertRule struct {
 	Conditions                   []convertCondition
 	BeforeIgnoreConditions       []convertCondition // 前のTokenで条件にマッチした場合は無視する
@@ -11,8 +12,8 @@ type convertRule struct {
 	Value                        string
 }
 
-// FIXME: 型が不適当
-type multiConvertRule struct {
+// continuousConditionsConvertRule は連続する条件がすべてマッチしたときに変換するルール。
+type continuousConditionsConvertRule struct {
 	Conditions     []convertConditions
 	AppendLongNote bool
 	Value          string
@@ -33,64 +34,19 @@ const (
 )
 
 var (
-	// convertContinuousConditionsRules は連続する条件がすべてマッチしたときに変換するルール。
+	// continuousConditionsConvertRules は連続する条件がすべてマッチしたときに変換するルール。
 	//
 	// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
 	// して初めて1つの意味になるような条件を定義する。
-	convertContinuousConditionsRules = []multiConvertRule{
+	continuousConditionsConvertRules = []continuousConditionsConvertRule{
 		{
 			Value: "壱百満天原サロメ",
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "一般"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"壱"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "数"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"百"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "一般"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"満天"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"接頭詞", "名詞接続"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"原"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "一般"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"サロメ"},
-					},
-				},
+				newCond([]string{"名詞", "一般"}, "壱"),
+				newCond([]string{"名詞", "数"}, "百"),
+				newCond([]string{"名詞", "一般"}, "満天"),
+				newCond([]string{"接頭詞", "名詞接続"}, "原"),
+				newCond([]string{"名詞", "一般"}, "サロメ"),
 			},
 		},
 
@@ -98,114 +54,33 @@ var (
 			Value:          "いたしますわ",
 			AppendLongNote: true,
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"動詞", "自立"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"し"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"ます"},
-					},
-				},
+				newCond([]string{"動詞", "自立"}, "し"),
+				newCond([]string{"助動詞"}, "ます"),
 			},
 		},
 
 		{
 			Value: "ですので",
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"だ"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助詞", "接続助詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"から"},
-					},
-				},
+				newCond([]string{"助動詞"}, "だ"),
+				newCond([]string{"助詞", "接続助詞"}, "から"),
 			},
 		},
 
 		{
 			Value: "なんですの",
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"な"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "非自立", "一般"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"ん"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"だ"},
-					},
-				},
+				newCond([]string{"助動詞"}, "な"),
+				newCond([]string{"名詞", "非自立", "一般"}, "ん"),
+				newCond([]string{"助動詞"}, "だ"),
 			},
 		},
 
 		{
 			Value: "ですわ",
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"だ"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助詞", "終助詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"よ"},
-					},
-				},
+				newCond([]string{"助動詞"}, "だ"),
+				newCond([]string{"助詞", "終助詞"}, "よ"),
 			},
 		},
 	}
@@ -241,17 +116,17 @@ var (
 
 	convertRules = []convertRule{
 		// 一人称
-		newCondPronounGeneral("俺", "私"),
-		newCondPronounGeneral("オレ", "ワタクシ"),
-		newCondPronounGeneral("おれ", "わたくし"),
-		newCondPronounGeneral("僕", "私"),
-		newCondPronounGeneral("ボク", "ワタクシ"),
-		newCondPronounGeneral("ぼく", "わたくし"),
-		newCondPronounGeneral("あたし", "わたくし"),
-		newCondPronounGeneral("わたし", "わたくし"),
+		newRulePronounGeneral("俺", "私"),
+		newRulePronounGeneral("オレ", "ワタクシ"),
+		newRulePronounGeneral("おれ", "わたくし"),
+		newRulePronounGeneral("僕", "私"),
+		newRulePronounGeneral("ボク", "ワタクシ"),
+		newRulePronounGeneral("ぼく", "わたくし"),
+		newRulePronounGeneral("あたし", "わたくし"),
+		newRulePronounGeneral("わたし", "わたくし"),
 
 		// 二人称
-		newCondPronounGeneral("あなた", "貴方"),
+		newRulePronounGeneral("あなた", "貴方"),
 
 		// 三人称
 		// TODO: AfterIgnore系も簡単に定義できるようにしたい
@@ -295,22 +170,22 @@ var (
 		},
 
 		// こそあど言葉
-		newCondPronounGeneral("これ", "こちら"),
-		newCondPronounGeneral("それ", "そちら"),
-		newCondPronounGeneral("あれ", "あちら"),
-		newCondPronounGeneral("どれ", "どちら"),
-		newCondAdnominalAdjective("この", "こちらの"),
-		newCondAdnominalAdjective("その", "そちらの"),
-		newCondAdnominalAdjective("あの", "あちらの"),
-		newCondAdnominalAdjective("どの", "どちらの"),
-		newCondPronounGeneral("ここ", "こちら"),
-		newCondPronounGeneral("そこ", "そちら"),
-		newCondPronounGeneral("あそこ", "あちら"),
-		newCondPronounGeneral("どこ", "どちら"),
-		newCondAdnominalAdjective("こんな", "このような"),
-		newCondAdnominalAdjective("そんな", "そのような"),
-		newCondAdnominalAdjective("あんな", "あのような"),
-		newCondAdnominalAdjective("どんな", "どのような"),
+		newRulePronounGeneral("これ", "こちら"),
+		newRulePronounGeneral("それ", "そちら"),
+		newRulePronounGeneral("あれ", "あちら"),
+		newRulePronounGeneral("どれ", "どちら"),
+		newRuleAdnominalAdjective("この", "こちらの"),
+		newRuleAdnominalAdjective("その", "そちらの"),
+		newRuleAdnominalAdjective("あの", "あちらの"),
+		newRuleAdnominalAdjective("どの", "どちらの"),
+		newRulePronounGeneral("ここ", "こちら"),
+		newRulePronounGeneral("そこ", "そちら"),
+		newRulePronounGeneral("あそこ", "あちら"),
+		newRulePronounGeneral("どこ", "どちら"),
+		newRuleAdnominalAdjective("こんな", "このような"),
+		newRuleAdnominalAdjective("そんな", "そのような"),
+		newRuleAdnominalAdjective("あんな", "あのような"),
+		newRuleAdnominalAdjective("どんな", "どのような"),
 
 		{
 			Conditions: []convertCondition{
@@ -619,9 +494,9 @@ var (
 			},
 			Value: "くださいまし",
 		},
-		newCondVerbs("ありがとう", "ありがとうございますわ"),
-		newCondVerbs("じゃぁ", "それでは"),
-		newCondVerbs("じゃあ", "それでは"),
+		newRuleVerbs("ありがとう", "ありがとうございますわ"),
+		newRuleVerbs("じゃぁ", "それでは"),
+		newRuleVerbs("じゃあ", "それでは"),
 		{
 			Conditions: []convertCondition{
 				{
@@ -635,14 +510,14 @@ var (
 			},
 			Value: "くれます",
 		},
-		newCondAdjectivesSelfSupporting("汚い", "きったねぇ"),
-		newCondAdjectivesSelfSupporting("きたない", "きったねぇ"),
-		newCondAdjectivesSelfSupporting("臭い", "くっせぇ"),
-		newCondAdjectivesSelfSupporting("くさい", "くっせぇ"),
-		newCondVerbs("うふ", "おほ"),
-		newCondVerbs("うふふ", "おほほ"),
-		newCondVerbs("う", "お"),
-		newCondVerbs("ふふふ", "ほほほ"),
+		newRuleAdjectivesSelfSupporting("汚い", "きったねぇ"),
+		newRuleAdjectivesSelfSupporting("きたない", "きったねぇ"),
+		newRuleAdjectivesSelfSupporting("臭い", "くっせぇ"),
+		newRuleAdjectivesSelfSupporting("くさい", "くっせぇ"),
+		newRuleVerbs("うふ", "おほ"),
+		newRuleVerbs("うふふ", "おほほ"),
+		newRuleVerbs("う", "お"),
+		newRuleVerbs("ふふふ", "ほほほ"),
 	}
 )
 
@@ -691,7 +566,20 @@ var (
 	verbs                    = []string{"感動詞"}
 )
 
-func newCond(features []string, surface, value string) convertRule {
+func newCond(features []string, surface string) convertConditions {
+	return convertConditions{
+		{
+			Type:  convertTypeFeatures,
+			Value: features,
+		},
+		{
+			Type:  convertTypeSurface,
+			Value: []string{surface},
+		},
+	}
+}
+
+func newRule(features []string, surface, value string) convertRule {
 	return convertRule{
 		Conditions: []convertCondition{
 			{
@@ -707,22 +595,22 @@ func newCond(features []string, surface, value string) convertRule {
 	}
 }
 
-func newCondPronounGeneral(surface, value string) convertRule {
-	return newCond(pronounGeneral, surface, value)
+func newRulePronounGeneral(surface, value string) convertRule {
+	return newRule(pronounGeneral, surface, value)
 }
 
-func newCondNounsGeneral(surface, value string) convertRule {
-	return newCond(nounsGeneral, surface, value)
+func newRuleNounsGeneral(surface, value string) convertRule {
+	return newRule(nounsGeneral, surface, value)
 }
 
-func newCondAdnominalAdjective(surface, value string) convertRule {
-	return newCond(adnominalAdjective, surface, value)
+func newRuleAdnominalAdjective(surface, value string) convertRule {
+	return newRule(adnominalAdjective, surface, value)
 }
 
-func newCondAdjectivesSelfSupporting(surface, value string) convertRule {
-	return newCond(adjectivesSelfSupporting, surface, value)
+func newRuleAdjectivesSelfSupporting(surface, value string) convertRule {
+	return newRule(adjectivesSelfSupporting, surface, value)
 }
 
-func newCondVerbs(surface, value string) convertRule {
-	return newCond(verbs, surface, value)
+func newRuleVerbs(surface, value string) convertRule {
+	return newRule(verbs, surface, value)
 }
