@@ -41,56 +41,11 @@ var (
 		{
 			Value: "壱百満天原サロメ",
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "一般"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"壱"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "数"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"百"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "一般"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"満天"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"接頭詞", "名詞接続"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"原"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "一般"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"サロメ"},
-					},
-				},
+				newCond([]string{"名詞", "一般"}, "壱"),
+				newCond([]string{"名詞", "数"}, "百"),
+				newCond([]string{"名詞", "一般"}, "満天"),
+				newCond([]string{"接頭詞", "名詞接続"}, "原"),
+				newCond([]string{"名詞", "一般"}, "サロメ"),
 			},
 		},
 
@@ -98,114 +53,33 @@ var (
 			Value:          "いたしますわ",
 			AppendLongNote: true,
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"動詞", "自立"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"し"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"ます"},
-					},
-				},
+				newCond([]string{"動詞", "自立"}, "し"),
+				newCond([]string{"助動詞"}, "ます"),
 			},
 		},
 
 		{
 			Value: "ですので",
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"だ"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助詞", "接続助詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"から"},
-					},
-				},
+				newCond([]string{"助動詞"}, "だ"),
+				newCond([]string{"助詞", "接続助詞"}, "から"),
 			},
 		},
 
 		{
 			Value: "なんですの",
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"な"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"名詞", "非自立", "一般"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"ん"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"だ"},
-					},
-				},
+				newCond([]string{"助動詞"}, "な"),
+				newCond([]string{"名詞", "非自立", "一般"}, "ん"),
+				newCond([]string{"助動詞"}, "だ"),
 			},
 		},
 
 		{
 			Value: "ですわ",
 			Conditions: []convertConditions{
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助動詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"だ"},
-					},
-				},
-				{
-					{
-						Type:  convertTypeFeatures,
-						Value: []string{"助詞", "終助詞"},
-					},
-					{
-						Type:  convertTypeSurface,
-						Value: []string{"よ"},
-					},
-				},
+				newCond([]string{"助動詞"}, "だ"),
+				newCond([]string{"助詞", "終助詞"}, "よ"),
 			},
 		},
 	}
@@ -690,6 +564,19 @@ var (
 	adjectivesSelfSupporting = []string{"形容詞", "自立"}
 	verbs                    = []string{"感動詞"}
 )
+
+func newCond(features []string, surface string) convertConditions {
+	return convertConditions{
+		{
+			Type:  convertTypeFeatures,
+			Value: features,
+		},
+		{
+			Type:  convertTypeSurface,
+			Value: []string{surface},
+		},
+	}
+}
 
 func newRule(features []string, surface, value string) convertRule {
 	return convertRule{
