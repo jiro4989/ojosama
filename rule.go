@@ -241,17 +241,17 @@ var (
 
 	convertRules = []convertRule{
 		// 一人称
-		newCondPronounGeneral("俺", "私"),
-		newCondPronounGeneral("オレ", "ワタクシ"),
-		newCondPronounGeneral("おれ", "わたくし"),
-		newCondPronounGeneral("僕", "私"),
-		newCondPronounGeneral("ボク", "ワタクシ"),
-		newCondPronounGeneral("ぼく", "わたくし"),
-		newCondPronounGeneral("あたし", "わたくし"),
-		newCondPronounGeneral("わたし", "わたくし"),
+		newRulePronounGeneral("俺", "私"),
+		newRulePronounGeneral("オレ", "ワタクシ"),
+		newRulePronounGeneral("おれ", "わたくし"),
+		newRulePronounGeneral("僕", "私"),
+		newRulePronounGeneral("ボク", "ワタクシ"),
+		newRulePronounGeneral("ぼく", "わたくし"),
+		newRulePronounGeneral("あたし", "わたくし"),
+		newRulePronounGeneral("わたし", "わたくし"),
 
 		// 二人称
-		newCondPronounGeneral("あなた", "貴方"),
+		newRulePronounGeneral("あなた", "貴方"),
 
 		// 三人称
 		// TODO: AfterIgnore系も簡単に定義できるようにしたい
@@ -295,22 +295,22 @@ var (
 		},
 
 		// こそあど言葉
-		newCondPronounGeneral("これ", "こちら"),
-		newCondPronounGeneral("それ", "そちら"),
-		newCondPronounGeneral("あれ", "あちら"),
-		newCondPronounGeneral("どれ", "どちら"),
-		newCondAdnominalAdjective("この", "こちらの"),
-		newCondAdnominalAdjective("その", "そちらの"),
-		newCondAdnominalAdjective("あの", "あちらの"),
-		newCondAdnominalAdjective("どの", "どちらの"),
-		newCondPronounGeneral("ここ", "こちら"),
-		newCondPronounGeneral("そこ", "そちら"),
-		newCondPronounGeneral("あそこ", "あちら"),
-		newCondPronounGeneral("どこ", "どちら"),
-		newCondAdnominalAdjective("こんな", "このような"),
-		newCondAdnominalAdjective("そんな", "そのような"),
-		newCondAdnominalAdjective("あんな", "あのような"),
-		newCondAdnominalAdjective("どんな", "どのような"),
+		newRulePronounGeneral("これ", "こちら"),
+		newRulePronounGeneral("それ", "そちら"),
+		newRulePronounGeneral("あれ", "あちら"),
+		newRulePronounGeneral("どれ", "どちら"),
+		newRuleAdnominalAdjective("この", "こちらの"),
+		newRuleAdnominalAdjective("その", "そちらの"),
+		newRuleAdnominalAdjective("あの", "あちらの"),
+		newRuleAdnominalAdjective("どの", "どちらの"),
+		newRulePronounGeneral("ここ", "こちら"),
+		newRulePronounGeneral("そこ", "そちら"),
+		newRulePronounGeneral("あそこ", "あちら"),
+		newRulePronounGeneral("どこ", "どちら"),
+		newRuleAdnominalAdjective("こんな", "このような"),
+		newRuleAdnominalAdjective("そんな", "そのような"),
+		newRuleAdnominalAdjective("あんな", "あのような"),
+		newRuleAdnominalAdjective("どんな", "どのような"),
 
 		{
 			Conditions: []convertCondition{
@@ -619,9 +619,9 @@ var (
 			},
 			Value: "くださいまし",
 		},
-		newCondVerbs("ありがとう", "ありがとうございますわ"),
-		newCondVerbs("じゃぁ", "それでは"),
-		newCondVerbs("じゃあ", "それでは"),
+		newRuleVerbs("ありがとう", "ありがとうございますわ"),
+		newRuleVerbs("じゃぁ", "それでは"),
+		newRuleVerbs("じゃあ", "それでは"),
 		{
 			Conditions: []convertCondition{
 				{
@@ -635,14 +635,14 @@ var (
 			},
 			Value: "くれます",
 		},
-		newCondAdjectivesSelfSupporting("汚い", "きったねぇ"),
-		newCondAdjectivesSelfSupporting("きたない", "きったねぇ"),
-		newCondAdjectivesSelfSupporting("臭い", "くっせぇ"),
-		newCondAdjectivesSelfSupporting("くさい", "くっせぇ"),
-		newCondVerbs("うふ", "おほ"),
-		newCondVerbs("うふふ", "おほほ"),
-		newCondVerbs("う", "お"),
-		newCondVerbs("ふふふ", "ほほほ"),
+		newRuleAdjectivesSelfSupporting("汚い", "きったねぇ"),
+		newRuleAdjectivesSelfSupporting("きたない", "きったねぇ"),
+		newRuleAdjectivesSelfSupporting("臭い", "くっせぇ"),
+		newRuleAdjectivesSelfSupporting("くさい", "くっせぇ"),
+		newRuleVerbs("うふ", "おほ"),
+		newRuleVerbs("うふふ", "おほほ"),
+		newRuleVerbs("う", "お"),
+		newRuleVerbs("ふふふ", "ほほほ"),
 	}
 )
 
@@ -691,7 +691,7 @@ var (
 	verbs                    = []string{"感動詞"}
 )
 
-func newCond(features []string, surface, value string) convertRule {
+func newRule(features []string, surface, value string) convertRule {
 	return convertRule{
 		Conditions: []convertCondition{
 			{
@@ -707,22 +707,22 @@ func newCond(features []string, surface, value string) convertRule {
 	}
 }
 
-func newCondPronounGeneral(surface, value string) convertRule {
-	return newCond(pronounGeneral, surface, value)
+func newRulePronounGeneral(surface, value string) convertRule {
+	return newRule(pronounGeneral, surface, value)
 }
 
-func newCondNounsGeneral(surface, value string) convertRule {
-	return newCond(nounsGeneral, surface, value)
+func newRuleNounsGeneral(surface, value string) convertRule {
+	return newRule(nounsGeneral, surface, value)
 }
 
-func newCondAdnominalAdjective(surface, value string) convertRule {
-	return newCond(adnominalAdjective, surface, value)
+func newRuleAdnominalAdjective(surface, value string) convertRule {
+	return newRule(adnominalAdjective, surface, value)
 }
 
-func newCondAdjectivesSelfSupporting(surface, value string) convertRule {
-	return newCond(adjectivesSelfSupporting, surface, value)
+func newRuleAdjectivesSelfSupporting(surface, value string) convertRule {
+	return newRule(adjectivesSelfSupporting, surface, value)
 }
 
-func newCondVerbs(surface, value string) convertRule {
-	return newCond(verbs, surface, value)
+func newRuleVerbs(surface, value string) convertRule {
+	return newRule(verbs, surface, value)
 }
