@@ -135,10 +135,8 @@ ruleLoop:
 func matchExcludeRule(data tokenizer.TokenData) bool {
 excludeLoop:
 	for _, c := range excludeRules {
-		for _, cond := range c.Conditions {
-			if cond.notEqualsTokenData(data) {
-				continue excludeLoop
-			}
+		if !c.Conditions.matchAllTokenData(data) {
+			continue excludeLoop
 		}
 		return true
 	}
@@ -149,10 +147,8 @@ excludeLoop:
 func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, opt *ConvertOption) string {
 converterLoop:
 	for _, c := range convertRules {
-		for _, cond := range c.Conditions {
-			if cond.notEqualsTokenData(data) {
-				continue converterLoop
-			}
+		if !c.Conditions.matchAllTokenData(data) {
+			continue converterLoop
 		}
 
 		// 前に続く単語をみて変換を無視する
