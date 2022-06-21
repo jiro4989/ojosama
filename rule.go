@@ -11,6 +11,7 @@ type convertRule struct {
 	AfterIgnoreConditions        convertConditions // 次のTokenで条件にマッチした場合は無視する
 	EnableWhenSentenceSeparation bool              // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
 	AppendLongNote               bool              // 波線を追加する
+	DisablePrefix                bool              // 「お」を手前に付与しない
 	Value                        string
 }
 
@@ -166,6 +167,8 @@ var (
 			},
 			Value: "ママ上",
 		},
+		newRulePronounGeneral("皆", "皆様方"),
+		newRuleNounsGeneral("皆様", "皆様方").disablePrefix(true),
 
 		// こそあど言葉
 		newRulePronounGeneral("これ", "こちら"),
@@ -622,4 +625,9 @@ func newRuleAdjectivesSelfSupporting(surface, value string) convertRule {
 
 func newRuleVerbs(surface, value string) convertRule {
 	return newRule(verbs, surface, value)
+}
+
+func (c convertRule) disablePrefix(v bool) convertRule {
+	c.DisablePrefix = v
+	return c
 }

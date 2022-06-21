@@ -77,10 +77,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// お嬢様言葉に変換
-		buf = convert(data, tokens, i, buf, opt)
-
-		// 手前に「お」をつける。
-		buf, nounKeep = appendPrefix(data, tokens, i, buf, nounKeep)
+		buf, nounKeep = convert(data, tokens, i, buf, nounKeep, opt)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
 		buf = appendPoliteWord(data, tokens, i, buf)
@@ -146,7 +143,7 @@ excludeLoop:
 }
 
 // convert は基本的な変換を行う。
-func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, opt *ConvertOption) string {
+func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool) {
 	var beforeToken tokenizer.TokenData
 	var beforeTokenOK bool
 	if 0 < i {
@@ -190,9 +187,18 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 			result = appendLongNote(result, tokens, i, opt)
 		}
 
-		return result
+		// 手前に「お」を付ける
+		if !c.DisablePrefix {
+			result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
+		}
+
+		return result, nounKeep
 	}
-	return surface
+
+	// 手前に「お」を付ける
+	result := surface
+	result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
+	return result, nounKeep
 }
 
 // appendPrefix は surface の前に「お」を付ける。
