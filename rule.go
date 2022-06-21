@@ -559,6 +559,7 @@ func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
 	return false
 }
 
+// matchAllTokenData は data がすべての c と一致した時に true を返す。
 func (c *convertConditions) matchAllTokenData(data tokenizer.TokenData) bool {
 	for _, cond := range *c {
 		if cond.notEqualsTokenData(data) {
@@ -568,6 +569,7 @@ func (c *convertConditions) matchAllTokenData(data tokenizer.TokenData) bool {
 	return true
 }
 
+// matchAnyTokenData は data がいずれかの c と一致した時に true を返す。
 func (c *convertConditions) matchAnyTokenData(data tokenizer.TokenData) bool {
 	for _, cond := range *c {
 		if cond.equalsTokenData(data) {
