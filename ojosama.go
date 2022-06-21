@@ -58,11 +58,12 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf := data.Surface
 
 		// 英数字のみの単語の場合は何もしない
-		if alnumRegexp.MatchString(data.Surface) {
+		if alnumRegexp.MatchString(buf) {
 			result.WriteString(buf)
 			continue
 		}
 
+		// 連続する条件による変換を行う
 		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
 			i = n
 			result.WriteString(s)
@@ -78,9 +79,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		// お嬢様言葉に変換
 		buf = convert(data, tokens, i, buf, opt)
 
-		// 名詞 一般の場合は手前に「お」をつける。
-		// ただし、直後に動詞 自立がくるときは「お」をつけない。
-		// 例: プレイする
+		// 手前に「お」をつける。
 		buf, nounKeep = appendPrefix(data, tokens, i, buf, nounKeep)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
