@@ -175,15 +175,10 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 		}
 
 		// 文の区切りか、文の終わりの時だけ有効にする。
-		if c.EnableWhenSentenceSeparation {
-			if i+1 < len(tokens) {
-				// 次のトークンが区切りではない場合は変換しない
-				data := tokenizer.NewTokenData(tokens[i+1])
-				if !isSentenceSeparation(data) {
-					break
-				}
-			}
-			// 次のトークンが存在しない場合は文の終わりなので変換する
+		// 次のトークンが存在して、且つ次のトークンが文を区切るトークンでない時
+		// は変換しない。
+		if c.EnableWhenSentenceSeparation && afterTokenOK && !isSentenceSeparation(afterToken) {
+			break
 		}
 
 		result := c.Value
