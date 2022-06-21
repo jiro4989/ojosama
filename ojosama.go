@@ -95,39 +95,38 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 //
 // 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
 // して初めて1つの意味になるような条件をすべて満たした時に変換を行う。
-func convertContinuousConditions(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
-ruleLoop:
+func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *ConvertOption) (string, int, bool) {
 	for _, mc := range continuousConditionsConvertRules {
-		j := i
-
-		// conditionsのすべての評価がtrueの場合だけ変換する。
-		// マッチすると次のTokenにアクセスするために、ループカウンタを1進める。
-		//
-		// conditions が1つでも不一致の場合、
-		// そのruleの以降のconditionsは評価する意味が無い。
-		// よって conditions の評価ループを脱出し、次のruleの評価に移行する。
-		//
-		// 次のトークンが存在しない場合も評価する意味が無いので conditions 評価
-		// ループを脱出する。
-		for _, conds := range mc.Conditions {
-			if len(tokens) <= j {
-				continue ruleLoop
-			}
-			data := tokenizer.NewTokenData(tokens[j])
-			if !conds.matchAllTokenData(data) {
-				continue ruleLoop
-			}
-			j++
+		if !matchContinuousConditions(tokens, tokenPos, mc.Conditions) {
+			continue
 		}
 
+		n := tokenPos + len(mc.Conditions) - 1
 		result := mc.Value
-		n := j - 1
 		if mc.AppendLongNote {
 			result = appendLongNote(result, tokens, n, opt)
 		}
 		return result, n, true
 	}
 	return "", -1, false
+}
+
+// matchContinuousConditions は tokens の tokenPos の位置からのトークンが、連続する条件にすべてマッチするかを判定する。
+//
+// 次のトークンが存在しなかったり、1つでも条件が不一致になった場合 false を返す。
+func matchContinuousConditions(tokens []tokenizer.Token, tokenPos int, ccs []convertConditions) bool {
+	j := tokenPos
+	for _, conds := range ccs {
+		if len(tokens) <= j {
+			return false
+		}
+		data := tokenizer.NewTokenData(tokens[j])
+		if !conds.matchAllTokenData(data) {
+			return false
+		}
+		j++
+	}
+	return true
 }
 
 // matchExcludeRule は除外ルールと一致するものが存在するかを判定する。
