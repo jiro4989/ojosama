@@ -64,7 +64,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// 特定の組み合わせが連続した時に変換
-		if s, n, ok := convertMulti(tokens, i, opt); ok {
+		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
 			i = n
 			result.WriteString(s)
 			continue
@@ -92,7 +92,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	return result.String(), nil
 }
 
-func convertMulti(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
+func convertContinuousConditions(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
 ruleLoop:
 	for _, mc := range convertContinuousConditionsRules {
 		j := i
