@@ -195,6 +195,7 @@ converterLoop:
 	return surface
 }
 
+// appendPrefix は surface の前に「お」を付ける。
 func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool) (string, bool) {
 	if equalsFeatures(data.Features, []string{"名詞", "一般"}) || equalsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
 		if i+1 < len(tokens) {
@@ -219,7 +220,7 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 	return surface, false
 }
 
-// 丁寧語を差し込む
+// appendPoliteWord は丁寧語を追加する。
 func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
 	if equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
 		if i+1 < len(tokens) {

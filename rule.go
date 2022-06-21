@@ -21,6 +21,10 @@ type continuousConditionsConvertRule struct {
 	Value          string
 }
 
+// convertConditions は変換条件のスライス。
+//
+// この型の評価をする側は、すべての条件が true の時に true として解釈する。
+// 一つでも false が混じったら false として解釈する。
 type convertConditions []convertCondition
 
 type convertType int
