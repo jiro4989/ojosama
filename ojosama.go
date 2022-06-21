@@ -58,11 +58,12 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf := data.Surface
 
 		// 英数字のみの単語の場合は何もしない
-		if alnumRegexp.MatchString(data.Surface) {
+		if alnumRegexp.MatchString(buf) {
 			result.WriteString(buf)
 			continue
 		}
 
+		// 連続する条件による変換を行う
 		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
 			i = n
 			result.WriteString(s)
@@ -78,9 +79,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		// お嬢様言葉に変換
 		buf = convert(data, tokens, i, buf, opt)
 
-		// 名詞 一般の場合は手前に「お」をつける。
-		// ただし、直後に動詞 自立がくるときは「お」をつけない。
-		// 例: プレイする
+		// 手前に「お」をつける。
 		buf, nounKeep = appendPrefix(data, tokens, i, buf, nounKeep)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
@@ -91,44 +90,47 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	return result.String(), nil
 }
 
-// convertContinuousConditions は連続する条件がすべてマッチした時に変換する。
+// convertContinuousConditions は連続する条件による変換ルールにマッチした変換結果を返す。
 //
 // 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
-// して初めて1つの意味になるような条件をすべて満たした時に変換を行う。
-func convertContinuousConditions(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int, bool) {
-ruleLoop:
+// して初めて1つの意味になるような条件をすべて満たした時に結果を返す。
+//
+// 連続する条件にマッチした場合は tokenPos をその分だけ進める必要があるため、進
+// めた後の tokenPos を返却する。
+//
+// 第三引数は変換ルールにマッチしたかどうかを返す。
+func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *ConvertOption) (string, int, bool) {
 	for _, mc := range continuousConditionsConvertRules {
-		j := i
-		var s strings.Builder
-
-		// conditionsのすべての評価がtrueの場合だけ変換する。
-		// マッチすると次のTokenにアクセスするために、ループカウンタを1進める。
-		//
-		// conditions が1つでも不一致の場合、
-		// そのruleの以降のconditionsは評価する意味が無い。
-		// よって conditions の評価ループを脱出し、次のruleの評価に移行する。
-		//
-		// 次のトークンが存在しない場合も評価する意味が無いので conditions 評価
-		// ループを脱出する。
-		for _, conds := range mc.Conditions {
-			if len(tokens) <= j {
-				continue ruleLoop
-			}
-			data := tokenizer.NewTokenData(tokens[j])
-			if !conds.matchAllTokenData(data) {
-				continue ruleLoop
-			}
-			s.WriteString(data.Surface)
-			j++
+		if !matchContinuousConditions(tokens, tokenPos, mc.Conditions) {
+			continue
 		}
 
+		n := tokenPos + len(mc.Conditions) - 1
 		result := mc.Value
 		if mc.AppendLongNote {
-			result = appendLongNote(result, tokens, j-1, opt)
+			result = appendLongNote(result, tokens, n, opt)
 		}
-		return result, j - 1, true
+		return result, n, true
 	}
 	return "", -1, false
+}
+
+// matchContinuousConditions は tokens の tokenPos の位置からのトークンが、連続する条件にすべてマッチするかを判定する。
+//
+// 次のトークンが存在しなかったり、1つでも条件が不一致になった場合 false を返す。
+func matchContinuousConditions(tokens []tokenizer.Token, tokenPos int, ccs []convertConditions) bool {
+	j := tokenPos
+	for _, conds := range ccs {
+		if len(tokens) <= j {
+			return false
+		}
+		data := tokenizer.NewTokenData(tokens[j])
+		if !conds.matchAllTokenData(data) {
+			return false
+		}
+		j++
+	}
+	return true
 }
 
 // matchExcludeRule は除外ルールと一致するものが存在するかを判定する。
@@ -195,45 +197,50 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 
 // appendPrefix は surface の前に「お」を付ける。
 func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool) (string, bool) {
-	if equalsFeatures(data.Features, []string{"名詞", "一般"}) || equalsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
-		if i+1 < len(tokens) {
-			data := tokenizer.NewTokenData(tokens[i+1])
-			if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
-				return surface, nounKeep
-			}
-		}
+	if !equalsFeatures(data.Features, []string{"名詞", "一般"}) && !equalsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
+		return surface, false
+	}
 
-		// 名詞 一般が連続する場合は最初の1つ目にだけ「お」を付ける
-		if !nounKeep {
-			// 1つ手前にすでに「お」が付いている場合は付与しない
-			if 0 < i {
-				data := tokenizer.NewTokenData(tokens[i-1])
-				if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
-					return surface, false
-				}
-			}
-			return "お" + surface, true
+	// 次のトークンが動詞の場合は「お」を付けない。
+	// 例: プレイする
+	if i+1 < len(tokens) {
+		data := tokenizer.NewTokenData(tokens[i+1])
+		if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
+			return surface, nounKeep
 		}
 	}
-	return surface, false
+
+	// すでに「お」を付与されているので、「お」を付与しない
+	if nounKeep {
+		return surface, false
+	}
+
+	// 手前のトークンが「お」の場合は付与しない
+	if 0 < i {
+		data := tokenizer.NewTokenData(tokens[i-1])
+		if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
+			return surface, false
+		}
+	}
+
+	return "お" + surface, true
 }
 
 // appendPoliteWord は丁寧語を追加する。
 func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
-	if equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
-		if i+1 < len(tokens) {
-			// 文の区切りのタイミングでは「ですわ」を差し込む
-			data := tokenizer.NewTokenData(tokens[i+1])
-			if isSentenceSeparation(data) {
-				return surface + "ですわ"
-			}
-
-			// // 次の単語が助動詞（です）出ない場合は「です」を差し込む
-			// if !equalsFeatures(data.Features, []string{"助動詞"}) {
-			// 	return surface + "です"
-			// }
-		}
+	if !equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
+		return surface
 	}
+
+	if len(tokens) <= i+1 {
+		return surface
+	}
+
+	// 文の区切りのタイミングでは「ですわ」を差し込む
+	if isSentenceSeparation(tokenizer.NewTokenData(tokens[i+1])) {
+		return surface + "ですわ"
+	}
+
 	return surface
 }
 
@@ -248,39 +255,41 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 // 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与でき
 // るようにしている。
 func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) string {
-	if i+1 < len(tokens) {
-		data := tokenizer.NewTokenData(tokens[i+1])
-		for _, s := range []string{"！", "？"} {
-			if data.Surface != s {
-				continue
-			}
+	if len(tokens) <= i+1 {
+		return src
+	}
 
-			var (
-				w, e int
-			)
-			if opt != nil && opt.forceAppendLongNote.enable {
-				// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
-				w = opt.forceAppendLongNote.wavyLineCount
-				e = opt.forceAppendLongNote.exclamationMarkCount
-			} else {
-				w = rand.Intn(3)
-				e = rand.Intn(3)
-			}
-
-			var suffix strings.Builder
-			for i := 0; i < w; i++ {
-				suffix.WriteString("～")
-			}
-
-			// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しるため
-			// -1 して数を調整している。
-			for i := 0; i < e-1; i++ {
-				suffix.WriteString(s)
-			}
-
-			src += suffix.String()
-			break
+	data := tokenizer.NewTokenData(tokens[i+1])
+	for _, s := range []string{"！", "？"} {
+		if data.Surface != s {
+			continue
 		}
+
+		var (
+			w, e int
+		)
+		if opt != nil && opt.forceAppendLongNote.enable {
+			// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
+			w = opt.forceAppendLongNote.wavyLineCount
+			e = opt.forceAppendLongNote.exclamationMarkCount
+		} else {
+			w = rand.Intn(3)
+			e = rand.Intn(3)
+		}
+
+		var suffix strings.Builder
+		for i := 0; i < w; i++ {
+			suffix.WriteString("～")
+		}
+
+		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しるため
+		// -1 して数を調整している。
+		for i := 0; i < e-1; i++ {
+			suffix.WriteString(s)
+		}
+
+		src += suffix.String()
+		break
 	}
 	return src
 }
