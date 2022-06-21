@@ -348,6 +348,13 @@ func TestConvert(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			desc:    "正常系: パパはおパパ上、ママはおママ上とお呼びいたしますわ",
+			src:     "皆、皆様",
+			want:    "皆様方、皆様方",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
 			desc:    "正常系: 罵倒には「お」を付けませんのよ",
 			src:     "カス",
 			want:    "カス",
