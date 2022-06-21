@@ -220,10 +220,17 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 		return surface, false
 	}
 
-	// 手前のトークンが「お」の場合は付与しない
 	if 0 < i {
 		data := tokenizer.NewTokenData(tokens[i-1])
+
+		// 手前のトークンが「お」の場合は付与しない
 		if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
+			return surface, false
+		}
+
+		// サ変接続が来ても付与しない。
+		// 例: 横断歩道、解体新書
+		if equalsFeatures(data.Features, []string{"名詞", "サ変接続"}) {
 			return surface, false
 		}
 	}
