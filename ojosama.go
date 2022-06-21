@@ -250,39 +250,41 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 // 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与でき
 // るようにしている。
 func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) string {
-	if i+1 < len(tokens) {
-		data := tokenizer.NewTokenData(tokens[i+1])
-		for _, s := range []string{"！", "？"} {
-			if data.Surface != s {
-				continue
-			}
+	if len(tokens) <= i+1 {
+		return src
+	}
 
-			var (
-				w, e int
-			)
-			if opt != nil && opt.forceAppendLongNote.enable {
-				// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
-				w = opt.forceAppendLongNote.wavyLineCount
-				e = opt.forceAppendLongNote.exclamationMarkCount
-			} else {
-				w = rand.Intn(3)
-				e = rand.Intn(3)
-			}
-
-			var suffix strings.Builder
-			for i := 0; i < w; i++ {
-				suffix.WriteString("～")
-			}
-
-			// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しるため
-			// -1 して数を調整している。
-			for i := 0; i < e-1; i++ {
-				suffix.WriteString(s)
-			}
-
-			src += suffix.String()
-			break
+	data := tokenizer.NewTokenData(tokens[i+1])
+	for _, s := range []string{"！", "？"} {
+		if data.Surface != s {
+			continue
 		}
+
+		var (
+			w, e int
+		)
+		if opt != nil && opt.forceAppendLongNote.enable {
+			// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
+			w = opt.forceAppendLongNote.wavyLineCount
+			e = opt.forceAppendLongNote.exclamationMarkCount
+		} else {
+			w = rand.Intn(3)
+			e = rand.Intn(3)
+		}
+
+		var suffix strings.Builder
+		for i := 0; i < w; i++ {
+			suffix.WriteString("～")
+		}
+
+		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しるため
+		// -1 して数を調整している。
+		for i := 0; i < e-1; i++ {
+			suffix.WriteString(s)
+		}
+
+		src += suffix.String()
+		break
 	}
 	return src
 }
