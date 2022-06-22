@@ -107,7 +107,12 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		if len(tokens) <= i+1 {
 			continue
 		}
-		result.WriteString(data.Surface)
+		s := data.Surface
+		// TODO: ベタ書きしててよくない
+		if equalsFeatures(data.Features, nounsGeneral) || equalsFeatures(data.Features[:2], nounsSaDynamic) {
+			s = "お" + s
+		}
+		result.WriteString(s)
 		i++
 		data = tokenizer.NewTokenData(tokens[i])
 
@@ -157,7 +162,7 @@ func getMeaningType(typeMap map[meaningType][]convertConditions, data tokenizer.
 			}
 		}
 	}
-	return 0, false
+	return meaningTypeUnknown, false
 }
 
 // convertContinuousConditions は連続する条件による変換ルールにマッチした変換結果を返す。

@@ -53,10 +53,11 @@ const (
 	convertTypeFeatures
 	convertTypeBaseForm
 
-	meaningTypeHope       meaningType = iota + 1 // 希望
-	meaningTypePoem                              // 詠嘆
-	meaningTypeProhibiton                        // 禁止
-	meaningTypeCoercion                          // 強制
+	meaningTypeUnknown    meaningType = iota
+	meaningTypeHope                   // 希望
+	meaningTypePoem                   // 詠嘆
+	meaningTypeProhibiton             // 禁止
+	meaningTypeCoercion               // 強制
 )
 
 var (
@@ -65,6 +66,9 @@ var (
 			conditions1: []convertConditions{
 				{
 					{Type: convertTypeFeatures, Value: nounsGeneral},
+				},
+				{
+					{Type: convertTypeFeatures, Value: nounsSaDynamic},
 				},
 			},
 			conditions2: []convertConditions{
@@ -84,7 +88,8 @@ var (
 					newCondSentenceEndingParticle("べ"),
 				},
 				meaningTypePoem: {
-					newCondSentenceEndingParticle("か"),
+					// これだけ特殊
+					newCond([]string{"助詞","副助詞／並立助詞／終助詞"},"か"),
 				},
 				meaningTypeProhibiton: {
 					newCondSentenceEndingParticle("な"),
@@ -671,6 +676,7 @@ var (
 	verbIndependence         = []string{"動詞", "自立"}
 	sentenceEndingParticle   = []string{"助詞", "終助詞"}
 	auxiliaryVerb            = []string{"助動詞"}
+	nounsSaDynamic           = []string{"名詞","サ変接続"}
 )
 
 func newCond(features []string, surface string) convertConditions {
