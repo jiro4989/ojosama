@@ -367,7 +367,7 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 	}
 
 	data := tokenizer.NewTokenData(tokens[i+1])
-	for _, s := range []string{"！", "？"} {
+	for _, s := range []string{"！", "？", "!", "?"} {
 		if data.Surface != s {
 			continue
 		}
