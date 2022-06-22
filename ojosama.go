@@ -13,6 +13,7 @@ import (
 // ConvertOption はお嬢様変換時のオプショナルな設定。
 type ConvertOption struct {
 	forceAppendLongNote forceAppendLongNote // 単体テスト用のパラメータ
+	forceExclQues       forceExclQues       // 単体テスト用のパラメータ
 }
 
 // forceAppendLongNote は強制的に波線や感嘆符や疑問符を任意の数追加するための設定。
@@ -25,6 +26,12 @@ type forceAppendLongNote struct {
 	enable               bool
 	wavyLineCount        int
 	exclamationMarkCount int
+}
+
+type forceExclQues struct {
+	enable          bool
+	enableFullWidth bool
+	enableEmoji     bool
 }
 
 var (

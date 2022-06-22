@@ -451,6 +451,30 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc: "正常系: すべて全角文字に変換しますわ",
+			src:  "！？!?❗❓",
+			want: "！？！？！？",
+			opt: &ConvertOption{
+				forceExclQues: forceExclQues{
+					enable:          true,
+					enableFullWidth: true,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "正常系: すべて絵文字に変換しますわ",
+			src:  "！？!?❗❓",
+			want: "❗❓❗❓❗❓",
+			opt: &ConvertOption{
+				forceExclQues: forceExclQues{
+					enable:      true,
+					enableEmoji: true,
+				},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
