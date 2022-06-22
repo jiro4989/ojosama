@@ -106,8 +106,8 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 //
 // その他にも「野球するな」だと「お野球をしてはいけませんわ」になる。
 func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (string, int, bool) {
-	var result strings.Builder
 	for _, r := range sentenceEndingParticleConvertRules {
+		var result strings.Builder
 		i := tokenPos
 		data := tokenizer.NewTokenData(tokens[i])
 
