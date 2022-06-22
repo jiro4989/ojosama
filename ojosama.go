@@ -413,12 +413,11 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 			suffix.WriteString(feq.Value)
 		}
 
+		// 後ろに！や？が連続する場合、それらをすべて feq と同じ種類（半角、全角、
+		// 絵文字）の！や？に置き換えて返却する。
 		pos := i
 	loop2:
 		for j := i + 1; j < len(tokens); j++ {
-			if len(tokens) <= j {
-				break
-			}
 			token := tokens[j]
 			data := tokenizer.NewTokenData(token)
 			for _, r := range data.Surface {

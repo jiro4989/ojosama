@@ -501,8 +501,8 @@ func TestConvert(t *testing.T) {
 		},
 		{
 			desc: "正常系: 絵文字を連続して付与もできますわ",
-			src:  "です！",
-			want: "ですわ～～❗❗❗",
+			src:  "です！寿司",
+			want: "ですわ～～❗❗❗お寿司",
 			opt: &ConvertOption{
 				forceAppendLongNote: forceAppendLongNote{
 					enable:               true,
