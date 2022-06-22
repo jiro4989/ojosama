@@ -87,7 +87,7 @@ func SampleExclQuesByValue(v string, t *TestMode) *ExclQuesMark {
 
 	if t != nil {
 		// テスト用のパラメータがあるときは決め打ちで返す
-			fmt.Println(s)
+		fmt.Println(s)
 		return &s[t.Pos]
 	}
 	rand.Shuffle(len(s), func(i, j int) { s[i], s[j] = s[j], s[i] })
