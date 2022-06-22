@@ -203,6 +203,19 @@ func TestConvert(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			desc: "正常系: 半角感嘆符にも反応しますわ！",
+			src:  "これはハーブです!これもハーブです?",
+			want: "こちらはおハーブですわ～～!!!こちらもおハーブですわ～～???",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+			},
+			wantErr: false,
+		},
+		{
 			desc: "正常系: 波線のばしを付与する場合がありますわ",
 			src:  "プレイします！",
 			want: "プレイいたしますわ～～！！！",
