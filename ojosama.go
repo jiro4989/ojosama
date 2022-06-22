@@ -63,6 +63,13 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			continue
 		}
 
+		// 名詞＋動詞＋終助詞の組み合わせに対して変換する
+		if s, n, ok := convertSentenceEndingParticle(tokens, i); ok {
+			i = n
+			result.WriteString(s)
+			continue
+		}
+
 		// 連続する条件による変換を行う
 		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
 			i = n
@@ -85,6 +92,88 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		result.WriteString(buf)
 	}
 	return result.String(), nil
+}
+
+// convertSentenceEndingParticle は名詞＋動詞（＋助動詞）＋終助詞の組み合わせすべてを満たす場合に変換する。
+//
+// 終助詞は文の終わりに、文を完結させつつ、文に「希望」「禁止」「詠嘆」「強意」等の意味を添える効果がある。
+//
+// 例えば「野球しようぜ」の場合、
+// 「名詞：野球」「動詞：しよ」「助動詞：う」「終助詞：ぜ」という分解がされる。
+//
+// 終助詞の「ぜ」としては「希望」の意味合いが含まれるため、希望する意味合いのお嬢様言葉に変換する。
+// 例：お野球をいたしませんこと
+//
+// その他にも「野球するな」だと「お野球をしてはいけませんわ」になる。
+func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (string, int, bool) {
+	for _, r := range sentenceEndingParticleConvertRules {
+		var result strings.Builder
+		i := tokenPos
+		data := tokenizer.NewTokenData(tokens[i])
+
+		// 先頭が一致するならば次の単語に進む
+		if !matchAnyMultiConvertConditions(r.conditions1, data) {
+			continue
+		}
+		if len(tokens) <= i+1 {
+			continue
+		}
+		s := data.Surface
+		// TODO: ベタ書きしててよくない
+		if equalsFeatures(data.Features, nounsGeneral) || equalsFeatures(data.Features[:2], nounsSaDynamic) {
+			s = "お" + s
+		}
+		result.WriteString(s)
+		i++
+		data = tokenizer.NewTokenData(tokens[i])
+
+		// NOTE:
+		// 2つ目以降は value の値で置き換えるため
+		// result.WriteString(data.Surface) を実行しない。
+
+		// 2つ目は動詞のいずれかとマッチする。マッチしなければふりだしに戻る
+		if !matchAnyMultiConvertConditions(r.conditions2, data) {
+			continue
+		}
+		if len(tokens) <= i+1 {
+			continue
+		}
+		i++
+		data = tokenizer.NewTokenData(tokens[i])
+
+		// 助動詞があった場合は無視してトークンを進める。
+		// 別に無くても良い。
+		if r.auxiliaryVerb.matchAllTokenData(data) {
+			if len(tokens) <= i+1 {
+				continue
+			}
+			i++
+			data = tokenizer.NewTokenData(tokens[i])
+		}
+
+		// 最後、終助詞がどの意味分類に該当するかを取得
+		mt, ok := getMeaningType(r.sentenceEndingParticle, data)
+		if !ok {
+			continue
+		}
+
+		// 意味分類に該当する変換候補の文字列を返す
+		// TODO: 現状1個だけなので決め打ちで最初の1つ目を返す。
+		result.WriteString(r.value[mt][0])
+		return result.String(), i, true
+	}
+	return "", -1, false
+}
+
+func getMeaningType(typeMap map[meaningType][]convertConditions, data tokenizer.TokenData) (meaningType, bool) {
+	for k, v := range typeMap {
+		for _, cond := range v {
+			if cond.matchAllTokenData(data) {
+				return k, true
+			}
+		}
+	}
+	return meaningTypeUnknown, false
 }
 
 // convertContinuousConditions は連続する条件による変換ルールにマッチした変換結果を返す。
