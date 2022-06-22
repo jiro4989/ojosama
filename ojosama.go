@@ -8,12 +8,13 @@ import (
 
 	"github.com/ikawaha/kagome-dict/ipa"
 	"github.com/ikawaha/kagome/v2/tokenizer"
+	"github.com/jiro4989/ojosama/internal/chars"
 )
 
 // ConvertOption はお嬢様変換時のオプショナルな設定。
 type ConvertOption struct {
 	forceAppendLongNote forceAppendLongNote // 単体テスト用のパラメータ
-	forceExclQues       forceExclQues       // 単体テスト用のパラメータ
+	forceCharsTestMode  *chars.TestMode      // 単体テスト用のパラメータ
 }
 
 // forceAppendLongNote は強制的に波線や感嘆符や疑問符を任意の数追加するための設定。
@@ -26,12 +27,6 @@ type forceAppendLongNote struct {
 	enable               bool
 	wavyLineCount        int
 	exclamationMarkCount int
-}
-
-type forceExclQues struct {
-	enable          bool
-	enableFullWidth bool
-	enableEmoji     bool
 }
 
 var (
@@ -91,7 +86,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// お嬢様言葉に変換
-		buf, nounKeep = convert(data, tokens, i, buf, nounKeep, opt)
+		buf, nounKeep, i = convert(data, tokens, i, buf, nounKeep, opt)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
 		buf = appendPoliteWord(data, tokens, i, buf)
@@ -201,7 +196,7 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 		n := tokenPos + len(mc.Conditions) - 1
 		result := mc.Value
 		if mc.AppendLongNote {
-			result = appendLongNote(result, tokens, n, opt)
+			result, n = appendLongNote(result, tokens, n, opt)
 		}
 		return result, n, true
 	}
@@ -239,7 +234,7 @@ excludeLoop:
 }
 
 // convert は基本的な変換を行う。
-func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool) {
+func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int) {
 	var beforeToken tokenizer.TokenData
 	var beforeTokenOK bool
 	if 0 < i {
@@ -277,10 +272,11 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 		}
 
 		result := c.Value
+		pos := i
 
 		// 波線伸ばしをランダムに追加する
 		if c.AppendLongNote {
-			result = appendLongNote(result, tokens, i, opt)
+			result, pos = appendLongNote(result, tokens, i, opt)
 		}
 
 		// 手前に「お」を付ける
@@ -288,13 +284,13 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 			result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
 		}
 
-		return result, nounKeep
+		return result, nounKeep, pos
 	}
 
 	// 手前に「お」を付ける
 	result := surface
 	result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
-	return result, nounKeep
+	return result, nounKeep, i
 }
 
 // appendPrefix は surface の前に「お」を付ける。
@@ -368,9 +364,9 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 //
 // 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与でき
 // るようにしている。
-func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) string {
+func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int) {
 	if len(tokens) <= i+1 {
-		return src
+		return src, i
 	}
 
 	data := tokenizer.NewTokenData(tokens[i+1])
@@ -396,16 +392,38 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 			suffix.WriteString("～")
 		}
 
+		// ！or？をどれかからランダムに選択する
+		feq := chars.SampleExclQuesByValue(s, opt.forceCharsTestMode)
+
 		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
 		// -1 して数を調整している。
 		for i := 0; i < e-1; i++ {
-			suffix.WriteString(s)
+			suffix.WriteString(feq.Value)
+		}
+
+		pos := i
+		for j := i; j < len(tokens); j++ {
+			if len(tokens) <= j {
+				break
+			}
+			token := tokens[j]
+			data := tokenizer.NewTokenData(token)
+			if ok, eq := chars.IsExclQuesMark(data.Surface); !ok {
+				break
+			} else {
+				// e は！か？のどちらかなので、同じスタイルの文字を取得して追加
+				if got := chars.FindExclQuesByStyleAndMeaning(feq.Style, eq.Meaning); got != nil {
+
+					suffix.WriteString(got.Value)
+					pos = j
+				}
+			}
 		}
 
 		src += suffix.String()
-		break
+		return src, pos
 	}
-	return src
+	return src, i
 }
 
 // isPoliteWord は丁寧語かどうかを判定する。

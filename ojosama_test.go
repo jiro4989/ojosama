@@ -3,6 +3,7 @@ package ojosama
 import (
 	"testing"
 
+	"github.com/jiro4989/ojosama/internal/chars"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -453,24 +454,22 @@ func TestConvert(t *testing.T) {
 		},
 		{
 			desc: "正常系: すべて全角文字に変換しますわ",
-			src:  "！？!?❗❓",
-			want: "！？！？！？",
+			src:  "です！？!?❗❓",
+			want: "です！？！？！？",
 			opt: &ConvertOption{
-				forceExclQues: forceExclQues{
-					enable:          true,
-					enableFullWidth: true,
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
 				},
 			},
 			wantErr: false,
 		},
 		{
 			desc: "正常系: すべて絵文字に変換しますわ",
-			src:  "！？!?❗❓",
-			want: "❗❓❗❓❗❓",
+			src:  "です！？!?❗❓",
+			want: "です❗❓❗❓❗❓",
 			opt: &ConvertOption{
-				forceExclQues: forceExclQues{
-					enable:      true,
-					enableEmoji: true,
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 2,
 				},
 			},
 			wantErr: false,
