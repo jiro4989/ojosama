@@ -41,9 +41,10 @@ type meaningType int
 
 // sentenceEndingParticleConvertRule は「名詞」＋「動詞」＋「終助詞」の組み合わせによる変換ルール。
 type sentenceEndingParticleConvertRule struct {
-	conditions1            []convertConditions // 一番最初に評価されるルール
-	conditions2            []convertConditions // 二番目に評価されるルール
-	sentenceEndingParticle map[meaningType][]convertConditions
+	conditions1            []convertConditions                 // 一番最初に評価されるルール
+	conditions2            []convertConditions                 // 二番目に評価されるルール
+	auxiliaryVerb          convertConditions                   // 助動詞。マッチしなくても次にすすむ
+	sentenceEndingParticle map[meaningType][]convertConditions // 終助詞
 	value                  map[meaningType][]string
 }
 
@@ -93,6 +94,7 @@ var (
 					newCondSentenceEndingParticle("の"),
 				},
 			},
+			auxiliaryVerb: newCondAuxiliaryVerb("う"),
 			value: map[meaningType][]string{
 				meaningTypeHope: {
 					"をいたしませんこと",
@@ -668,6 +670,7 @@ var (
 	verbs                    = []string{"感動詞"}
 	verbIndependence         = []string{"動詞", "自立"}
 	sentenceEndingParticle   = []string{"助詞", "終助詞"}
+	auxiliaryVerb            = []string{"助動詞"}
 )
 
 func newCond(features []string, surface string) convertConditions {
@@ -688,6 +691,19 @@ func newCondSentenceEndingParticle(surface string) convertConditions {
 		{
 			Type:  convertTypeFeatures,
 			Value: sentenceEndingParticle,
+		},
+		{
+			Type:  convertTypeSurface,
+			Value: []string{surface},
+		},
+	}
+}
+
+func newCondAuxiliaryVerb(surface string) convertConditions {
+	return convertConditions{
+		{
+			Type:  convertTypeFeatures,
+			Value: auxiliaryVerb,
 		},
 		{
 			Type:  convertTypeSurface,

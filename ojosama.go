@@ -95,10 +95,6 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 }
 
 func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (string, int, bool) {
-	if len(tokens) <= tokenPos+2 {
-		return "", -1, false
-	}
-
 	var result strings.Builder
 	for _, r := range sentenceEndingParticleConvertRules {
 		i := tokenPos
@@ -106,6 +102,9 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 
 		// 先頭が一致するならば次の単語に進む
 		if !matchAnyMultiConvertConditions(r.conditions1, data) {
+			continue
+		}
+		if len(tokens) <= i+1 {
 			continue
 		}
 		result.WriteString(data.Surface)
@@ -120,10 +119,23 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		if !matchAnyMultiConvertConditions(r.conditions2, data) {
 			continue
 		}
+		if len(tokens) <= i+1 {
+			continue
+		}
 		i++
 		data = tokenizer.NewTokenData(tokens[i])
 
-		// 3つ目は、終助詞がどの意味分類に該当するかを取得
+		// 助動詞はあった場合は無視する
+		// なくても良い。
+		if r.auxiliaryVerb.matchAllTokenData(data) {
+			if len(tokens) <= i+1 {
+				continue
+			}
+			i++
+			data = tokenizer.NewTokenData(tokens[i])
+		}
+
+		// 最後、終助詞がどの意味分類に該当するかを取得
 		mt, ok := getMeaningType(r.sentenceEndingParticle, data)
 		if !ok {
 			continue
