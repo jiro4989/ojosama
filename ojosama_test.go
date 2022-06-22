@@ -455,8 +455,13 @@ func TestConvert(t *testing.T) {
 		{
 			desc: "正常系: すべて全角文字に変換しますわ",
 			src:  "です！？!?❗❓",
-			want: "です！？！？！？",
+			want: "ですわ～！？！？！？",
 			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        1,
+					exclamationMarkCount: 1,
+				},
 				forceCharsTestMode: &chars.TestMode{
 					Pos: 0,
 				},
@@ -466,8 +471,13 @@ func TestConvert(t *testing.T) {
 		{
 			desc: "正常系: すべて絵文字に変換しますわ",
 			src:  "です！？!?❗❓",
-			want: "です❗❓❗❓❗❓",
+			want: "ですわ～❗❓❗❓❗❓",
 			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        1,
+					exclamationMarkCount: 1,
+				},
 				forceCharsTestMode: &chars.TestMode{
 					Pos: 2,
 				},

@@ -45,6 +45,18 @@ func init() {
 // opt は挙動を微調整するためのオプショナルなパラメータ。不要であれば nil を渡せ
 // ば良い。
 func Convert(src string, opt *ConvertOption) (string, error) {
+	// 正規化
+	// ！？だと「！」と「？」に分割されるが
+	// ！？!?❗❓とかだと、1つのサ変接続として解釈されてしまう。
+	// この辺の文字のばらつきで処理がばらつくのが面倒なので
+	// 形態素解析するまえに表記ゆれを統一してしまう。
+	src = strings.ReplaceAll(src, "!", "！")
+	src = strings.ReplaceAll(src, "?", "？")
+	src = strings.ReplaceAll(src, "❗", "！")
+	src = strings.ReplaceAll(src, "❓", "？")
+	src = strings.ReplaceAll(src, "‼", "！！")
+	src = strings.ReplaceAll(src, "⁉", "！？")
+
 	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
 		return "", err
@@ -402,22 +414,27 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		}
 
 		pos := i
-		for j := i; j < len(tokens); j++ {
+	loop2:
+		for j := i + 1; j < len(tokens); j++ {
 			if len(tokens) <= j {
 				break
 			}
 			token := tokens[j]
 			data := tokenizer.NewTokenData(token)
-			if ok, eq := chars.IsExclQuesMark(data.Surface); !ok {
-				break
-			} else {
-				// e は！か？のどちらかなので、同じスタイルの文字を取得して追加
-				if got := chars.FindExclQuesByStyleAndMeaning(feq.Style, eq.Meaning); got != nil {
+			for _, r := range data.Surface {
+				surface := string(r)
+				if ok, eq := chars.IsExclQuesMark(surface); !ok {
+					break loop2
+				} else {
+					// e は！か？のどちらかなので、同じスタイルの文字を取得して追加
+					if got := chars.FindExclQuesByStyleAndMeaning(feq.Style, eq.Meaning); got != nil {
 
-					suffix.WriteString(got.Value)
-					pos = j
+						suffix.WriteString(got.Value)
+					}
 				}
 			}
+			// トークンの位置を制御する変数なので、forループ内では変更しない
+			pos = j
 		}
 
 		src += suffix.String()

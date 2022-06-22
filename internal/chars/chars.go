@@ -1,7 +1,6 @@
 package chars
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -23,11 +22,11 @@ const (
 	styleTypeHalfWidth
 	styleTypeEmoji
 	styleTypeDoubleEmoji // !!
-	styleTypeEQEmoji     // !?
 
 	meaningTypeUnknown = iota
 	meaningTypeExcl    // !
 	meaningTypeQues    // ?
+	meaningTypeEQ      // !?
 )
 
 var (
@@ -39,7 +38,8 @@ var (
 		newQues("？", styleTypeFullWidth),
 		newQues("?", styleTypeHalfWidth),
 		newQues("❓", styleTypeEmoji),
-		newQues("⁉", styleTypeEQEmoji),
+		newEQ("!?", styleTypeHalfWidth),
+		newEQ("⁉", styleTypeEmoji),
 	}
 )
 
@@ -56,6 +56,14 @@ func newQues(v string, t StyleType) ExclQuesMark {
 		Value:   v,
 		Style:   t,
 		Meaning: meaningTypeQues,
+	}
+}
+
+func newEQ(v string, t StyleType) ExclQuesMark {
+	return ExclQuesMark{
+		Value:   v,
+		Style:   t,
+		Meaning: meaningTypeEQ,
 	}
 }
 
@@ -77,7 +85,6 @@ func SampleExclQuesByValue(v string, t *TestMode) *ExclQuesMark {
 	var s []ExclQuesMark
 	for _, mark := range eqMarks {
 		if mark.Meaning == got.Meaning {
-			fmt.Println(mark, got)
 			s = append(s, mark)
 		}
 	}
@@ -87,7 +94,6 @@ func SampleExclQuesByValue(v string, t *TestMode) *ExclQuesMark {
 
 	if t != nil {
 		// テスト用のパラメータがあるときは決め打ちで返す
-		fmt.Println(s)
 		return &s[t.Pos]
 	}
 	rand.Shuffle(len(s), func(i, j int) { s[i], s[j] = s[j], s[i] })
