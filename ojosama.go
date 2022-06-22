@@ -63,6 +63,13 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			continue
 		}
 
+		// 動詞＋する＋終助詞の組み合わせに対して変換する
+		if s, n, ok := convertSentenceEndingParticle(tokens, i); ok {
+			i = n
+			result.WriteString(s)
+			continue
+		}
+
 		// 連続する条件による変換を行う
 		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
 			i = n
@@ -85,6 +92,60 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		result.WriteString(buf)
 	}
 	return result.String(), nil
+}
+
+func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (string, int, bool) {
+	if len(tokens) <= tokenPos+2 {
+		return "", -1, false
+	}
+
+	var result strings.Builder
+	for _, r := range sentenceEndingParticleConvertRules {
+		i := tokenPos
+		data := tokenizer.NewTokenData(tokens[i])
+
+		// 先頭が一致するならば次の単語に進む
+		if !matchAnyMultiConvertConditions(r.conditions1, data) {
+			continue
+		}
+		result.WriteString(data.Surface)
+		i++
+		data = tokenizer.NewTokenData(tokens[i])
+
+		// NOTE:
+		// 2つ目以降は value の値で置き換えるため
+		// result.WriteString(data.Surface) を実行しない。
+
+		// 2つ目は動詞のいずれかとマッチする。マッチしなければふりだしに戻る
+		if !matchAnyMultiConvertConditions(r.conditions2, data) {
+			continue
+		}
+		i++
+		data = tokenizer.NewTokenData(tokens[i])
+
+		// 3つ目は、終助詞がどの意味分類に該当するかを取得
+		mt, ok := getMeaningType(r.sentenceEndingParticle, data)
+		if !ok {
+			continue
+		}
+
+		// 意味分類に該当する変換候補の文字列を返す
+		// TODO: 現状1個だけなので決め打ちで最初の1つ目を返す。
+		result.WriteString(r.value[mt][0])
+		return result.String(), i, true
+	}
+	return "", -1, false
+}
+
+func getMeaningType(typeMap map[meaningType][]convertConditions, data tokenizer.TokenData) (meaningType, bool) {
+	for k, v := range typeMap {
+		for _, cond := range v {
+			if cond.matchAllTokenData(data) {
+				return k, true
+			}
+		}
+	}
+	return 0, false
 }
 
 // convertContinuousConditions は連続する条件による変換ルールにマッチした変換結果を返す。

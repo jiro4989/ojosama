@@ -36,12 +36,80 @@ type convertCondition struct {
 	Value []string
 }
 
+// meaningType は言葉の意味分類。
+type meaningType int
+
+// sentenceEndingParticleConvertRule は「名詞」＋「動詞」＋「終助詞」の組み合わせによる変換ルール。
+type sentenceEndingParticleConvertRule struct {
+	conditions1            []convertConditions // 一番最初に評価されるルール
+	conditions2            []convertConditions // 二番目に評価されるルール
+	sentenceEndingParticle map[meaningType][]convertConditions
+	value                  map[meaningType][]string
+}
+
 const (
 	convertTypeSurface convertType = iota + 1
 	convertTypeFeatures
+	convertTypeBaseForm
+
+	meaningTypeHope       meaningType = iota + 1 // 希望
+	meaningTypePoem                              // 詠嘆
+	meaningTypeProhibiton                        // 禁止
+	meaningTypeCoercion                          // 強制
 )
 
 var (
+	sentenceEndingParticleConvertRules = []sentenceEndingParticleConvertRule{
+		{
+			conditions1: []convertConditions{
+				{
+					{Type: convertTypeFeatures, Value: nounsGeneral},
+				},
+			},
+			conditions2: []convertConditions{
+				{
+					{Type: convertTypeFeatures, Value: verbIndependence},
+					{Type: convertTypeBaseForm, Value: []string{"する"}},
+				},
+				{
+					{Type: convertTypeFeatures, Value: verbIndependence},
+					{Type: convertTypeBaseForm, Value: []string{"やる"}},
+				},
+			},
+			sentenceEndingParticle: map[meaningType][]convertConditions{
+				meaningTypeHope: {
+					newCondSentenceEndingParticle("ぜ"),
+					newCondSentenceEndingParticle("よ"),
+					newCondSentenceEndingParticle("べ"),
+				},
+				meaningTypePoem: {
+					newCondSentenceEndingParticle("か"),
+				},
+				meaningTypeProhibiton: {
+					newCondSentenceEndingParticle("な"),
+				},
+				meaningTypeCoercion: {
+					newCondSentenceEndingParticle("ぞ"),
+					newCondSentenceEndingParticle("の"),
+				},
+			},
+			value: map[meaningType][]string{
+				meaningTypeHope: {
+					"をいたしませんこと",
+				},
+				meaningTypePoem: {
+					"をいたしますわ",
+				},
+				meaningTypeProhibiton: {
+					"をしてはいけませんわ",
+				},
+				meaningTypeCoercion: {
+					"をいたしますわよ",
+				},
+			},
+		},
+	}
+
 	// continuousConditionsConvertRules は連続する条件がすべてマッチしたときに変換するルール。
 	//
 	// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
@@ -536,6 +604,10 @@ func (c *convertCondition) equalsTokenData(data tokenizer.TokenData) bool {
 		if data.Surface == c.Value[0] {
 			return true
 		}
+	case convertTypeBaseForm:
+		if data.BaseForm == c.Value[0] {
+			return true
+		}
 	}
 	return false
 }
@@ -548,6 +620,10 @@ func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
 		}
 	case convertTypeSurface:
 		if data.Surface != c.Value[0] {
+			return true
+		}
+	case convertTypeBaseForm:
+		if data.BaseForm != c.Value[0] {
 			return true
 		}
 	}
@@ -574,12 +650,24 @@ func (c *convertConditions) matchAnyTokenData(data tokenizer.TokenData) bool {
 	return false
 }
 
+func matchAnyMultiConvertConditions(ccs []convertConditions, data tokenizer.TokenData) bool {
+	for _, cs := range ccs {
+		// 1つでも一致すればOK
+		if cs.matchAllTokenData(data) {
+			return true
+		}
+	}
+	return false
+}
+
 var (
 	pronounGeneral           = []string{"名詞", "代名詞", "一般"}
 	nounsGeneral             = []string{"名詞", "一般"}
 	adnominalAdjective       = []string{"連体詞"}
 	adjectivesSelfSupporting = []string{"形容詞", "自立"}
 	verbs                    = []string{"感動詞"}
+	verbIndependence         = []string{"動詞", "自立"}
+	sentenceEndingParticle   = []string{"助詞", "終助詞"}
 )
 
 func newCond(features []string, surface string) convertConditions {
@@ -587,6 +675,19 @@ func newCond(features []string, surface string) convertConditions {
 		{
 			Type:  convertTypeFeatures,
 			Value: features,
+		},
+		{
+			Type:  convertTypeSurface,
+			Value: []string{surface},
+		},
+	}
+}
+
+func newCondSentenceEndingParticle(surface string) convertConditions {
+	return convertConditions{
+		{
+			Type:  convertTypeFeatures,
+			Value: sentenceEndingParticle,
 		},
 		{
 			Type:  convertTypeSurface,
