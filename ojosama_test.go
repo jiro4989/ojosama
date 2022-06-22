@@ -431,6 +431,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 名詞＋動詞＋助動詞のみで終助詞がない場合でもエラーにはなりませんのよ",
+			src:     "流鏑馬やろう",
+			want:    "流鏑馬やろう",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
