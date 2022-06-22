@@ -200,6 +200,9 @@ func TestConvert(t *testing.T) {
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
 				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
+				},
 			},
 			wantErr: false,
 		},
@@ -212,6 +215,9 @@ func TestConvert(t *testing.T) {
 					enable:               true,
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 1,
 				},
 			},
 			wantErr: false,
@@ -226,6 +232,9 @@ func TestConvert(t *testing.T) {
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
 				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
+				},
 			},
 			wantErr: false,
 		},
@@ -238,6 +247,9 @@ func TestConvert(t *testing.T) {
 					enable:               true,
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
 				},
 			},
 			wantErr: false,
@@ -260,6 +272,9 @@ func TestConvert(t *testing.T) {
 					enable:               true,
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
 				},
 			},
 			wantErr: false,
@@ -477,6 +492,22 @@ func TestConvert(t *testing.T) {
 					enable:               true,
 					wavyLineCount:        1,
 					exclamationMarkCount: 1,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 2,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "正常系: 絵文字を連続して付与もできますわ",
+			src:  "です！",
+			want: "ですわ～～❗❗❗",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
 				},
 				forceCharsTestMode: &chars.TestMode{
 					Pos: 2,
