@@ -300,7 +300,7 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 			suffix.WriteString("～")
 		}
 
-		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しるため
+		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
 		// -1 して数を調整している。
 		for i := 0; i < e-1; i++ {
 			suffix.WriteString(s)
