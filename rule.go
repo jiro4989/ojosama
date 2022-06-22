@@ -48,14 +48,18 @@ var (
 	// して初めて1つの意味になるような条件を定義する。
 	continuousConditionsConvertRules = []continuousConditionsConvertRule{
 		{
-			Value: "壱百満天原サロメ",
-			Conditions: []convertConditions{
-				newCond([]string{"名詞", "一般"}, "壱"),
-				newCond([]string{"名詞", "数"}, "百"),
-				newCond([]string{"名詞", "一般"}, "満天"),
-				newCond([]string{"接頭詞", "名詞接続"}, "原"),
-				newCond([]string{"名詞", "一般"}, "サロメ"),
-			},
+			Value:      "壱百満天原サロメ",
+			Conditions: newConds([]string{"壱", "百", "満天", "原", "サロメ"}),
+		},
+
+		{
+			Value:      "壱百満天原",
+			Conditions: newConds([]string{"壱", "百", "満天", "原"}),
+		},
+
+		{
+			Value:      "壱百満点",
+			Conditions: newConds([]string{"壱", "百", "満点"}),
 		},
 
 		{
@@ -589,6 +593,20 @@ func newCond(features []string, surface string) convertConditions {
 			Value: []string{surface},
 		},
 	}
+}
+
+func newConds(surfaces []string) []convertConditions {
+	var c []convertConditions
+	for _, s := range surfaces {
+		cc := convertConditions{
+			{
+				Type:  convertTypeSurface,
+				Value: []string{s},
+			},
+		}
+		c = append(c, cc)
+	}
+	return c
 }
 
 func newRule(features []string, surface, value string) convertRule {

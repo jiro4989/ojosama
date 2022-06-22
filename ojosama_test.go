@@ -134,6 +134,20 @@ func TestConvert(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			desc:    "正常系: 名字も1単語として認識いたしますわ",
+			src:     "わたしの名字は壱百満天原です",
+			want:    "わたくしのお名字は壱百満天原ですわ",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc:    "正常系: 壱百満点の笑顔を皆様方にお届けするのがわたくしの使命ですわ",
+			src:     "壱百満点",
+			want:    "壱百満点",
+			opt:     nil,
+			wantErr: false,
+		},
+		{
 			desc:    "正常系: 部分一致の場合は処理しませんわ",
 			src:     "壱",
 			want:    "お壱",
