@@ -141,8 +141,8 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		i++
 		data = tokenizer.NewTokenData(tokens[i])
 
-		// 助動詞はあった場合は無視する
-		// なくても良い。
+		// 助動詞があった場合は無視してトークンを進める。
+		// 別に無くても良い。
 		if r.auxiliaryVerb.matchAllTokenData(data) {
 			if len(tokens) <= i+1 {
 				continue
