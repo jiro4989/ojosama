@@ -63,7 +63,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 			continue
 		}
 
-		// 動詞＋する＋終助詞の組み合わせに対して変換する
+		// 名詞＋動詞＋終助詞の組み合わせに対して変換する
 		if s, n, ok := convertSentenceEndingParticle(tokens, i); ok {
 			i = n
 			result.WriteString(s)
@@ -94,6 +94,17 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	return result.String(), nil
 }
 
+// convertSentenceEndingParticle は名詞＋動詞（＋助動詞）＋終助詞の組み合わせすべてを満たす場合に変換する。
+//
+// 終助詞は、文の終わりに、「文を完結させつつ、文に「希望」「禁止」「詠嘆」「強意」等の意味を添える効果がある。
+//
+// 例えば「野球しようぜ」の場合、
+// 「名詞：野球」「動詞：しよ」「助動詞：う」「終助詞：ぜ」という分解がされる。
+//
+// 終助詞の「ぜ」としては「希望」の意味合いが含まれるため、希望する意味合いのお嬢様言葉に変換する。
+// 例：お野球をいたしませんこと
+//
+// その他にも「野球するな」だと「お野球をしてはいけませんわ」になる。
 func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (string, int, bool) {
 	var result strings.Builder
 	for _, r := range sentenceEndingParticleConvertRules {
