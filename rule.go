@@ -89,7 +89,7 @@ var (
 				},
 				meaningTypePoem: {
 					// これだけ特殊
-					newCond([]string{"助詞","副助詞／並立助詞／終助詞"},"か"),
+					newCond([]string{"助詞", "副助詞／並立助詞／終助詞"}, "か"),
 				},
 				meaningTypeProhibiton: {
 					newCondSentenceEndingParticle("な"),
@@ -676,7 +676,7 @@ var (
 	verbIndependence         = []string{"動詞", "自立"}
 	sentenceEndingParticle   = []string{"助詞", "終助詞"}
 	auxiliaryVerb            = []string{"助動詞"}
-	nounsSaDynamic           = []string{"名詞","サ変接続"}
+	nounsSaDynamic           = []string{"名詞", "サ変接続"}
 )
 
 func newCond(features []string, surface string) convertConditions {
