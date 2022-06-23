@@ -45,18 +45,6 @@ func init() {
 // opt は挙動を微調整するためのオプショナルなパラメータ。不要であれば nil を渡せ
 // ば良い。
 func Convert(src string, opt *ConvertOption) (string, error) {
-	// 正規化
-	// ！？だと「！」と「？」に分割されるが
-	// ！？!?❗❓とかだと、1つのサ変接続として解釈されてしまう。
-	// この辺の文字のばらつきで処理がばらつくのが面倒なので
-	// 形態素解析するまえに表記ゆれを統一してしまう。
-	src = strings.ReplaceAll(src, "!", "！")
-	src = strings.ReplaceAll(src, "?", "？")
-	src = strings.ReplaceAll(src, "❗", "！")
-	src = strings.ReplaceAll(src, "❓", "？")
-	src = strings.ReplaceAll(src, "‼", "！！")
-	src = strings.ReplaceAll(src, "⁉", "！？")
-
 	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
 		return "", err

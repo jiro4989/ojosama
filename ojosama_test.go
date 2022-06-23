@@ -515,6 +515,13 @@ func TestConvert(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 意味のない文章のテストですわ",
+			src:     "あ！い❓❗う",
+			want:    "あ！い❓❗う",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
