@@ -529,6 +529,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: なん(じゃ|や|だ)は、いずれも「なんですの」に変換いたしますわ",
+			src:     "なんじゃこれ。なんだこれ。なんやこれ。",
+			want:    "なんですのこちら。なんですのこちら。なんですのこちら。",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

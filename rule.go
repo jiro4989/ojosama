@@ -175,6 +175,28 @@ var (
 				newCond([]string{"助詞", "終助詞"}, "よ"),
 			},
 		},
+
+		{
+			Value: "なんですの",
+			Conditions: []convertConditions{
+				newCond(pronounGeneral, "なん"),
+				newCond(verbsSubAssistant, "じゃ"),
+			},
+		},
+		{
+			Value: "なんですの",
+			Conditions: []convertConditions{
+				newCond(pronounGeneral, "なん"),
+				newCond(auxiliaryVerb, "だ"),
+			},
+		},
+		{
+			Value: "なんですの",
+			Conditions: []convertConditions{
+				newCond(pronounGeneral, "なん"),
+				newCond(assistantParallel, "や"),
+			},
+		},
 	}
 
 	// excludeRules は変換処理を無視するルール。
@@ -695,6 +717,8 @@ var (
 	verbs                    = []string{"感動詞"}
 	verbIndependence         = []string{"動詞", "自立"}
 	sentenceEndingParticle   = []string{"助詞", "終助詞"}
+	verbsSubAssistant        = []string{"助詞", "副助詞"}
+	assistantParallel        = []string{"助詞", "並立助詞"}
 	auxiliaryVerb            = []string{"助動詞"}
 	nounsSaDynamic           = []string{"名詞", "サ変接続"}
 )
