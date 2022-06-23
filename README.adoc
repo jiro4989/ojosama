@@ -155,6 +155,13 @@ $ ojosama -t お願いします | ojosama
 お願いいたしますわですわ
 ----
 
+== 派生プロジェクト
+
+派生したプロジェクトのリンクです。多謝。
+
+* https://github.com/wgdp/ojosama-discord-bot
+* https://github.com/Sigumaa/ojosama-commit
+
 == 開発者向け
 
 === 開発環境
