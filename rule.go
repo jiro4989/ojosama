@@ -197,6 +197,50 @@ var (
 				newCond(assistantParallel, "や"),
 			},
 		},
+
+		{
+			Value: "@1ですの",
+			Conditions: []convertConditions{
+				{{Type: convertTypeFeatures, Value: nounsGeneral}},
+				newCond(auxiliaryVerb, "じゃ"),
+			},
+		},
+		{
+			Value: "@1ですの",
+			Conditions: []convertConditions{
+				{{Type: convertTypeFeatures, Value: nounsGeneral}},
+				newCond(auxiliaryVerb, "だ"),
+			},
+		},
+		{
+			Value: "@1ですの",
+			Conditions: []convertConditions{
+				{{Type: convertTypeFeatures, Value: nounsGeneral}},
+				newCond(auxiliaryVerb, "や"),
+			},
+		},
+
+		{
+			Value: "@1ですの",
+			Conditions: []convertConditions{
+				{{Type: convertTypeFeatures, Value: pronounGeneral}},
+				newCond(auxiliaryVerb, "じゃ"),
+			},
+		},
+		{
+			Value: "@1ですの",
+			Conditions: []convertConditions{
+				{{Type: convertTypeFeatures, Value: pronounGeneral}},
+				newCond(auxiliaryVerb, "だ"),
+			},
+		},
+		{
+			Value: "@1ですの",
+			Conditions: []convertConditions{
+				{{Type: convertTypeFeatures, Value: pronounGeneral}},
+				newCond(auxiliaryVerb, "や"),
+			},
+		},
 	}
 
 	// excludeRules は変換処理を無視するルール。

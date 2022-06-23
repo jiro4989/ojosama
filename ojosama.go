@@ -195,6 +195,14 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 
 		n := tokenPos + len(mc.Conditions) - 1
 		result := mc.Value
+
+		// FIXME: 書き方が汚い
+		data := tokenizer.NewTokenData(tokens[tokenPos])
+		surface := data.Surface
+		if appendablePrefix(data) {
+			surface = "お" + surface
+		}
+		result = strings.ReplaceAll(result, "@1", surface)
 		if mc.AppendLongNote {
 			result, n = appendLongNote(result, tokens, n, opt)
 		}
@@ -293,14 +301,22 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 	return result, nounKeep, i
 }
 
-// appendPrefix は surface の前に「お」を付ける。
-func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool) (string, bool) {
+func appendablePrefix(data tokenizer.TokenData) bool {
 	if !equalsFeatures(data.Features, []string{"名詞", "一般"}) && !equalsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
-		return surface, false
+		return false
 	}
 
 	// 丁寧語の場合は「お」を付けない
 	if isPoliteWord(data) {
+		return false
+	}
+
+	return true
+}
+
+// appendPrefix は surface の前に「お」を付ける。
+func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool) (string, bool) {
+	if !appendablePrefix(data) {
 		return surface, false
 	}
 
