@@ -108,15 +108,15 @@ func TestFindExclQuesByStyleAndMeaning(t *testing.T) {
 			want: newQues("？", styleTypeFullWidth),
 		},
 		{
-			desc: "正常系: 不明な要素の場合は何もお返しいたしませんわ",
-			s:    styleTypeUnknown,
-			m:    meaningTypeExcl,
+			desc:    "正常系: 不明な要素の場合は何もお返しいたしませんわ",
+			s:       styleTypeUnknown,
+			m:       meaningTypeExcl,
 			wantNil: true,
 		},
 		{
-			desc: "正常系: 不明な要素の場合は何もお返しいたしませんわ",
-			s:    styleTypeFullWidth,
-			m:    meaningTypeUnknown,
+			desc:    "正常系: 不明な要素の場合は何もお返しいたしませんわ",
+			s:       styleTypeFullWidth,
+			m:       meaningTypeUnknown,
 			wantNil: true,
 		},
 	}
