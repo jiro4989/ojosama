@@ -43,7 +43,7 @@ jobs:
       - run: go build ./cmd/ojosama
       - run: go install ./cmd/ojosama
       - run: go test -cover ./...
-      - run: ./cmd/ojosama/ojosama README.adoc
+      - run: ./ojosama README.adoc
 
   coverage:
     runs-on: ubuntu-latest
