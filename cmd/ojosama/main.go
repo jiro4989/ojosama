@@ -115,6 +115,7 @@ func run(s string, args *CmdArgs) (int, error) {
 		if err != nil {
 			return exitStatusOutputError, err
 		}
+		defer out.Close()
 	}
 	out.WriteString(text)
 	return exitStatusOK, nil
