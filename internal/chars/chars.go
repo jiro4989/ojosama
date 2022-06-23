@@ -119,12 +119,3 @@ func FindExclQuesByStyleAndMeaning(s StyleType, m MeaningType) *ExclQuesMark {
 
 	return nil
 }
-
-func FindExclQuesByStyle(s StyleType) *ExclQuesMark {
-	for _, mark := range eqMarks {
-		if mark.Style == s {
-			return &mark
-		}
-	}
-	return nil
-}
