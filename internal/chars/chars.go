@@ -88,6 +88,7 @@ func SampleExclQuesByValue(v string, t *TestMode) *ExclQuesMark {
 			s = append(s, mark)
 		}
 	}
+	// 到達しないはずだけれど一応いれてる
 	if len(s) < 1 {
 		return nil
 	}
