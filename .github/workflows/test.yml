@@ -40,9 +40,10 @@ jobs:
           fi
       - name: Static analysis
         run: go vet .
-      - run: go build
-      - run: go install
+      - run: go build ./cmd/ojosama
+      - run: go install ./cmd/ojosama
       - run: go test -cover ./...
+      - run: ./ojosama README.adoc
 
   coverage:
     runs-on: ubuntu-latest

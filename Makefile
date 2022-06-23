@@ -1,4 +1,4 @@
-bin/ojosama: go.* *.go cmd/*
+bin/ojosama: go.* *.go cmd/* internal/*
 	make test
 	go vet .
 	go fmt .
@@ -10,5 +10,5 @@ test:
 	go test -cover ./...
 
 .PHONY: install
-install: go.* *.go cmd/*
+install: go.* *.go cmd/* internal/*
 	go install ./cmd/ojosama

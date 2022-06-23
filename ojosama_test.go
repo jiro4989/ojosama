@@ -3,6 +3,7 @@ package ojosama
 import (
 	"testing"
 
+	"github.com/jiro4989/ojosama/internal/chars"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -199,6 +200,9 @@ func TestConvert(t *testing.T) {
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
 				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
+				},
 			},
 			wantErr: false,
 		},
@@ -211,6 +215,9 @@ func TestConvert(t *testing.T) {
 					enable:               true,
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 1,
 				},
 			},
 			wantErr: false,
@@ -225,6 +232,9 @@ func TestConvert(t *testing.T) {
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
 				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
+				},
 			},
 			wantErr: false,
 		},
@@ -237,6 +247,9 @@ func TestConvert(t *testing.T) {
 					enable:               true,
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
 				},
 			},
 			wantErr: false,
@@ -259,6 +272,9 @@ func TestConvert(t *testing.T) {
 					enable:               true,
 					wavyLineCount:        2,
 					exclamationMarkCount: 3,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
 				},
 			},
 			wantErr: false,
@@ -449,6 +465,54 @@ func TestConvert(t *testing.T) {
 			src:     "流鏑馬やろう",
 			want:    "流鏑馬やろう",
 			opt:     nil,
+			wantErr: false,
+		},
+		{
+			desc: "正常系: すべて全角文字に変換しますわ",
+			src:  "です！？!?❗❓",
+			want: "ですわ～！？！？！？",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        1,
+					exclamationMarkCount: 1,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 0,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "正常系: すべて絵文字に変換しますわ",
+			src:  "です！？!?❗❓",
+			want: "ですわ～❗❓❗❓❗❓",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        1,
+					exclamationMarkCount: 1,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 2,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			desc: "正常系: 絵文字を連続して付与もできますわ",
+			src:  "です！寿司",
+			want: "ですわ～～❗❗❗お寿司",
+			opt: &ConvertOption{
+				forceAppendLongNote: forceAppendLongNote{
+					enable:               true,
+					wavyLineCount:        2,
+					exclamationMarkCount: 3,
+				},
+				forceCharsTestMode: &chars.TestMode{
+					Pos: 2,
+				},
+			},
 			wantErr: false,
 		},
 	}
