@@ -381,6 +381,11 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		return src, i
 	}
 
+	var tm *chars.TestMode
+	if opt != nil {
+		tm = opt.forceCharsTestMode
+	}
+
 	data := tokenizer.NewTokenData(tokens[i+1])
 	for _, s := range []string{"！", "？", "!", "?"} {
 		if data.Surface != s {
@@ -405,7 +410,7 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		}
 
 		// ！or？をどれかからランダムに選択する
-		feq := chars.SampleExclQuesByValue(s, opt.forceCharsTestMode)
+		feq := chars.SampleExclQuesByValue(s, tm)
 
 		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
 		// -1 して数を調整している。
