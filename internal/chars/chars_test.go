@@ -86,3 +86,51 @@ func TestSampleExclQuesByValue(t *testing.T) {
 		})
 	}
 }
+
+func TestFindExclQuesByStyleAndMeaning(t *testing.T) {
+	tests := []struct {
+		desc    string
+		s       StyleType
+		m       MeaningType
+		want    ExclQuesMark
+		wantNil bool
+	}{
+		{
+			desc: "正常系: ❗を指定いたしますわ",
+			s:    styleTypeEmoji,
+			m:    meaningTypeExcl,
+			want: newExcl("❗", styleTypeEmoji),
+		},
+		{
+			desc: "正常系: ？を指定いたしますわ",
+			s:    styleTypeFullWidth,
+			m:    meaningTypeQues,
+			want: newQues("？", styleTypeFullWidth),
+		},
+		{
+			desc: "正常系: 不明な要素の場合は何もお返しいたしませんわ",
+			s:    styleTypeUnknown,
+			m:    meaningTypeExcl,
+			wantNil: true,
+		},
+		{
+			desc: "正常系: 不明な要素の場合は何もお返しいたしませんわ",
+			s:    styleTypeFullWidth,
+			m:    meaningTypeUnknown,
+			wantNil: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			assert := assert.New(t)
+
+			got := FindExclQuesByStyleAndMeaning(tt.s, tt.m)
+			if tt.wantNil {
+				assert.Nil(got)
+				return
+			}
+			assert.Equal(&tt.want, got)
+		})
+	}
+}
