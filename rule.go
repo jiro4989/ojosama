@@ -53,11 +53,11 @@ const (
 	convertTypeFeatures
 	convertTypeBaseForm
 
-	meaningTypeUnknown    meaningType = iota
-	meaningTypeHope                   // 希望
-	meaningTypePoem                   // 詠嘆
-	meaningTypeProhibiton             // 禁止
-	meaningTypeCoercion               // 強制
+	meaningTypeUnknown     meaningType = iota
+	meaningTypeHope                    // 希望
+	meaningTypePoem                    // 詠嘆
+	meaningTypeProhibition             // 禁止
+	meaningTypeCoercion                // 強制
 )
 
 var (
@@ -91,7 +91,7 @@ var (
 					// これだけ特殊
 					newCond([]string{"助詞", "副助詞／並立助詞／終助詞"}, "か"),
 				},
-				meaningTypeProhibiton: {
+				meaningTypeProhibition: {
 					newCondSentenceEndingParticle("な"),
 				},
 				meaningTypeCoercion: {
@@ -107,7 +107,7 @@ var (
 				meaningTypePoem: {
 					"をいたしますわ",
 				},
-				meaningTypeProhibiton: {
+				meaningTypeProhibition: {
 					"をしてはいけませんわ",
 				},
 				meaningTypeCoercion: {
