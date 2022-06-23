@@ -1,6 +1,10 @@
 package ojosama
 
-import "github.com/ikawaha/kagome/v2/tokenizer"
+import (
+	"regexp"
+
+	"github.com/ikawaha/kagome/v2/tokenizer"
+)
 
 // convertRule は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
 //
@@ -32,8 +36,9 @@ type convertType int
 
 // convertCondition は変換に使う条件。
 type convertCondition struct {
-	Type  convertType
-	Value []string
+	Type        convertType
+	Value       []string
+	ValueRegexp *regexp.Regexp // オプション。設定されてる時だけ使う
 }
 
 // meaningType は言葉の意味分類。
@@ -186,6 +191,9 @@ var (
 					Value: []string{"カス"},
 				},
 			},
+		},
+		{
+			Conditions: newCondRe(nounsGeneral, regexp.MustCompile(`^(ー+|～+)$`)),
 		},
 	}
 
@@ -608,10 +616,16 @@ func (c *convertCondition) equalsTokenData(data tokenizer.TokenData) bool {
 			return true
 		}
 	case convertTypeSurface:
+		if c.ValueRegexp != nil {
+			return c.ValueRegexp.MatchString(data.Surface)
+		}
 		if data.Surface == c.Value[0] {
 			return true
 		}
 	case convertTypeBaseForm:
+		if c.ValueRegexp != nil {
+			return c.ValueRegexp.MatchString(data.BaseForm)
+		}
 		if data.BaseForm == c.Value[0] {
 			return true
 		}
@@ -626,10 +640,16 @@ func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
 			return true
 		}
 	case convertTypeSurface:
+		if c.ValueRegexp != nil {
+			return !c.ValueRegexp.MatchString(data.Surface)
+		}
 		if data.Surface != c.Value[0] {
 			return true
 		}
 	case convertTypeBaseForm:
+		if c.ValueRegexp != nil {
+			return !c.ValueRegexp.MatchString(data.BaseForm)
+		}
 		if data.BaseForm != c.Value[0] {
 			return true
 		}
@@ -688,6 +708,19 @@ func newCond(features []string, surface string) convertConditions {
 		{
 			Type:  convertTypeSurface,
 			Value: []string{surface},
+		},
+	}
+}
+
+func newCondRe(features []string, re *regexp.Regexp) convertConditions {
+	return convertConditions{
+		{
+			Type:  convertTypeFeatures,
+			Value: features,
+		},
+		{
+			Type:        convertTypeSurface,
+			ValueRegexp: re,
 		},
 	}
 }

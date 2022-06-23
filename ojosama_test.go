@@ -522,6 +522,13 @@ func TestConvert(t *testing.T) {
 			opt:     nil,
 			wantErr: false,
 		},
+		{
+			desc:    "正常系: 「ー」の前に「お」は付きませんの",
+			src:     "しようぜー。しようぜーー。しようぜ～。しようぜ～～。しようぜー～。",
+			want:    "しようぜー。しようぜーー。しようぜ～。しようぜ～～。しようぜー～。",
+			opt:     nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
