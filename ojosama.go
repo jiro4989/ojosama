@@ -414,7 +414,7 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		}
 
 		// ！or？をどれかからランダムに選択する
-		feq := chars.SampleExclQuesByValue(s, tm)
+		feq := chars.SampleExclamationQuestionByValue(s, tm)
 
 		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
 		// -1 して数を調整している。
@@ -432,7 +432,7 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 	return src, i
 }
 
-func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.ExclQuesMark) (string, int) {
+func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.ExclamationQuestionMark) (string, int) {
 	var result strings.Builder
 	pos := i
 
@@ -441,11 +441,11 @@ func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.Ex
 		data := tokenizer.NewTokenData(token)
 		for _, r := range data.Surface {
 			surface := string(r)
-			if ok, eq := chars.IsExclQuesMark(surface); !ok {
+			if ok, eq := chars.IsExclamationQuestionMark(surface); !ok {
 				return result.String(), pos
 			} else {
 				// e は！か？のどちらかなので、同じスタイルの文字を取得して追加
-				if got := chars.FindExclQuesByStyleAndMeaning(feq.Style, eq.Meaning); got != nil {
+				if got := chars.FindExclamationQuestionByStyleAndMeaning(feq.Style, eq.Meaning); got != nil {
 
 					result.WriteString(got.Value)
 				}
