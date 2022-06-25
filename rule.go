@@ -70,19 +70,19 @@ var (
 		{
 			conditions1: []convertConditions{
 				{
-					{Type: convertTypeFeatures, Value: nounsGeneral},
+					{Type: convertTypeFeatures, Value: posNounsGeneral},
 				},
 				{
-					{Type: convertTypeFeatures, Value: nounsSaDynamic},
+					{Type: convertTypeFeatures, Value: posNounsSaDynamic},
 				},
 			},
 			conditions2: []convertConditions{
 				{
-					{Type: convertTypeFeatures, Value: verbIndependence},
+					{Type: convertTypeFeatures, Value: posVerbIndependence},
 					{Type: convertTypeBaseForm, Value: []string{"する"}},
 				},
 				{
-					{Type: convertTypeFeatures, Value: verbIndependence},
+					{Type: convertTypeFeatures, Value: posVerbIndependence},
 					{Type: convertTypeBaseForm, Value: []string{"やる"}},
 				},
 			},
@@ -179,66 +179,66 @@ var (
 		{
 			Value: "なんですの",
 			Conditions: []convertConditions{
-				newCond(pronounGeneral, "なん"),
-				newCond(subPostpositionalParticle, "じゃ"),
+				newCond(posPronounGeneral, "なん"),
+				newCond(posSubPostpositionalParticle, "じゃ"),
 			},
 		},
 		{
 			Value: "なんですの",
 			Conditions: []convertConditions{
-				newCond(pronounGeneral, "なん"),
-				newCond(auxiliaryVerb, "だ"),
+				newCond(posPronounGeneral, "なん"),
+				newCond(posAuxiliaryVerb, "だ"),
 			},
 		},
 		{
 			Value: "なんですの",
 			Conditions: []convertConditions{
-				newCond(pronounGeneral, "なん"),
-				newCond(assistantParallelParticle, "や"),
+				newCond(posPronounGeneral, "なん"),
+				newCond(posAssistantParallelParticle, "や"),
 			},
 		},
 
 		{
 			Value: "@1ですの",
 			Conditions: []convertConditions{
-				{{Type: convertTypeFeatures, Value: nounsGeneral}},
-				newCond(auxiliaryVerb, "じゃ"),
+				{{Type: convertTypeFeatures, Value: posNounsGeneral}},
+				newCond(posAuxiliaryVerb, "じゃ"),
 			},
 		},
 		{
 			Value: "@1ですの",
 			Conditions: []convertConditions{
-				{{Type: convertTypeFeatures, Value: nounsGeneral}},
-				newCond(auxiliaryVerb, "だ"),
+				{{Type: convertTypeFeatures, Value: posNounsGeneral}},
+				newCond(posAuxiliaryVerb, "だ"),
 			},
 		},
 		{
 			Value: "@1ですの",
 			Conditions: []convertConditions{
-				{{Type: convertTypeFeatures, Value: nounsGeneral}},
-				newCond(auxiliaryVerb, "や"),
+				{{Type: convertTypeFeatures, Value: posNounsGeneral}},
+				newCond(posAuxiliaryVerb, "や"),
 			},
 		},
 
 		{
 			Value: "@1ですの",
 			Conditions: []convertConditions{
-				{{Type: convertTypeFeatures, Value: pronounGeneral}},
-				newCond(auxiliaryVerb, "じゃ"),
+				{{Type: convertTypeFeatures, Value: posPronounGeneral}},
+				newCond(posAuxiliaryVerb, "じゃ"),
 			},
 		},
 		{
 			Value: "@1ですの",
 			Conditions: []convertConditions{
-				{{Type: convertTypeFeatures, Value: pronounGeneral}},
-				newCond(auxiliaryVerb, "だ"),
+				{{Type: convertTypeFeatures, Value: posPronounGeneral}},
+				newCond(posAuxiliaryVerb, "だ"),
 			},
 		},
 		{
 			Value: "@1ですの",
 			Conditions: []convertConditions{
-				{{Type: convertTypeFeatures, Value: pronounGeneral}},
-				newCond(auxiliaryVerb, "や"),
+				{{Type: convertTypeFeatures, Value: posPronounGeneral}},
+				newCond(posAuxiliaryVerb, "や"),
 			},
 		},
 	}
@@ -259,7 +259,7 @@ var (
 			},
 		},
 		{
-			Conditions: newCondRe(nounsGeneral, regexp.MustCompile(`^(ー+|～+)$`)),
+			Conditions: newCondRe(posNounsGeneral, regexp.MustCompile(`^(ー+|～+)$`)),
 		},
 	}
 
@@ -760,17 +760,17 @@ https://ja.wikibooks.org/wiki/%E8%8B%B1%E8%AA%9E/%E6%96%87%E6%B3%95/%E5%93%81%E8
 品詞 part of speech (pos)
 */
 var (
-	pronounGeneral            = []string{"名詞", "代名詞", "一般"}
-	nounsGeneral              = []string{"名詞", "一般"}
-	adnominalAdjective        = []string{"連体詞"}
-	adjectivesSelfSupporting  = []string{"形容詞", "自立"}
-	interjection              = []string{"感動詞"}
-	verbIndependence          = []string{"動詞", "自立"}
-	sentenceEndingParticle    = []string{"助詞", "終助詞"}
-	subPostpositionalParticle = []string{"助詞", "副助詞"}
-	assistantParallelParticle = []string{"助詞", "並立助詞"}
-	auxiliaryVerb             = []string{"助動詞"}
-	nounsSaDynamic            = []string{"名詞", "サ変接続"}
+	posPronounGeneral            = []string{"名詞", "代名詞", "一般"}
+	posNounsGeneral              = []string{"名詞", "一般"}
+	posAdnominalAdjective        = []string{"連体詞"}
+	posAdjectivesSelfSupporting  = []string{"形容詞", "自立"}
+	posInterjection              = []string{"感動詞"}
+	posVerbIndependence          = []string{"動詞", "自立"}
+	posSentenceEndingParticle    = []string{"助詞", "終助詞"}
+	posSubPostpositionalParticle = []string{"助詞", "副助詞"}
+	posAssistantParallelParticle = []string{"助詞", "並立助詞"}
+	posAuxiliaryVerb             = []string{"助動詞"}
+	posNounsSaDynamic            = []string{"名詞", "サ変接続"}
 )
 
 func newCond(features []string, surface string) convertConditions {
@@ -803,7 +803,7 @@ func newCondSentenceEndingParticle(surface string) convertConditions {
 	return convertConditions{
 		{
 			Type:  convertTypeFeatures,
-			Value: sentenceEndingParticle,
+			Value: posSentenceEndingParticle,
 		},
 		{
 			Type:  convertTypeSurface,
@@ -816,7 +816,7 @@ func newCondAuxiliaryVerb(surface string) convertConditions {
 	return convertConditions{
 		{
 			Type:  convertTypeFeatures,
-			Value: auxiliaryVerb,
+			Value: posAuxiliaryVerb,
 		},
 		{
 			Type:  convertTypeSurface,
@@ -856,23 +856,23 @@ func newRule(features []string, surface, value string) convertRule {
 }
 
 func newRulePronounGeneral(surface, value string) convertRule {
-	return newRule(pronounGeneral, surface, value)
+	return newRule(posPronounGeneral, surface, value)
 }
 
 func newRuleNounsGeneral(surface, value string) convertRule {
-	return newRule(nounsGeneral, surface, value)
+	return newRule(posNounsGeneral, surface, value)
 }
 
 func newRuleAdnominalAdjective(surface, value string) convertRule {
-	return newRule(adnominalAdjective, surface, value)
+	return newRule(posAdnominalAdjective, surface, value)
 }
 
 func newRuleAdjectivesSelfSupporting(surface, value string) convertRule {
-	return newRule(adjectivesSelfSupporting, surface, value)
+	return newRule(posAdjectivesSelfSupporting, surface, value)
 }
 
 func newRuleInterjection(surface, value string) convertRule {
-	return newRule(interjection, surface, value)
+	return newRule(posInterjection, surface, value)
 }
 
 func (c convertRule) disablePrefix(v bool) convertRule {

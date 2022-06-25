@@ -122,7 +122,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		}
 		s := data.Surface
 		// TODO: ベタ書きしててよくない
-		if equalsFeatures(data.Features, nounsGeneral) || equalsFeatures(data.Features[:2], nounsSaDynamic) {
+		if equalsFeatures(data.Features, posNounsGeneral) || equalsFeatures(data.Features[:2], posNounsSaDynamic) {
 			s = "お" + s
 		}
 		result.WriteString(s)
