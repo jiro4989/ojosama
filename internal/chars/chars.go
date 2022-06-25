@@ -4,7 +4,7 @@ import (
 	"math/rand"
 )
 
-type ExclQuesMark struct {
+type ExclamationQuestionMark struct {
 	Value   string
 	Style   StyleType
 	Meaning MeaningType
@@ -30,7 +30,7 @@ const (
 )
 
 var (
-	eqMarks = []ExclQuesMark{
+	eqMarks = []ExclamationQuestionMark{
 		newExcl("！", styleTypeFullWidth),
 		newExcl("!", styleTypeHalfWidth),
 		newExcl("❗", styleTypeEmoji),
@@ -43,31 +43,31 @@ var (
 	}
 )
 
-func newExcl(v string, t StyleType) ExclQuesMark {
-	return ExclQuesMark{
+func newExcl(v string, t StyleType) ExclamationQuestionMark {
+	return ExclamationQuestionMark{
 		Value:   v,
 		Style:   t,
 		Meaning: meaningTypeExcl,
 	}
 }
 
-func newQues(v string, t StyleType) ExclQuesMark {
-	return ExclQuesMark{
+func newQues(v string, t StyleType) ExclamationQuestionMark {
+	return ExclamationQuestionMark{
 		Value:   v,
 		Style:   t,
 		Meaning: meaningTypeQues,
 	}
 }
 
-func newEQ(v string, t StyleType) ExclQuesMark {
-	return ExclQuesMark{
+func newEQ(v string, t StyleType) ExclamationQuestionMark {
+	return ExclamationQuestionMark{
 		Value:   v,
 		Style:   t,
 		Meaning: meaningTypeEQ,
 	}
 }
 
-func IsExclQuesMark(s string) (bool, *ExclQuesMark) {
+func IsExclamationQuestionMark(s string) (bool, *ExclamationQuestionMark) {
 	for _, v := range eqMarks {
 		if v.Value == s {
 			return true, &v
@@ -76,13 +76,13 @@ func IsExclQuesMark(s string) (bool, *ExclQuesMark) {
 	return false, nil
 }
 
-func SampleExclQuesByValue(v string, t *TestMode) *ExclQuesMark {
-	ok, got := IsExclQuesMark(v)
+func SampleExclamationQuestionByValue(v string, t *TestMode) *ExclamationQuestionMark {
+	ok, got := IsExclamationQuestionMark(v)
 	if !ok {
 		return nil
 	}
 
-	var s []ExclQuesMark
+	var s []ExclamationQuestionMark
 	for _, mark := range eqMarks {
 		if mark.Meaning == got.Meaning {
 			s = append(s, mark)
@@ -101,8 +101,8 @@ func SampleExclQuesByValue(v string, t *TestMode) *ExclQuesMark {
 	return &s[0]
 }
 
-func FindExclQuesByStyleAndMeaning(s StyleType, m MeaningType) *ExclQuesMark {
-	var eq []ExclQuesMark
+func FindExclamationQuestionByStyleAndMeaning(s StyleType, m MeaningType) *ExclamationQuestionMark {
+	var eq []ExclamationQuestionMark
 	for _, mark := range eqMarks {
 		if mark.Style == s {
 			eq = append(eq, mark)

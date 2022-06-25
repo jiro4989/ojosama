@@ -122,7 +122,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		}
 		s := data.Surface
 		// TODO: ベタ書きしててよくない
-		if equalsFeatures(data.Features, nounsGeneral) || equalsFeatures(data.Features[:2], nounsSaDynamic) {
+		if equalsFeatures(data.Features, posNounsGeneral) || equalsFeatures(data.Features[:2], posNounsSaDynamic) {
 			s = "お" + s
 		}
 		result.WriteString(s)
@@ -414,7 +414,7 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		}
 
 		// ！or？をどれかからランダムに選択する
-		feq := chars.SampleExclQuesByValue(s, tm)
+		feq := chars.SampleExclamationQuestionByValue(s, tm)
 
 		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
 		// -1 して数を調整している。
@@ -424,31 +424,38 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 
 		// 後ろに！や？が連続する場合、それらをすべて feq と同じ種類（半角、全角、
 		// 絵文字）の！や？に置き換えて返却する。
-		pos := i
-	loop2:
-		for j := i + 1; j < len(tokens); j++ {
-			token := tokens[j]
-			data := tokenizer.NewTokenData(token)
-			for _, r := range data.Surface {
-				surface := string(r)
-				if ok, eq := chars.IsExclQuesMark(surface); !ok {
-					break loop2
-				} else {
-					// e は！か？のどちらかなので、同じスタイルの文字を取得して追加
-					if got := chars.FindExclQuesByStyleAndMeaning(feq.Style, eq.Meaning); got != nil {
-
-						suffix.WriteString(got.Value)
-					}
-				}
-			}
-			// トークンの位置を制御する変数なので、forループ内では変更しない
-			pos = j
-		}
-
+		excl, pos := getContinuousExclamationMark(tokens, i, feq)
+		suffix.WriteString(excl)
 		src += suffix.String()
 		return src, pos
 	}
 	return src, i
+}
+
+func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.ExclamationQuestionMark) (string, int) {
+	var result strings.Builder
+	pos := i
+
+	for j := i + 1; j < len(tokens); j++ {
+		token := tokens[j]
+		data := tokenizer.NewTokenData(token)
+		for _, r := range data.Surface {
+			surface := string(r)
+			if ok, eq := chars.IsExclamationQuestionMark(surface); !ok {
+				return result.String(), pos
+			} else {
+				// e は！か？のどちらかなので、同じスタイルの文字を取得して追加
+				if got := chars.FindExclamationQuestionByStyleAndMeaning(feq.Style, eq.Meaning); got != nil {
+
+					result.WriteString(got.Value)
+				}
+			}
+		}
+		// トークンの位置を制御する変数なので、forループ内では変更しない
+		pos = j
+	}
+
+	return result.String(), pos
 }
 
 // isPoliteWord は丁寧語かどうかを判定する。

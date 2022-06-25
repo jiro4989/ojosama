@@ -6,12 +6,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIsExclQuesMark(t *testing.T) {
+func TestIsExclamationQuestionMark(t *testing.T) {
 	tests := []struct {
 		desc   string
 		s      string
 		wantOK bool
-		wantEQ ExclQuesMark
+		wantEQ ExclamationQuestionMark
 	}{
 		{
 			desc:   "正常系: ！とはマッチいたしますわ",
@@ -36,7 +36,7 @@ func TestIsExclQuesMark(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			assert := assert.New(t)
 
-			got, got2 := IsExclQuesMark(tt.s)
+			got, got2 := IsExclamationQuestionMark(tt.s)
 			assert.Equal(tt.wantOK, got)
 			if tt.wantOK {
 				assert.Equal(&tt.wantEQ, got2)
@@ -45,12 +45,12 @@ func TestIsExclQuesMark(t *testing.T) {
 	}
 }
 
-func TestSampleExclQuesByValue(t *testing.T) {
+func TestSampleExclamationQuestionByValue(t *testing.T) {
 	tests := []struct {
 		desc    string
 		v       string
 		t       *TestMode
-		want    ExclQuesMark
+		want    ExclamationQuestionMark
 		wantNil bool
 	}{
 		{
@@ -77,7 +77,7 @@ func TestSampleExclQuesByValue(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			assert := assert.New(t)
 
-			got := SampleExclQuesByValue(tt.v, tt.t)
+			got := SampleExclamationQuestionByValue(tt.v, tt.t)
 			if tt.wantNil {
 				assert.Nil(got)
 				return
@@ -87,12 +87,12 @@ func TestSampleExclQuesByValue(t *testing.T) {
 	}
 }
 
-func TestFindExclQuesByStyleAndMeaning(t *testing.T) {
+func TestFindExclamationQuestionByStyleAndMeaning(t *testing.T) {
 	tests := []struct {
 		desc    string
 		s       StyleType
 		m       MeaningType
-		want    ExclQuesMark
+		want    ExclamationQuestionMark
 		wantNil bool
 	}{
 		{
@@ -125,7 +125,7 @@ func TestFindExclQuesByStyleAndMeaning(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			assert := assert.New(t)
 
-			got := FindExclQuesByStyleAndMeaning(tt.s, tt.m)
+			got := FindExclamationQuestionByStyleAndMeaning(tt.s, tt.m)
 			if tt.wantNil {
 				assert.Nil(got)
 				return
