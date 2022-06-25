@@ -175,7 +175,7 @@ $ ojosama -t お願いします | ojosama
 [options="header"]
 |=================
 | 説明 | 言語 | リポジトリURL
-| Discord bot | Go | https://github.com/wgdp/ojosama-discord-bot
+| スラッシュコマンドでお嬢様に変換できるDiscordBot | Go | https://github.com/wgdp/ojosama-discord-bot
 | Gitのコミットメッセージをお嬢様にするCLI | Rust | https://github.com/Sigumaa/ojosama-commit
 | 任意のテキストや、開いてるバッファ上のテキストをお嬢様にするVimプラグイン | Vim Script | https://github.com/heavenshell/vim-ojosama
 |=================
