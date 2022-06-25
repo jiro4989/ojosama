@@ -180,7 +180,7 @@ var (
 			Value: "なんですの",
 			Conditions: []convertConditions{
 				newCond(pronounGeneral, "なん"),
-				newCond(verbsSubAssistant, "じゃ"),
+				newCond(subPostpositionalParticle, "じゃ"),
 			},
 		},
 		{
@@ -194,7 +194,7 @@ var (
 			Value: "なんですの",
 			Conditions: []convertConditions{
 				newCond(pronounGeneral, "なん"),
-				newCond(assistantParallel, "や"),
+				newCond(assistantParallelParticle, "や"),
 			},
 		},
 
@@ -756,19 +756,21 @@ func matchAnyMultiConvertConditions(ccs []convertConditions, data tokenizer.Toke
 /*
 英語 文法 品詞
 https://ja.wikibooks.org/wiki/%E8%8B%B1%E8%AA%9E/%E6%96%87%E6%B3%95/%E5%93%81%E8%A9%9E
+
+品詞 part of speech (pos)
 */
 var (
-	pronounGeneral           = []string{"名詞", "代名詞", "一般"}
-	nounsGeneral             = []string{"名詞", "一般"}
-	adnominalAdjective       = []string{"連体詞"}
-	adjectivesSelfSupporting = []string{"形容詞", "自立"}
-	interjection             = []string{"感動詞"}
-	verbIndependence         = []string{"動詞", "自立"}
-	sentenceEndingParticle   = []string{"助詞", "終助詞"}
-	verbsSubAssistant        = []string{"助詞", "副助詞"}
-	assistantParallel        = []string{"助詞", "並立助詞"}
-	auxiliaryVerb            = []string{"助動詞"}
-	nounsSaDynamic           = []string{"名詞", "サ変接続"}
+	pronounGeneral            = []string{"名詞", "代名詞", "一般"}
+	nounsGeneral              = []string{"名詞", "一般"}
+	adnominalAdjective        = []string{"連体詞"}
+	adjectivesSelfSupporting  = []string{"形容詞", "自立"}
+	interjection              = []string{"感動詞"}
+	verbIndependence          = []string{"動詞", "自立"}
+	sentenceEndingParticle    = []string{"助詞", "終助詞"}
+	subPostpositionalParticle = []string{"助詞", "副助詞"}
+	assistantParallelParticle = []string{"助詞", "並立助詞"}
+	auxiliaryVerb             = []string{"助動詞"}
+	nounsSaDynamic            = []string{"名詞", "サ変接続"}
 )
 
 func newCond(features []string, surface string) convertConditions {
