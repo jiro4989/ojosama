@@ -172,8 +172,13 @@ $ ojosama -t お願いします | ojosama
 
 派生したプロジェクトのリンクです。多謝。
 
-* https://github.com/wgdp/ojosama-discord-bot
-* https://github.com/Sigumaa/ojosama-commit
+[options="header"]
+|=================
+| 説明 | 言語 | リポジトリURL
+| Discord bot | Go | https://github.com/wgdp/ojosama-discord-bot
+| Gitのコミットメッセージをお嬢様にするCLI | Rust | https://github.com/Sigumaa/ojosama-commit
+| 任意のテキストや、開いてるバッファ上のテキストをお嬢様にするVimプラグイン | Vim Script | https://github.com/heavenshell/vim-ojosama
+|=================
 
 == 開発者向け
 
