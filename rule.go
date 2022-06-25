@@ -648,9 +648,9 @@ var (
 			},
 			Value: "くださいまし",
 		},
-		newRuleVerbs("ありがとう", "ありがとうございますわ"),
-		newRuleVerbs("じゃぁ", "それでは"),
-		newRuleVerbs("じゃあ", "それでは"),
+		newRuleInterjection("ありがとう", "ありがとうございますわ"),
+		newRuleInterjection("じゃぁ", "それでは"),
+		newRuleInterjection("じゃあ", "それでは"),
 		{
 			Conditions: convertConditions{
 				{
@@ -668,10 +668,10 @@ var (
 		newRuleAdjectivesSelfSupporting("きたない", "きったねぇ"),
 		newRuleAdjectivesSelfSupporting("臭い", "くっせぇ"),
 		newRuleAdjectivesSelfSupporting("くさい", "くっせぇ"),
-		newRuleVerbs("うふ", "おほ"),
-		newRuleVerbs("うふふ", "おほほ"),
-		newRuleVerbs("う", "お"),
-		newRuleVerbs("ふふふ", "ほほほ"),
+		newRuleInterjection("うふ", "おほ"),
+		newRuleInterjection("うふふ", "おほほ"),
+		newRuleInterjection("う", "お"),
+		newRuleInterjection("ふふふ", "ほほほ"),
 	}
 )
 
@@ -753,12 +753,16 @@ func matchAnyMultiConvertConditions(ccs []convertConditions, data tokenizer.Toke
 	return false
 }
 
+/*
+英語 文法 品詞
+https://ja.wikibooks.org/wiki/%E8%8B%B1%E8%AA%9E/%E6%96%87%E6%B3%95/%E5%93%81%E8%A9%9E
+*/
 var (
 	pronounGeneral           = []string{"名詞", "代名詞", "一般"}
 	nounsGeneral             = []string{"名詞", "一般"}
 	adnominalAdjective       = []string{"連体詞"}
 	adjectivesSelfSupporting = []string{"形容詞", "自立"}
-	verbs                    = []string{"感動詞"}
+	interjection             = []string{"感動詞"}
 	verbIndependence         = []string{"動詞", "自立"}
 	sentenceEndingParticle   = []string{"助詞", "終助詞"}
 	verbsSubAssistant        = []string{"助詞", "副助詞"}
@@ -865,8 +869,8 @@ func newRuleAdjectivesSelfSupporting(surface, value string) convertRule {
 	return newRule(adjectivesSelfSupporting, surface, value)
 }
 
-func newRuleVerbs(surface, value string) convertRule {
-	return newRule(verbs, surface, value)
+func newRuleInterjection(surface, value string) convertRule {
+	return newRule(interjection, surface, value)
 }
 
 func (c convertRule) disablePrefix(v bool) convertRule {
