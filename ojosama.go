@@ -169,7 +169,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 
 func getMeaningType(typeMap map[meaningType]convertConditions, data tokenizer.TokenData) (meaningType, bool) {
 	for k, cond := range typeMap {
-		if cond.matchAllTokenData(data) {
+		if cond.matchAnyTokenData(data) {
 			return k, true
 		}
 	}
