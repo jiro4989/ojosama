@@ -506,7 +506,7 @@ var (
 		newRuleInterjection("じゃあ", "それでは"),
 		{
 			Conditions: convertConditions{
-				newCond(posNotIndependenceGeneral, "くれる"),
+				newCond(posVerbNotIndependence, "くれる"),
 			},
 			Value: "くれます",
 		},
