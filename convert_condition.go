@@ -56,8 +56,7 @@ func newConds(surfaces []string) convertConditions {
 	var c convertConditions
 	for _, s := range surfaces {
 		cc := convertCondition{
-			Features: posAuxiliaryVerb,
-			Surface:  s,
+			Surface: s,
 		}
 		c = append(c, cc)
 	}

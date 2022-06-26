@@ -32,6 +32,7 @@ var (
 	posAdjectivesSelfSupporting  = []string{"形容詞", "自立"}
 	posInterjection              = []string{"感動詞"}
 	posVerbIndependence          = []string{"動詞", "自立"}
+	posVerbNotIndependence       = []string{"動詞", "非自立"}
 	posSentenceEndingParticle    = []string{"助詞", "終助詞"}
 	posSubPostpositionalParticle = []string{"助詞", "副助詞"}
 	posAssistantParallelParticle = []string{"助詞", "並立助詞"}
@@ -454,7 +455,7 @@ var (
 				newCond(posAuxiliaryVerb, "まし"),
 			},
 			BeforeIgnoreConditions: convertConditions{
-				{ Features: posVerbIndependence },
+				{Features: posVerbIndependence},
 			},
 			Value: "おりまし",
 		},
@@ -484,19 +485,19 @@ var (
 				newCond(posAuxiliaryVerb, "ない"),
 			},
 			BeforeIgnoreConditions: convertConditions{
-				{ Features: posVerbIndependence },
+				{Features: posVerbIndependence},
 			},
 			Value: "ありません",
 		},
 		{
 			Conditions: convertConditions{
-				newCond(posNotIndependenceGeneral, "ください"),
+				newCond(posVerbNotIndependence, "ください"),
 			},
 			Value: "くださいまし",
 		},
 		{
 			Conditions: convertConditions{
-				newCond(posNotIndependenceGeneral, "くれ"),
+				newCond(posVerbNotIndependence, "くれ"),
 			},
 			Value: "くださいまし",
 		},
