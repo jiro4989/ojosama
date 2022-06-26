@@ -311,6 +311,15 @@ var (
 
 		// 二人称
 		newRulePronounGeneral("あなた", "貴方"),
+		newRulePronounGeneral("あんた", "貴方"),
+		newRulePronounGeneral("おまえ", "貴方"),
+		newRulePronounGeneral("お前", "貴方"),
+		newRulePronounGeneral("てめぇ", "貴方"),
+		newRulePronounGeneral("てめえ", "貴方"),
+		newRuleNounsGeneral("貴様", "貴方").disablePrefix(true),
+		// newRulePronounGeneral("きさま", "貴方"),
+		// newRulePronounGeneral("そなた", "貴方"),
+		newRulePronounGeneral("君", "貴方"),
 
 		// 三人称
 		// TODO: AfterIgnore系も簡単に定義できるようにしたい

@@ -37,9 +37,9 @@ func TestConvert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			desc:    "正常系: あなたは貴方に変換いたしますわ",
-			src:     "あなた",
-			want:    "貴方",
+			desc:    "正常系: 二人称はすべて「貴方」に変換いたしますわ",
+			src:     "あなたは。あんたは。おまえは。お前は。てめぇは。てめえは。貴様は。君は。",
+			want:    "貴方は。貴方は。貴方は。貴方は。貴方は。貴方は。貴方は。貴方は。",
 			opt:     nil,
 			wantErr: false,
 		},
