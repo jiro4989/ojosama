@@ -8,137 +8,99 @@ import (
 
 // convertCondition は変換に使う条件。
 type convertCondition struct {
-	Type        convertType
-	Value       []string
-	ValueRegexp *regexp.Regexp // オプション。設定されてる時だけ使う
+	Features   []string
+	Reading    string
+	ReadingRe  *regexp.Regexp // オプション。設定されてる時だけ使う
+	Surface    string
+	SurfaceRe  *regexp.Regexp // オプション。設定されてる時だけ使う
+	BaseForm   string
+	BaseFormRe *regexp.Regexp // オプション。設定されてる時だけ使う
 }
 
 type convertType int
 
 // convertConditions は変換条件のスライス。
 //
-// この型の評価をする側は、すべての条件が true の時に true として解釈する。
-// 一つでも false が混じったら false として解釈する。
+// ANDで評価するかORで評価するかは、この型を使う側に依存する
 type convertConditions []convertCondition
 
-func newCond(features []string, surface string) convertConditions {
-	return convertConditions{
-		{
-			Type:  convertTypeFeatures,
-			Value: features,
-		},
-		{
-			Type:  convertTypeSurface,
-			Value: []string{surface},
-		},
+func newCond(features []string, surface string) convertCondition {
+	return convertCondition{
+		Features: features,
+		Surface:  surface,
 	}
 }
 
-func newCondRe(features []string, re *regexp.Regexp) convertConditions {
-	return convertConditions{
-		{
-			Type:  convertTypeFeatures,
-			Value: features,
-		},
-		{
-			Type:        convertTypeSurface,
-			ValueRegexp: re,
-		},
+func newCondRe(features []string, surfaceRe *regexp.Regexp) convertCondition {
+	return convertCondition{
+		Features:  features,
+		SurfaceRe: surfaceRe,
 	}
 }
 
-func newCondSentenceEndingParticle(surface string) convertConditions {
-	return convertConditions{
-		{
-			Type:  convertTypeFeatures,
-			Value: posSentenceEndingParticle,
-		},
-		{
-			Type:  convertTypeSurface,
-			Value: []string{surface},
-		},
+func newCondSentenceEndingParticle(surface string) convertCondition {
+	return convertCondition{
+		Features: posSentenceEndingParticle,
+		Surface:  surface,
 	}
 }
 
-func newCondAuxiliaryVerb(surface string) convertConditions {
-	return convertConditions{
-		{
-			Type:  convertTypeFeatures,
-			Value: posAuxiliaryVerb,
-		},
-		{
-			Type:  convertTypeSurface,
-			Value: []string{surface},
-		},
+func newCondAuxiliaryVerb(surface string) convertCondition {
+	return convertCondition{
+		Features: posAuxiliaryVerb,
+		Surface:  surface,
 	}
 }
 
-func newConds(surfaces []string) []convertConditions {
-	var c []convertConditions
+func newConds(surfaces []string) convertConditions {
+	var c convertConditions
 	for _, s := range surfaces {
-		cc := convertConditions{
-			{
-				Type:  convertTypeSurface,
-				Value: []string{s},
-			},
+		cc := convertCondition{
+			Surface: s,
 		}
 		c = append(c, cc)
 	}
 	return c
 }
 
-func (c *convertCondition) equalsTokenData(data tokenizer.TokenData) bool {
-	switch c.Type {
-	case convertTypeFeatures:
-		if equalsFeatures(data.Features, c.Value) {
-			return true
-		}
-	case convertTypeSurface:
-		if c.ValueRegexp != nil {
-			return c.ValueRegexp.MatchString(data.Surface)
-		}
-		if data.Surface == c.Value[0] {
-			return true
-		}
-	case convertTypeBaseForm:
-		if c.ValueRegexp != nil {
-			return c.ValueRegexp.MatchString(data.BaseForm)
-		}
-		if data.BaseForm == c.Value[0] {
-			return true
-		}
-	}
-	return false
+func neStr(a, b string) bool {
+	return a != "" && a != b
 }
 
-func (c *convertCondition) notEqualsTokenData(data tokenizer.TokenData) bool {
-	switch c.Type {
-	case convertTypeFeatures:
-		if !equalsFeatures(data.Features, c.Value) {
-			return true
-		}
-	case convertTypeSurface:
-		if c.ValueRegexp != nil {
-			return !c.ValueRegexp.MatchString(data.Surface)
-		}
-		if data.Surface != c.Value[0] {
-			return true
-		}
-	case convertTypeBaseForm:
-		if c.ValueRegexp != nil {
-			return !c.ValueRegexp.MatchString(data.BaseForm)
-		}
-		if data.BaseForm != c.Value[0] {
-			return true
-		}
+func neRe(a *regexp.Regexp, b string) bool {
+	return a != nil && !a.MatchString(b)
+}
+
+func (c *convertCondition) equalsTokenData(data tokenizer.TokenData) bool {
+	if 0 < len(c.Features) && !equalsFeatures(data.Features, c.Features) {
+		return false
 	}
-	return false
+	if neStr(c.Surface, data.Surface) {
+		return false
+	}
+	if neStr(c.Reading, data.Reading) {
+		return false
+	}
+	if neStr(c.BaseForm, data.BaseForm) {
+		return false
+	}
+	if neRe(c.SurfaceRe, data.Surface) {
+		return false
+	}
+	if neRe(c.ReadingRe, data.Reading) {
+		return false
+	}
+	if neRe(c.BaseFormRe, data.BaseForm) {
+		return false
+	}
+
+	return true
 }
 
 // matchAllTokenData は data がすべての c と一致した時に true を返す。
 func (c *convertConditions) matchAllTokenData(data tokenizer.TokenData) bool {
 	for _, cond := range *c {
-		if cond.notEqualsTokenData(data) {
+		if !cond.equalsTokenData(data) {
 			return false
 		}
 	}
@@ -149,17 +111,6 @@ func (c *convertConditions) matchAllTokenData(data tokenizer.TokenData) bool {
 func (c *convertConditions) matchAnyTokenData(data tokenizer.TokenData) bool {
 	for _, cond := range *c {
 		if cond.equalsTokenData(data) {
-			return true
-		}
-	}
-	return false
-}
-
-// matchAnyMultiConvertConditions は ccs のどれかが1つでも一致すれば true を返す。
-func matchAnyMultiConvertConditions(ccs []convertConditions, data tokenizer.TokenData) bool {
-	for _, cs := range ccs {
-		// 1つでも一致すればOK
-		if cs.matchAllTokenData(data) {
 			return true
 		}
 	}

@@ -114,7 +114,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		data := tokenizer.NewTokenData(tokens[i])
 
 		// 先頭が一致するならば次の単語に進む
-		if !matchAnyMultiConvertConditions(r.conditions1, data) {
+		if !r.conditions1.matchAnyTokenData(data) {
 			continue
 		}
 		if len(tokens) <= i+1 {
@@ -134,7 +134,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		// result.WriteString(data.Surface) を実行しない。
 
 		// 2つ目は動詞のいずれかとマッチする。マッチしなければふりだしに戻る
-		if !matchAnyMultiConvertConditions(r.conditions2, data) {
+		if !r.conditions2.matchAnyTokenData(data) {
 			continue
 		}
 		if len(tokens) <= i+1 {
@@ -167,12 +167,10 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 	return "", -1, false
 }
 
-func getMeaningType(typeMap map[meaningType][]convertConditions, data tokenizer.TokenData) (meaningType, bool) {
-	for k, v := range typeMap {
-		for _, cond := range v {
-			if cond.matchAllTokenData(data) {
-				return k, true
-			}
+func getMeaningType(typeMap map[meaningType]convertConditions, data tokenizer.TokenData) (meaningType, bool) {
+	for k, cond := range typeMap {
+		if cond.matchAnyTokenData(data) {
+			return k, true
 		}
 	}
 	return meaningTypeUnknown, false
@@ -214,14 +212,14 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 // matchContinuousConditions は tokens の tokenPos の位置からのトークンが、連続する条件にすべてマッチするかを判定する。
 //
 // 次のトークンが存在しなかったり、1つでも条件が不一致になった場合 false を返す。
-func matchContinuousConditions(tokens []tokenizer.Token, tokenPos int, ccs []convertConditions) bool {
+func matchContinuousConditions(tokens []tokenizer.Token, tokenPos int, ccs convertConditions) bool {
 	j := tokenPos
 	for _, conds := range ccs {
 		if len(tokens) <= j {
 			return false
 		}
 		data := tokenizer.NewTokenData(tokens[j])
-		if !conds.matchAllTokenData(data) {
+		if !conds.equalsTokenData(data) {
 			return false
 		}
 		j++
