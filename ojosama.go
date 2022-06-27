@@ -13,8 +13,9 @@ import (
 
 type Converter struct {
 	TokenCtl
-	result strings.Builder
-	opt    *ConvertOption
+	result   strings.Builder
+	nounKeep bool
+	opt      *ConvertOption
 }
 
 // ConvertOption はお嬢様変換時のオプショナルな設定。
@@ -92,10 +93,8 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	// tokenize
 	tokens := t.Tokenize(src)
 	c := NewConverter(*NewTokenCtl(tokens), opt)
-	var nounKeep bool
 	for ; c.Runnable(); c.Next() {
 		data := c.TokenData()
-		i := c.pos
 		buf := data.Surface
 
 		// 英数字のみの単語の場合は何もしない
@@ -119,12 +118,11 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// お嬢様言葉に変換
-		buf, nounKeep, i = convert(*data, tokens, i, buf, nounKeep, opt)
+		buf = c.convert()
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
-		buf = appendPoliteWord(*data, tokens, i, buf)
+		buf = appendPoliteWord(*data, tokens, c.pos, buf)
 
-		c.pos = i
 		c.writeString(buf)
 	}
 	return c.Result(), nil
@@ -283,63 +281,55 @@ excludeLoop:
 }
 
 // convert は基本的な変換を行う。
-func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int) {
-	var beforeToken tokenizer.TokenData
-	var beforeTokenOK bool
-	if 0 < i {
-		beforeToken = tokenizer.NewTokenData(tokens[i-1])
-		beforeTokenOK = true
-	}
+func (c *Converter) convert() string {
+	b := c.PrevTokenData()
+	a := c.NextTokenData()
+	data := *c.TokenData()
 
-	var afterToken tokenizer.TokenData
-	var afterTokenOK bool
-	if i+1 < len(tokens) {
-		afterToken = tokenizer.NewTokenData(tokens[i+1])
-		afterTokenOK = true
-	}
-
-	for _, c := range convertRules {
-		if !c.Conditions.matchAllTokenData(data) {
+	for _, cr := range convertRules {
+		if !cr.Conditions.matchAllTokenData(data) {
 			continue
 		}
 
 		// 前に続く単語をみて変換を無視する
-		if beforeTokenOK && c.BeforeIgnoreConditions.matchAnyTokenData(beforeToken) {
+		if b != nil && cr.BeforeIgnoreConditions.matchAnyTokenData(*b) {
 			break
 		}
 
 		// 次に続く単語をみて変換を無視する
-		if afterTokenOK && c.AfterIgnoreConditions.matchAnyTokenData(afterToken) {
+		if a != nil && cr.AfterIgnoreConditions.matchAnyTokenData(*a) {
 			break
 		}
 
 		// 文の区切りか、文の終わりの時だけ有効にする。
 		// 次のトークンが存在して、且つ次のトークンが文を区切るトークンでない時
 		// は変換しない。
-		if c.EnableWhenSentenceSeparation && afterTokenOK && !isSentenceSeparation(afterToken) {
+		if cr.EnableWhenSentenceSeparation && a != nil && !isSentenceSeparation(*a) {
 			break
 		}
 
-		result := c.Value
-		pos := i
+		result := cr.Value
+		pos := c.pos
+		tokens := c.tokens
 
 		// 波線伸ばしをランダムに追加する
-		if c.AppendLongNote {
-			result, pos = appendLongNote(result, tokens, i, opt)
+		if cr.AppendLongNote {
+			result, pos = appendLongNote(result, tokens, c.pos, c.opt)
 		}
 
 		// 手前に「お」を付ける
-		if !c.DisablePrefix {
-			result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
+		if !cr.DisablePrefix {
+			result, c.nounKeep = appendPrefix(data, tokens, c.pos, result, c.nounKeep)
 		}
 
-		return result, nounKeep, pos
+		c.pos = pos
+		return result
 	}
 
 	// 手前に「お」を付ける
-	result := surface
-	result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
-	return result, nounKeep, i
+	result := c.TokenData().Surface
+	result, c.nounKeep = appendPrefix(data, c.tokens, c.pos, result, c.nounKeep)
+	return result
 }
 
 func appendablePrefix(data tokenizer.TokenData) bool {
