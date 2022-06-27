@@ -29,6 +29,10 @@ type forceAppendLongNote struct {
 	exclamationMarkCount int
 }
 
+const (
+	politeWord = "ですわ"
+)
+
 var (
 	alnumRegexp = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
 )
@@ -89,7 +93,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf, nounKeep, i = convert(data, tokens, i, buf, nounKeep, opt)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
-		buf = appendPoliteWord(data, tokens, i, buf)
+		if isAppendablePoliteWord(data, tokens, i) {
+			buf += politeWord
+		}
 
 		result.WriteString(buf)
 	}
@@ -350,22 +356,22 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 	return "お" + surface, true
 }
 
-// appendPoliteWord は丁寧語を追加する。
-func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
+// isAppendablePoliteWord は丁寧語を追加する。
+func isAppendablePoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int) bool {
 	if !equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
-		return surface
+		return false
 	}
 
 	if len(tokens) <= i+1 {
-		return surface
+		return false
 	}
 
 	// 文の区切りのタイミングでは「ですわ」を差し込む
 	if isSentenceSeparation(tokenizer.NewTokenData(tokens[i+1])) {
-		return surface + "ですわ"
+		return true
 	}
 
-	return surface
+	return false
 }
 
 // isSentenceSeparation は data が文の区切りに使われる token かどうかを判定する。
