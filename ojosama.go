@@ -29,6 +29,10 @@ type forceAppendLongNote struct {
 	exclamationMarkCount int
 }
 
+const (
+	politeWord = "ですわ"
+)
+
 var (
 	alnumRegexp = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
 )
@@ -89,7 +93,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf, nounKeep, i = convert(data, tokens, i, buf, nounKeep, opt)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
-		buf = appendPoliteWord(data, tokens, i, buf)
+		if isAppendablePoliteWord(data, tokens, i) {
+			buf += politeWord
+		}
 
 		result.WriteString(buf)
 	}
@@ -202,7 +208,10 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 		}
 		result = strings.ReplaceAll(result, "@1", surface)
 		if mc.AppendLongNote {
-			result, n = appendLongNote(result, tokens, n, opt)
+			if note, pos := newLongNote(tokens, n, opt); note != "" {
+				result += note
+				n = pos
+			}
 		}
 		return result, n, true
 	}
@@ -241,6 +250,34 @@ excludeLoop:
 
 // convert は基本的な変換を行う。
 func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int) {
+	var ok bool
+	var c convertRule
+	if ok, c = matchConvertRule(data, tokens, i); !ok {
+		result := surface
+		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
+		return result, nounKeep, i
+	}
+
+	result := c.Value
+	pos := i
+
+	// 波線伸ばしをランダムに追加する
+	if c.AppendLongNote {
+		if note, pos2 := newLongNote(tokens, i, opt); note != "" {
+			result += note
+			pos = pos2
+		}
+	}
+
+	// 手前に「お」を付ける
+	if !c.DisablePrefix {
+		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
+	}
+
+	return result, nounKeep, pos
+}
+
+func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int) (bool, convertRule) {
 	var beforeToken tokenizer.TokenData
 	var beforeTokenOK bool
 	if 0 < i {
@@ -277,26 +314,9 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 			break
 		}
 
-		result := c.Value
-		pos := i
-
-		// 波線伸ばしをランダムに追加する
-		if c.AppendLongNote {
-			result, pos = appendLongNote(result, tokens, i, opt)
-		}
-
-		// 手前に「お」を付ける
-		if !c.DisablePrefix {
-			result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
-		}
-
-		return result, nounKeep, pos
+		return true, c
 	}
-
-	// 手前に「お」を付ける
-	result := surface
-	result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
-	return result, nounKeep, i
+	return false, convertRule{}
 }
 
 func appendablePrefix(data tokenizer.TokenData) bool {
@@ -350,22 +370,22 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 	return "お" + surface, true
 }
 
-// appendPoliteWord は丁寧語を追加する。
-func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
+// isAppendablePoliteWord は丁寧語を追加する。
+func isAppendablePoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int) bool {
 	if !equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
-		return surface
+		return false
 	}
 
 	if len(tokens) <= i+1 {
-		return surface
+		return false
 	}
 
 	// 文の区切りのタイミングでは「ですわ」を差し込む
 	if isSentenceSeparation(tokenizer.NewTokenData(tokens[i+1])) {
-		return surface + "ですわ"
+		return true
 	}
 
-	return surface
+	return false
 }
 
 // isSentenceSeparation は data が文の区切りに使われる token かどうかを判定する。
@@ -374,13 +394,14 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 		containsString([]string{"！", "!", "？", "?"}, data.Surface)
 }
 
-// appendLongNote は次の token が感嘆符か疑問符の場合に波線、感嘆符、疑問符をランダムに追加する。
+// newLongNote は次の token が感嘆符か疑問符の場合に波線、感嘆符、疑問符をランダムに生成する。
 //
-// 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与でき
-// るようにしている。
-func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int) {
-	if len(tokens) <= i+1 {
-		return src, i
+// 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与できるようにしている。
+func newLongNote(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int) {
+	var ok bool
+	var s string
+	if ok, s = creatableLongNote(tokens, i); !ok {
+		return "", -1
 	}
 
 	var tm *chars.TestMode
@@ -388,46 +409,52 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		tm = opt.forceCharsTestMode
 	}
 
+	var (
+		w, e int
+	)
+	if opt != nil && opt.forceAppendLongNote.enable {
+		// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
+		w = opt.forceAppendLongNote.wavyLineCount
+		e = opt.forceAppendLongNote.exclamationMarkCount
+	} else {
+		w = rand.Intn(3)
+		e = rand.Intn(3)
+	}
+
+	var suffix strings.Builder
+	for i := 0; i < w; i++ {
+		suffix.WriteString("～")
+	}
+
+	// ！or？をどれかからランダムに選択する
+	feq := chars.SampleExclamationQuestionByValue(s, tm)
+
+	// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
+	// -1 して数を調整している。
+	for i := 0; i < e-1; i++ {
+		suffix.WriteString(feq.Value)
+	}
+
+	// 後ろに！や？が連続する場合、それらをすべて feq と同じ種類（半角、全角、
+	// 絵文字）の！や？に置き換えて返却する。
+	excl, pos := getContinuousExclamationMark(tokens, i, feq)
+	suffix.WriteString(excl)
+	return suffix.String(), pos
+}
+
+func creatableLongNote(tokens []tokenizer.Token, i int) (bool, string) {
+	if len(tokens) <= i+1 {
+		return false, ""
+	}
+
 	data := tokenizer.NewTokenData(tokens[i+1])
 	for _, s := range []string{"！", "？", "!", "?"} {
 		if data.Surface != s {
 			continue
 		}
-
-		var (
-			w, e int
-		)
-		if opt != nil && opt.forceAppendLongNote.enable {
-			// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
-			w = opt.forceAppendLongNote.wavyLineCount
-			e = opt.forceAppendLongNote.exclamationMarkCount
-		} else {
-			w = rand.Intn(3)
-			e = rand.Intn(3)
-		}
-
-		var suffix strings.Builder
-		for i := 0; i < w; i++ {
-			suffix.WriteString("～")
-		}
-
-		// ！or？をどれかからランダムに選択する
-		feq := chars.SampleExclamationQuestionByValue(s, tm)
-
-		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
-		// -1 して数を調整している。
-		for i := 0; i < e-1; i++ {
-			suffix.WriteString(feq.Value)
-		}
-
-		// 後ろに！や？が連続する場合、それらをすべて feq と同じ種類（半角、全角、
-		// 絵文字）の！や？に置き換えて返却する。
-		excl, pos := getContinuousExclamationMark(tokens, i, feq)
-		suffix.WriteString(excl)
-		src += suffix.String()
-		return src, pos
+		return true, s
 	}
-	return src, i
+	return false, ""
 }
 
 func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.ExclamationQuestionMark) (string, int) {
