@@ -104,9 +104,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// 名詞＋動詞＋終助詞の組み合わせに対して変換する
-		if s, n, ok := convertSentenceEndingParticle(tokens, i); ok {
-			c.pos = n
-			c.writeString(s)
+		if c.convertSentenceEndingParticle() {
 			continue
 		}
 
@@ -145,7 +143,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 // 例：お野球をいたしませんこと
 //
 // その他にも「野球するな」だと「お野球をしてはいけませんわ」になる。
-func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (string, int, bool) {
+func (c *Converter) convertSentenceEndingParticle() bool {
+	tokens := c.tokens
+	tokenPos := c.pos
 	for _, r := range sentenceEndingParticleConvertRules {
 		var result strings.Builder
 		i := tokenPos
@@ -200,9 +200,11 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		// 意味分類に該当する変換候補の文字列を返す
 		// TODO: 現状1個だけなので決め打ちで最初の1つ目を返す。
 		result.WriteString(r.value[mt][0])
-		return result.String(), i, true
+		c.writeString(result.String())
+		c.pos = i
+		return true
 	}
-	return "", -1, false
+	return false
 }
 
 func getMeaningType(typeMap map[meaningType]convertConditions, data tokenizer.TokenData) (meaningType, bool) {
