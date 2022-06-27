@@ -11,10 +11,22 @@ import (
 	"github.com/jiro4989/ojosama/internal/chars"
 )
 
+type Converter struct {
+	TokenCtl
+	opt *ConvertOption
+}
+
 // ConvertOption はお嬢様変換時のオプショナルな設定。
 type ConvertOption struct {
 	forceAppendLongNote forceAppendLongNote // 単体テスト用のパラメータ
 	forceCharsTestMode  *chars.TestMode     // 単体テスト用のパラメータ
+}
+
+func NewConverter(t TokenCtl, opt *ConvertOption) *Converter {
+	return &Converter{
+		TokenCtl: t,
+		opt:      opt,
+	}
 }
 
 // forceAppendLongNote は強制的に波線や感嘆符や疑問符を任意の数追加するための設定。
@@ -52,11 +64,12 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 
 	// tokenize
 	tokens := t.Tokenize(src)
+	c := NewConverter(*NewTokenCtl(tokens), opt)
 	var result strings.Builder
 	var nounKeep bool
-	for i := 0; i < len(tokens); i++ {
-		token := tokens[i]
-		data := tokenizer.NewTokenData(token)
+	for ; c.Runnable(); c.Next() {
+		data := c.TokenData()
+		i := c.pos
 		buf := data.Surface
 
 		// 英数字のみの単語の場合は何もしない
@@ -67,30 +80,31 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 
 		// 名詞＋動詞＋終助詞の組み合わせに対して変換する
 		if s, n, ok := convertSentenceEndingParticle(tokens, i); ok {
-			i = n
+			c.pos = n
 			result.WriteString(s)
 			continue
 		}
 
 		// 連続する条件による変換を行う
 		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
-			i = n
+			c.pos = n
 			result.WriteString(s)
 			continue
 		}
 
 		// 特定条件は優先して無視する
-		if matchExcludeRule(data) {
+		if matchExcludeRule(*data) {
 			result.WriteString(buf)
 			continue
 		}
 
 		// お嬢様言葉に変換
-		buf, nounKeep, i = convert(data, tokens, i, buf, nounKeep, opt)
+		buf, nounKeep, i = convert(*data, tokens, i, buf, nounKeep, opt)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
-		buf = appendPoliteWord(data, tokens, i, buf)
+		buf = appendPoliteWord(*data, tokens, i, buf)
 
+		c.pos = i
 		result.WriteString(buf)
 	}
 	return result.String(), nil
