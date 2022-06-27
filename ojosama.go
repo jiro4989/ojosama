@@ -13,7 +13,8 @@ import (
 
 type Converter struct {
 	TokenCtl
-	opt *ConvertOption
+	result strings.Builder
+	opt    *ConvertOption
 }
 
 // ConvertOption はお嬢様変換時のオプショナルな設定。
@@ -27,6 +28,23 @@ func NewConverter(t TokenCtl, opt *ConvertOption) *Converter {
 		TokenCtl: t,
 		opt:      opt,
 	}
+}
+
+func (c *Converter) writeString(s string) {
+	c.result.WriteString(s)
+}
+
+func (c *Converter) Result() string {
+	return c.result.String()
+}
+
+func (c *Converter) matchAlphaNumeric() bool {
+	s := c.TokenData().Surface
+	if alnumRegexp.MatchString(s) {
+		c.writeString(s)
+		return true
+	}
+	return false
 }
 
 // forceAppendLongNote は強制的に波線や感嘆符や疑問符を任意の数追加するための設定。
@@ -65,7 +83,6 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	// tokenize
 	tokens := t.Tokenize(src)
 	c := NewConverter(*NewTokenCtl(tokens), opt)
-	var result strings.Builder
 	var nounKeep bool
 	for ; c.Runnable(); c.Next() {
 		data := c.TokenData()
@@ -73,28 +90,27 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf := data.Surface
 
 		// 英数字のみの単語の場合は何もしない
-		if alnumRegexp.MatchString(buf) {
-			result.WriteString(buf)
+		if c.matchAlphaNumeric() {
 			continue
 		}
 
 		// 名詞＋動詞＋終助詞の組み合わせに対して変換する
 		if s, n, ok := convertSentenceEndingParticle(tokens, i); ok {
 			c.pos = n
-			result.WriteString(s)
+			c.writeString(s)
 			continue
 		}
 
 		// 連続する条件による変換を行う
 		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
 			c.pos = n
-			result.WriteString(s)
+			c.writeString(s)
 			continue
 		}
 
 		// 特定条件は優先して無視する
 		if matchExcludeRule(*data) {
-			result.WriteString(buf)
+			c.writeString(buf)
 			continue
 		}
 
@@ -105,9 +121,9 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf = appendPoliteWord(*data, tokens, i, buf)
 
 		c.pos = i
-		result.WriteString(buf)
+		c.writeString(buf)
 	}
-	return result.String(), nil
+	return c.Result(), nil
 }
 
 // convertSentenceEndingParticle は名詞＋動詞（＋助動詞）＋終助詞の組み合わせすべてを満たす場合に変換する。
