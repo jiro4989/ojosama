@@ -250,6 +250,34 @@ excludeLoop:
 
 // convert は基本的な変換を行う。
 func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int) {
+	var ok bool
+	var c convertRule
+	if ok, c = matchConvertRule(data, tokens, i); !ok {
+		result := surface
+		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
+		return result, nounKeep, i
+	}
+
+	result := c.Value
+	pos := i
+
+	// 波線伸ばしをランダムに追加する
+	if c.AppendLongNote {
+		if note, pos2 := newLongNote(tokens, i, opt); note != "" {
+			result += note
+			pos = pos2
+		}
+	}
+
+	// 手前に「お」を付ける
+	if !c.DisablePrefix {
+		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
+	}
+
+	return result, nounKeep, pos
+}
+
+func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int) (bool, convertRule) {
 	var beforeToken tokenizer.TokenData
 	var beforeTokenOK bool
 	if 0 < i {
@@ -286,29 +314,9 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 			break
 		}
 
-		result := c.Value
-		pos := i
-
-		// 波線伸ばしをランダムに追加する
-		if c.AppendLongNote {
-			if note, pos2 := newLongNote(tokens, i, opt); note != "" {
-				result += note
-				pos = pos2
-			}
-		}
-
-		// 手前に「お」を付ける
-		if !c.DisablePrefix {
-			result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
-		}
-
-		return result, nounKeep, pos
+		return true, c
 	}
-
-	// 手前に「お」を付ける
-	result := surface
-	result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
-	return result, nounKeep, i
+	return false, convertRule{}
 }
 
 func appendablePrefix(data tokenizer.TokenData) bool {
