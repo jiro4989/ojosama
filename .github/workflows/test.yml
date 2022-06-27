@@ -9,10 +9,12 @@ name: test
     paths-ignore:
       - README*
       - LICENSE
+      - '*.md'
   pull_request:
     paths-ignore:
       - README*
       - LICENSE
+      - '*.md'
 
 env:
   goversion: '1.18'
