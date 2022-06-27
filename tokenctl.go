@@ -47,5 +47,12 @@ func (t *TokenCtl) availablePrevToken() bool {
 }
 
 func (t *TokenCtl) availableNextToken() bool {
-	return len(t.tokens) <= t.pos+1
+	return t.pos+1 < len(t.tokens)
+}
+
+func (t *TokenCtl) Copy() *TokenCtl {
+	return &TokenCtl{
+		tokens: t.tokens,
+		pos:    t.pos,
+	}
 }

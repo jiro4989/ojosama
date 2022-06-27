@@ -144,18 +144,16 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 //
 // その他にも「野球するな」だと「お野球をしてはいけませんわ」になる。
 func (c *Converter) convertSentenceEndingParticle() bool {
-	tokens := c.tokens
-	tokenPos := c.pos
 	for _, r := range sentenceEndingParticleConvertRules {
+		t := c.TokenCtl.Copy()
+		data := *t.TokenData()
 		var result strings.Builder
-		i := tokenPos
-		data := tokenizer.NewTokenData(tokens[i])
 
 		// 先頭が一致するならば次の単語に進む
 		if !r.conditions1.matchAnyTokenData(data) {
 			continue
 		}
-		if len(tokens) <= i+1 {
+		if !t.availableNextToken() {
 			continue
 		}
 		s := data.Surface
@@ -164,8 +162,8 @@ func (c *Converter) convertSentenceEndingParticle() bool {
 			s = "お" + s
 		}
 		result.WriteString(s)
-		i++
-		data = tokenizer.NewTokenData(tokens[i])
+		t.Next()
+		data = *t.TokenData()
 
 		// NOTE:
 		// 2つ目以降は value の値で置き換えるため
@@ -175,20 +173,20 @@ func (c *Converter) convertSentenceEndingParticle() bool {
 		if !r.conditions2.matchAnyTokenData(data) {
 			continue
 		}
-		if len(tokens) <= i+1 {
+		if !t.availableNextToken() {
 			continue
 		}
-		i++
-		data = tokenizer.NewTokenData(tokens[i])
+		t.Next()
+		data = *t.TokenData()
 
 		// 助動詞があった場合は無視してトークンを進める。
 		// 別に無くても良い。
 		if r.auxiliaryVerb.matchAllTokenData(data) {
-			if len(tokens) <= i+1 {
+			if !t.availableNextToken() {
 				continue
 			}
-			i++
-			data = tokenizer.NewTokenData(tokens[i])
+			t.Next()
+			data = *t.TokenData()
 		}
 
 		// 最後、終助詞がどの意味分類に該当するかを取得
@@ -200,8 +198,9 @@ func (c *Converter) convertSentenceEndingParticle() bool {
 		// 意味分類に該当する変換候補の文字列を返す
 		// TODO: 現状1個だけなので決め打ちで最初の1つ目を返す。
 		result.WriteString(r.value[mt][0])
+
 		c.writeString(result.String())
-		c.pos = i
+		c.pos = t.pos
 		return true
 	}
 	return false
