@@ -390,7 +390,9 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 //
 // 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与できるようにしている。
 func newLongNote(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int) {
-	if len(tokens) <= i+1 {
+	var ok bool
+	var s string
+	if ok, s = creatableLongNote(tokens, i); !ok {
 		return "", -1
 	}
 
@@ -399,45 +401,52 @@ func newLongNote(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, i
 		tm = opt.forceCharsTestMode
 	}
 
+	var (
+		w, e int
+	)
+	if opt != nil && opt.forceAppendLongNote.enable {
+		// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
+		w = opt.forceAppendLongNote.wavyLineCount
+		e = opt.forceAppendLongNote.exclamationMarkCount
+	} else {
+		w = rand.Intn(3)
+		e = rand.Intn(3)
+	}
+
+	var suffix strings.Builder
+	for i := 0; i < w; i++ {
+		suffix.WriteString("～")
+	}
+
+	// ！or？をどれかからランダムに選択する
+	feq := chars.SampleExclamationQuestionByValue(s, tm)
+
+	// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
+	// -1 して数を調整している。
+	for i := 0; i < e-1; i++ {
+		suffix.WriteString(feq.Value)
+	}
+
+	// 後ろに！や？が連続する場合、それらをすべて feq と同じ種類（半角、全角、
+	// 絵文字）の！や？に置き換えて返却する。
+	excl, pos := getContinuousExclamationMark(tokens, i, feq)
+	suffix.WriteString(excl)
+	return suffix.String(), pos
+}
+
+func creatableLongNote(tokens []tokenizer.Token, i int) (bool, string) {
+	if len(tokens) <= i+1 {
+		return false, ""
+	}
+
 	data := tokenizer.NewTokenData(tokens[i+1])
 	for _, s := range []string{"！", "？", "!", "?"} {
 		if data.Surface != s {
 			continue
 		}
-
-		var (
-			w, e int
-		)
-		if opt != nil && opt.forceAppendLongNote.enable {
-			// opt がある場合に限って任意の数付与できる。基本的に単体テスト用途。
-			w = opt.forceAppendLongNote.wavyLineCount
-			e = opt.forceAppendLongNote.exclamationMarkCount
-		} else {
-			w = rand.Intn(3)
-			e = rand.Intn(3)
-		}
-
-		var suffix strings.Builder
-		for i := 0; i < w; i++ {
-			suffix.WriteString("～")
-		}
-
-		// ！or？をどれかからランダムに選択する
-		feq := chars.SampleExclamationQuestionByValue(s, tm)
-
-		// 次の token は必ず感嘆符か疑問符のどちらかであることが確定しているため
-		// -1 して数を調整している。
-		for i := 0; i < e-1; i++ {
-			suffix.WriteString(feq.Value)
-		}
-
-		// 後ろに！や？が連続する場合、それらをすべて feq と同じ種類（半角、全角、
-		// 絵文字）の！や？に置き換えて返却する。
-		excl, pos := getContinuousExclamationMark(tokens, i, feq)
-		suffix.WriteString(excl)
-		return suffix.String(), pos
+		return true, s
 	}
-	return "", -1
+	return false, ""
 }
 
 func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.ExclamationQuestionMark) (string, int) {
