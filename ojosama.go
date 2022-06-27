@@ -94,9 +94,6 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 	tokens := t.Tokenize(src)
 	c := NewConverter(*NewTokenCtl(tokens), opt)
 	for ; c.Runnable(); c.Next() {
-		data := c.TokenData()
-		buf := data.Surface
-
 		// 英数字のみの単語の場合は何もしない
 		if c.matchAlphaNumeric() {
 			continue
@@ -118,12 +115,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// お嬢様言葉に変換
-		buf = c.convert()
-
-		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
-		buf = c.appendPoliteWord(buf)
-
-		c.writeString(buf)
+		c.convert()
 	}
 	return c.Result(), nil
 }
@@ -281,7 +273,7 @@ excludeLoop:
 }
 
 // convert は基本的な変換を行う。
-func (c *Converter) convert() string {
+func (c *Converter) convert() {
 	b := c.PrevTokenData()
 	a := c.NextTokenData()
 	data := *c.TokenData()
@@ -323,13 +315,19 @@ func (c *Converter) convert() string {
 		}
 
 		c.pos = pos
-		return result
+
+		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
+		result = c.appendPoliteWord(result)
+		c.writeString(result)
+		return
 	}
 
 	// 手前に「お」を付ける
 	result := c.TokenData().Surface
 	result, c.nounKeep = appendPrefix(data, c.tokens, c.pos, result, c.nounKeep)
-	return result
+	result = c.appendPoliteWord(result)
+	c.writeString(result)
+	return
 }
 
 func appendablePrefix(data tokenizer.TokenData) bool {
