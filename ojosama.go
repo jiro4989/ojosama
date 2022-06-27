@@ -47,6 +47,15 @@ func (c *Converter) matchAlphaNumeric() bool {
 	return false
 }
 
+func (c *Converter) matchExcludeRule() bool {
+	data := c.TokenData()
+	if matchExcludeRule(*data) {
+		c.writeString(data.Surface)
+		return true
+	}
+	return false
+}
+
 // forceAppendLongNote は強制的に波線や感嘆符や疑問符を任意の数追加するための設定。
 //
 // 波線や感嘆符の付与には乱数が絡むため、単体テスト実行時に確実に等しい結果を得
@@ -109,8 +118,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// 特定条件は優先して無視する
-		if matchExcludeRule(*data) {
-			c.writeString(buf)
+		if c.matchExcludeRule() {
 			continue
 		}
 
