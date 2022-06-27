@@ -109,9 +109,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// 連続する条件による変換を行う
-		if s, n, ok := convertContinuousConditions(tokens, i, opt); ok {
-			c.pos = n
-			c.writeString(s)
+		if c.convertContinuousConditions() {
 			continue
 		}
 
@@ -224,7 +222,10 @@ func getMeaningType(typeMap map[meaningType]convertConditions, data tokenizer.To
 // めた後の tokenPos を返却する。
 //
 // 第三引数は変換ルールにマッチしたかどうかを返す。
-func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *ConvertOption) (string, int, bool) {
+func (c *Converter) convertContinuousConditions() bool {
+	tokens := c.tokens
+	tokenPos := c.pos
+	opt := c.opt
 	for _, mc := range continuousConditionsConvertRules {
 		if !matchContinuousConditions(tokens, tokenPos, mc.Conditions) {
 			continue
@@ -234,7 +235,7 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 		result := mc.Value
 
 		// FIXME: 書き方が汚い
-		data := tokenizer.NewTokenData(tokens[tokenPos])
+		data := *c.TokenData()
 		surface := data.Surface
 		if appendablePrefix(data) {
 			surface = "お" + surface
@@ -243,9 +244,12 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 		if mc.AppendLongNote {
 			result, n = appendLongNote(result, tokens, n, opt)
 		}
-		return result, n, true
+
+		c.writeString(result)
+		c.pos = n
+		return true
 	}
-	return "", -1, false
+	return false
 }
 
 // matchContinuousConditions は tokens の tokenPos の位置からのトークンが、連続する条件にすべてマッチするかを判定する。
