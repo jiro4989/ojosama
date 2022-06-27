@@ -121,7 +121,7 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		buf = c.convert()
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
-		buf = appendPoliteWord(*data, tokens, c.pos, buf)
+		buf = c.appendPoliteWord(buf)
 
 		c.writeString(buf)
 	}
@@ -384,17 +384,18 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 }
 
 // appendPoliteWord は丁寧語を追加する。
-func appendPoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string) string {
+func (c *Converter) appendPoliteWord(surface string) string {
+	data := c.TokenData()
 	if !equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
 		return surface
 	}
 
-	if len(tokens) <= i+1 {
+	if !c.availableNextToken() {
 		return surface
 	}
 
 	// 文の区切りのタイミングでは「ですわ」を差し込む
-	if isSentenceSeparation(tokenizer.NewTokenData(tokens[i+1])) {
+	if isSentenceSeparation(*c.NextTokenData()) {
 		return surface + "ですわ"
 	}
 
