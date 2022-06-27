@@ -208,7 +208,10 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 		}
 		result = strings.ReplaceAll(result, "@1", surface)
 		if mc.AppendLongNote {
-			result, n = appendLongNote(result, tokens, n, opt)
+			if note, pos := newLongNote(tokens, n, opt); note != "" {
+				result += note
+				n = pos
+			}
 		}
 		return result, n, true
 	}
@@ -288,7 +291,10 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 
 		// 波線伸ばしをランダムに追加する
 		if c.AppendLongNote {
-			result, pos = appendLongNote(result, tokens, i, opt)
+			if note, pos2 := newLongNote(tokens, i, opt); note != "" {
+				result += note
+				pos = pos2
+			}
 		}
 
 		// 手前に「お」を付ける
@@ -380,13 +386,12 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 		containsString([]string{"！", "!", "？", "?"}, data.Surface)
 }
 
-// appendLongNote は次の token が感嘆符か疑問符の場合に波線、感嘆符、疑問符をランダムに追加する。
+// newLongNote は次の token が感嘆符か疑問符の場合に波線、感嘆符、疑問符をランダムに生成する。
 //
-// 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与でき
-// るようにしている。
-func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int) {
+// 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与できるようにしている。
+func newLongNote(tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int) {
 	if len(tokens) <= i+1 {
-		return src, i
+		return "", -1
 	}
 
 	var tm *chars.TestMode
@@ -430,10 +435,9 @@ func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOpt
 		// 絵文字）の！や？に置き換えて返却する。
 		excl, pos := getContinuousExclamationMark(tokens, i, feq)
 		suffix.WriteString(excl)
-		src += suffix.String()
-		return src, pos
+		return suffix.String(), pos
 	}
-	return src, i
+	return "", -1
 }
 
 func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.ExclamationQuestionMark) (string, int) {
