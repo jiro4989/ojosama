@@ -9,12 +9,12 @@ name: test
     paths-ignore:
       - README*
       - LICENSE
-      - '.github/PULL_REQUEST_TEMPLATE/*'
+      - '.github/*.md'
   pull_request:
     paths-ignore:
       - README*
       - LICENSE
-      - '.github/PULL_REQUEST_TEMPLATE/*'
+      - '.github/*.md'
 
 env:
   goversion: '1.18'
