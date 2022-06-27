@@ -223,6 +223,7 @@ func getMeaningType(typeMap map[meaningType]convertConditions, data tokenizer.To
 func (c *Converter) convertContinuousConditions() bool {
 	tokens := c.tokens
 	tokenPos := c.pos
+	opt := c.opt
 	for _, mc := range continuousConditionsConvertRules {
 		if !matchContinuousConditions(tokens, tokenPos, mc.Conditions) {
 			continue
@@ -239,7 +240,7 @@ func (c *Converter) convertContinuousConditions() bool {
 		}
 		result = strings.ReplaceAll(result, "@1", surface)
 		if mc.AppendLongNote {
-			result = c.appendLongNote(result)
+			result, n = appendLongNote(result, tokens, n, opt)
 		}
 
 		c.writeString(result)
@@ -313,7 +314,7 @@ func (c *Converter) convert() string {
 
 		// 波線伸ばしをランダムに追加する
 		if cr.AppendLongNote {
-			result = c.appendLongNote(result)
+			result, pos = appendLongNote(result, tokens, c.pos, c.opt)
 		}
 
 		// 手前に「お」を付ける
@@ -410,18 +411,17 @@ func isSentenceSeparation(data tokenizer.TokenData) bool {
 //
 // 乱数が絡むと単体テストがやりづらくなるので、 opt を使うことで任意の数付与でき
 // るようにしている。
-func (c *Converter) appendLongNote(src string) string {
-	if !c.availableNextToken() {
-		return src
+func appendLongNote(src string, tokens []tokenizer.Token, i int, opt *ConvertOption) (string, int) {
+	if len(tokens) <= i+1 {
+		return src, i
 	}
 
-	opt := c.opt
 	var tm *chars.TestMode
 	if opt != nil {
 		tm = opt.forceCharsTestMode
 	}
 
-	data := *c.NextTokenData()
+	data := tokenizer.NewTokenData(tokens[i+1])
 	for _, s := range []string{"！", "？", "!", "?"} {
 		if data.Surface != s {
 			continue
@@ -455,13 +455,12 @@ func (c *Converter) appendLongNote(src string) string {
 
 		// 後ろに！や？が連続する場合、それらをすべて feq と同じ種類（半角、全角、
 		// 絵文字）の！や？に置き換えて返却する。
-		excl, pos := getContinuousExclamationMark(c.tokens, c.pos, feq)
+		excl, pos := getContinuousExclamationMark(tokens, i, feq)
 		suffix.WriteString(excl)
 		src += suffix.String()
-		c.pos = pos
-		return src
+		return src, pos
 	}
-	return src
+	return src, i
 }
 
 func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.ExclamationQuestionMark) (string, int) {
