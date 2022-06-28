@@ -178,6 +178,7 @@ $ ojosama -t お願いします | ojosama
 | スラッシュコマンドでお嬢様に変換できるDiscordBot | Go | https://github.com/wgdp/ojosama-discord-bot
 | Gitのコミットメッセージをお嬢様にするCLI | Rust | https://github.com/Sigumaa/ojosama-commit
 | 任意のテキストや、開いてるバッファ上のテキストをお嬢様にするVimプラグイン | Vim Script | https://github.com/heavenshell/vim-ojosama
+| スラッシュコマンドでお嬢様に変換できるSlack App | Go | https://github.com/yoskeoka/ojosama-slack-app
 |=================
 
 == 開発者向け
