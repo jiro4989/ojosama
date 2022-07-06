@@ -13,8 +13,14 @@ import (
 
 // ConvertOption はお嬢様変換時のオプショナルな設定。
 type ConvertOption struct {
-	forceAppendLongNote forceAppendLongNote // 単体テスト用のパラメータ
-	forceCharsTestMode  *chars.TestMode     // 単体テスト用のパラメータ
+	// 句点を！に変換する機能をOFFにする。句点を！に変換してしまうと変換元の文章
+	// のニュアンスを破壊する可能性があるため、オプションパラメータで無効にでき
+	// るようにする。
+	DisableKutenToExclamation bool
+
+	forceAppendLongNote     forceAppendLongNote // 単体テスト用のパラメータ
+	forceCharsTestMode      *chars.TestMode     // 単体テスト用のパラメータ
+	forceKutenToExclamation bool                // KutenToExclamationで強制的に3番目の要素を選択する
 }
 
 // forceAppendLongNote は強制的に波線や感嘆符や疑問符を任意の数追加するための設定。
@@ -35,6 +41,11 @@ const (
 
 var (
 	alnumRegexp = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
+
+	featKuten = []string{"記号", "句点"} // 。
+	featToten = []string{"記号", "読点"} // 、
+
+	shuffleElementsKutenToExclamation = []string{"。", "。", "！", "❗"}
 )
 
 func init() {
@@ -90,11 +101,20 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// お嬢様言葉に変換
-		buf, nounKeep, i = convert(data, tokens, i, buf, nounKeep, opt)
+		var kutenToEx bool
+		buf, nounKeep, i, kutenToEx = convert(data, tokens, i, buf, nounKeep, opt)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
 		if isAppendablePoliteWord(data, tokens, i) {
 			buf += politeWord
+			kutenToEx = true
+		}
+
+		if kutenToEx {
+			if ok, s, pos := randomKutenToExclamation(tokens, i, opt); ok {
+				buf += s
+				i = pos
+			}
 		}
 
 		result.WriteString(buf)
@@ -207,12 +227,21 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 			surface = "お" + surface
 		}
 		result = strings.ReplaceAll(result, "@1", surface)
+
+		// 句点と～が同時に発生することは無いので早期リターンで良い
+		if ok, s, pos := randomKutenToExclamation(tokens, n, opt); ok {
+			result += s
+			n = pos
+			return result, n, true
+		}
+
 		if mc.AppendLongNote {
 			if note, pos := newLongNote(tokens, n, opt); note != "" {
 				result += note
 				n = pos
 			}
 		}
+
 		return result, n, true
 	}
 	return "", -1, false
@@ -249,13 +278,13 @@ excludeLoop:
 }
 
 // convert は基本的な変換を行う。
-func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int) {
+func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int, bool) {
 	var ok bool
 	var c convertRule
 	if ok, c = matchConvertRule(data, tokens, i); !ok {
 		result := surface
 		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
-		return result, nounKeep, i
+		return result, nounKeep, i, false
 	}
 
 	result := c.Value
@@ -274,7 +303,7 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
 	}
 
-	return result, nounKeep, pos
+	return result, nounKeep, pos, c.EnableKutenToExclamation
 }
 
 func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int) (bool, convertRule) {
@@ -390,7 +419,7 @@ func isAppendablePoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, 
 
 // isSentenceSeparation は data が文の区切りに使われる token かどうかを判定する。
 func isSentenceSeparation(data tokenizer.TokenData) bool {
-	return containsFeatures([][]string{{"記号", "句点"}, {"記号", "読点"}}, data.Features) ||
+	return containsFeatures([][]string{featKuten, featToten}, data.Features) ||
 		containsString([]string{"！", "!", "？", "?"}, data.Surface)
 }
 
@@ -487,4 +516,36 @@ func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.Ex
 // 読みがオで始まる言葉も true になる。
 func isPoliteWord(data tokenizer.TokenData) bool {
 	return strings.HasPrefix(data.Reading, "オ")
+}
+
+// randomKutenToExclamation はランダムで句点を！に変換する。
+func randomKutenToExclamation(tokens []tokenizer.Token, tokenPos int, opt *ConvertOption) (bool, string, int) {
+	if opt != nil && opt.DisableKutenToExclamation {
+		return false, "", tokenPos
+	}
+
+	pos := tokenPos + 1
+	if len(tokens) <= pos {
+		return false, "", tokenPos
+	}
+
+	data := tokenizer.NewTokenData(tokens[pos])
+	if !isKuten(data) {
+		return false, "", tokenPos
+	}
+
+	// テスト用に値をすげ替えられるようにする
+	var s []string
+	if opt != nil && opt.forceKutenToExclamation {
+		s = []string{"❗", "❗"}
+	} else {
+		s = shuffleElementsKutenToExclamation
+	}
+
+	rand.Shuffle(len(s), func(i, j int) { s[i], s[j] = s[j], s[i] })
+	return true, s[0], pos
+}
+
+func isKuten(data tokenizer.TokenData) bool {
+	return equalsFeatures(data.Features, featKuten) && data.Surface == "。"
 }
