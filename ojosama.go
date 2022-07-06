@@ -101,11 +101,16 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 		}
 
 		// お嬢様言葉に変換
-		buf, nounKeep, i = convert(data, tokens, i, buf, nounKeep, opt)
+		var kutenToEx bool
+		buf, nounKeep, i, kutenToEx = convert(data, tokens, i, buf, nounKeep, opt)
 
 		// 形容詞、自立で文が終わった時は丁寧語ですわを追加する
 		if isAppendablePoliteWord(data, tokens, i) {
 			buf += politeWord
+			kutenToEx = true
+		}
+
+		if kutenToEx {
 			if ok, s, pos := randomKutenToExclamation(tokens, i, opt); ok {
 				buf += s
 				i = pos
@@ -222,12 +227,21 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 			surface = "お" + surface
 		}
 		result = strings.ReplaceAll(result, "@1", surface)
+
+		// 句点と～が同時に発生することは無いので早期リターンで良い
+		if ok, s, pos := randomKutenToExclamation(tokens, n, opt); ok {
+			result += s
+			n = pos
+			return result, n, true
+		}
+
 		if mc.AppendLongNote {
 			if note, pos := newLongNote(tokens, n, opt); note != "" {
 				result += note
 				n = pos
 			}
 		}
+
 		return result, n, true
 	}
 	return "", -1, false
@@ -264,13 +278,13 @@ excludeLoop:
 }
 
 // convert は基本的な変換を行う。
-func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int) {
+func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int, bool) {
 	var ok bool
 	var c convertRule
 	if ok, c = matchConvertRule(data, tokens, i); !ok {
 		result := surface
 		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
-		return result, nounKeep, i
+		return result, nounKeep, i, false
 	}
 
 	result := c.Value
@@ -289,7 +303,7 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
 	}
 
-	return result, nounKeep, pos
+	return result, nounKeep, pos, c.EnableKutenToExclamation
 }
 
 func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int) (bool, convertRule) {

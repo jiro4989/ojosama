@@ -14,7 +14,8 @@ type convertRule struct {
 	EnableWhenSentenceSeparation bool              // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
 	AppendLongNote               bool              // 波線を追加する
 	DisablePrefix                bool              // 「お」を手前に付与しない
-	Value                        string            // この文字列に置換する
+	EnableKutenToExclamation     bool
+	Value                        string // この文字列に置換する
 }
 
 /*
@@ -78,9 +79,10 @@ func (c convertRule) disablePrefix(v bool) convertRule {
 
 // continuousConditionsConvertRule は連続する条件がすべてマッチしたときに変換するルール。
 type continuousConditionsConvertRule struct {
-	Conditions     convertConditions
-	AppendLongNote bool
-	Value          string
+	Conditions               convertConditions
+	AppendLongNote           bool
+	EnableKutenToExclamation bool
+	Value                    string
 }
 
 // sentenceEndingParticleConvertRule は「名詞」＋「動詞」＋「終助詞」の組み合わせによる変換ルール。
@@ -186,6 +188,7 @@ var (
 				newCond([]string{"動詞", "自立"}, "し"),
 				newCond([]string{"助動詞"}, "ます"),
 			},
+			EnableKutenToExclamation: true,
 		},
 
 		{
@@ -194,6 +197,7 @@ var (
 				newCond([]string{"助動詞"}, "だ"),
 				newCond([]string{"助詞", "接続助詞"}, "から"),
 			},
+			EnableKutenToExclamation: true,
 		},
 
 		{
@@ -203,6 +207,7 @@ var (
 				newCond([]string{"名詞", "非自立", "一般"}, "ん"),
 				newCond([]string{"助動詞"}, "だ"),
 			},
+			EnableKutenToExclamation: true,
 		},
 
 		{
@@ -211,6 +216,7 @@ var (
 				newCond([]string{"助動詞"}, "だ"),
 				newCond([]string{"助詞", "終助詞"}, "よ"),
 			},
+			EnableKutenToExclamation: true,
 		},
 
 		{
@@ -219,6 +225,7 @@ var (
 				newCond(posPronounGeneral, "なん"),
 				newCond(posSubPostpositionalParticle, "じゃ"),
 			},
+			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "なんですの",
@@ -226,6 +233,7 @@ var (
 				newCond(posPronounGeneral, "なん"),
 				newCond(posAuxiliaryVerb, "だ"),
 			},
+			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "なんですの",
@@ -233,6 +241,7 @@ var (
 				newCond(posPronounGeneral, "なん"),
 				newCond(posAssistantParallelParticle, "や"),
 			},
+			EnableKutenToExclamation: true,
 		},
 
 		{
@@ -241,6 +250,7 @@ var (
 				condNounsGeneral,
 				newCond(posAuxiliaryVerb, "じゃ"),
 			},
+			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "@1ですの",
@@ -248,6 +258,7 @@ var (
 				condNounsGeneral,
 				newCond(posAuxiliaryVerb, "だ"),
 			},
+			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "@1ですの",
@@ -255,6 +266,7 @@ var (
 				condNounsGeneral,
 				newCond(posAuxiliaryVerb, "や"),
 			},
+			EnableKutenToExclamation: true,
 		},
 
 		{
@@ -263,6 +275,7 @@ var (
 				condPronounsGeneral,
 				newCond(posAuxiliaryVerb, "じゃ"),
 			},
+			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "@1ですの",
@@ -270,6 +283,7 @@ var (
 				condPronounsGeneral,
 				newCond(posAuxiliaryVerb, "だ"),
 			},
+			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "@1ですの",
@@ -277,6 +291,7 @@ var (
 				condPronounsGeneral,
 				newCond(posAuxiliaryVerb, "や"),
 			},
+			EnableKutenToExclamation: true,
 		},
 	}
 
@@ -375,8 +390,9 @@ var (
 			AfterIgnoreConditions: convertConditions{
 				{Features: posSubParEndParticle},
 			},
-			AppendLongNote: true,
-			Value:          "ですわ",
+			AppendLongNote:           true,
+			EnableKutenToExclamation: true,
+			Value:                    "ですわ",
 		},
 		{
 			Conditions: convertConditions{
@@ -385,8 +401,9 @@ var (
 			AfterIgnoreConditions: convertConditions{
 				{Features: posSubParEndParticle},
 			},
-			AppendLongNote: true,
-			Value:          "ですわ",
+			AppendLongNote:           true,
+			EnableKutenToExclamation: true,
+			Value:                    "ですわ",
 		},
 		{
 			Conditions: convertConditions{
@@ -394,6 +411,7 @@ var (
 			},
 			EnableWhenSentenceSeparation: true,
 			AppendLongNote:               true,
+			EnableKutenToExclamation:     true,
 			Value:                        "いたしますわ",
 		},
 		{
@@ -402,6 +420,7 @@ var (
 			},
 			EnableWhenSentenceSeparation: true,
 			AppendLongNote:               true,
+			EnableKutenToExclamation:     true,
 			Value:                        "なりますわ",
 		},
 		{
@@ -426,8 +445,9 @@ var (
 			Conditions: convertConditions{
 				newCond(posSentenceEndingParticle, "わ"),
 			},
-			AppendLongNote: true,
-			Value:          "ですわ",
+			AppendLongNote:           true,
+			EnableKutenToExclamation: true,
+			Value:                    "ですわ",
 		},
 		{
 			Conditions: convertConditions{
@@ -472,8 +492,9 @@ var (
 			Conditions: convertConditions{
 				newCond(posAuxiliaryVerb, "ます"),
 			},
-			AppendLongNote: true,
-			Value:          "ますわ",
+			AppendLongNote:           true,
+			EnableKutenToExclamation: true,
+			Value:                    "ますわ",
 		},
 		{
 			Conditions: convertConditions{
@@ -481,6 +502,7 @@ var (
 			},
 			EnableWhenSentenceSeparation: true,
 			AppendLongNote:               true,
+			EnableKutenToExclamation:     true,
 			Value:                        "たわ",
 		},
 		{
@@ -502,13 +524,15 @@ var (
 			Conditions: convertConditions{
 				newCond(posVerbNotIndependence, "ください"),
 			},
-			Value: "くださいまし",
+			EnableKutenToExclamation: true,
+			Value:                    "くださいまし",
 		},
 		{
 			Conditions: convertConditions{
 				newCond(posVerbNotIndependence, "くれ"),
 			},
-			Value: "くださいまし",
+			EnableKutenToExclamation: true,
+			Value:                    "くださいまし",
 		},
 		newRuleInterjection("ありがとう", "ありがとうございますわ"),
 		newRuleInterjection("じゃぁ", "それでは"),

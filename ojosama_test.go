@@ -556,6 +556,15 @@ func TestConvert(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			desc: "正常系: 「。」で終わる時に「！」に変換いたしますわ！",
+			src:  "プレイする。ショットガンだ。",
+			want: "プレイいたしますわ❗おショットガンですの❗",
+			opt: &ConvertOption{
+				forceKutenToExclamation: true,
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
