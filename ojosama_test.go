@@ -547,6 +547,15 @@ func TestConvert(t *testing.T) {
 			opt:     opt,
 			wantErr: false,
 		},
+		{
+			desc: "正常系: 形容詞＋自立の後に「ですわ」を付与する場合、「。」をランダムに！に変換いたしますわ",
+			src:  "とても悲しい。",
+			want: "とても悲しいですわ❗",
+			opt: &ConvertOption{
+				forceKutenToExclamation: true,
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
