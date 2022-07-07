@@ -4,13 +4,11 @@ import (
 	"strings"
 
 	"github.com/ikawaha/kagome/v2/tokenizer"
+	"github.com/jiro4989/ojosama/internal/feat"
 )
 
-// FIXME: 二重管理になってる
-var featKuten = []string{"記号", "句点"} // 。
-
 func IsKuten(data tokenizer.TokenData) bool {
-	return EqualsFeatures(data.Features, featKuten) && data.Surface == "。"
+	return EqualsFeatures(data.Features, feat.Kuten) && data.Surface == "。"
 }
 
 // IsPoliteWord は丁寧語かどうかを判定する。

@@ -10,6 +10,7 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 	"github.com/jiro4989/ojosama/internal/chars"
 	"github.com/jiro4989/ojosama/internal/converter"
+	"github.com/jiro4989/ojosama/internal/feat"
 	"github.com/jiro4989/ojosama/internal/pos"
 	"github.com/jiro4989/ojosama/internal/tokendata"
 )
@@ -44,9 +45,6 @@ const (
 
 var (
 	alnumRegexp = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
-
-	featKuten = []string{"記号", "句点"} // 。
-	featToten = []string{"記号", "読点"} // 、
 
 	shuffleElementsKutenToExclamation = []string{"。", "。", "！", "❗"}
 )
@@ -413,7 +411,7 @@ func isAppendablePoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, 
 
 // isSentenceSeparation は data が文の区切りに使われる token かどうかを判定する。
 func isSentenceSeparation(data tokenizer.TokenData) bool {
-	return tokendata.ContainsFeatures([][]string{featKuten, featToten}, data.Features) ||
+	return tokendata.ContainsFeatures([][]string{feat.Kuten, feat.Toten}, data.Features) ||
 		tokendata.ContainsString([]string{"！", "!", "？", "?"}, data.Surface)
 }
 

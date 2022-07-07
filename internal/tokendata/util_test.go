@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ikawaha/kagome/v2/tokenizer"
+	"github.com/jiro4989/ojosama/internal/feat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +17,7 @@ func TestIsKuten(t *testing.T) {
 		{
 			desc: "正常系: 句点の場合はtrueですわ",
 			data: tokenizer.TokenData{
-				Features: featKuten,
+				Features: feat.Kuten,
 				Surface:  "。",
 			},
 			want: true,
@@ -24,7 +25,7 @@ func TestIsKuten(t *testing.T) {
 		{
 			desc: "正常系: 句点出ない場合はfalseですわ",
 			data: tokenizer.TokenData{
-				Features: featKuten,
+				Features: feat.Kuten,
 				Surface:  "、",
 			},
 			want: false,
