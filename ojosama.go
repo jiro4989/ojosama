@@ -9,6 +9,7 @@ import (
 	"github.com/ikawaha/kagome-dict/ipa"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 	"github.com/jiro4989/ojosama/internal/chars"
+	"github.com/jiro4989/ojosama/internal/converter"
 )
 
 // ConvertOption はお嬢様変換時のオプショナルな設定。
@@ -46,6 +47,32 @@ var (
 	featToten = []string{"記号", "読点"} // 、
 
 	shuffleElementsKutenToExclamation = []string{"。", "。", "！", "❗"}
+)
+
+// FIXME: 一旦コピペで対応。二重管理になってるので直す
+/*
+英語 文法 品詞
+https://ja.wikibooks.org/wiki/%E8%8B%B1%E8%AA%9E/%E6%96%87%E6%B3%95/%E5%93%81%E8%A9%9E
+
+品詞 part of speech (pos)
+*/
+var (
+	posPronounGeneral            = []string{"名詞", "代名詞", "一般"}
+	posNounsGeneral              = []string{"名詞", "一般"}
+	posSpecificGeneral           = []string{"名詞", "固有名詞", "一般"}
+	posNotIndependenceGeneral    = []string{"名詞", "非自立", "一般"}
+	posAdnominalAdjective        = []string{"連体詞"}
+	posAdjectivesSelfSupporting  = []string{"形容詞", "自立"}
+	posInterjection              = []string{"感動詞"}
+	posVerbIndependence          = []string{"動詞", "自立"}
+	posVerbNotIndependence       = []string{"動詞", "非自立"}
+	posSentenceEndingParticle    = []string{"助詞", "終助詞"}
+	posSubPostpositionalParticle = []string{"助詞", "副助詞"}
+	posAssistantParallelParticle = []string{"助詞", "並立助詞"}
+	posSubParEndParticle         = []string{"助詞", "副助詞／並立助詞／終助詞"}
+	posConnAssistant             = []string{"助詞", "接続助詞"}
+	posAuxiliaryVerb             = []string{"助動詞"}
+	posNounsSaDynamic            = []string{"名詞", "サ変接続"}
 )
 
 func init() {
@@ -134,13 +161,13 @@ func Convert(src string, opt *ConvertOption) (string, error) {
 //
 // その他にも「野球するな」だと「お野球をしてはいけませんわ」になる。
 func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (string, int, bool) {
-	for _, r := range sentenceEndingParticleConvertRules {
+	for _, r := range converter.SentenceEndingParticleConvertRules {
 		var result strings.Builder
 		i := tokenPos
 		data := tokenizer.NewTokenData(tokens[i])
 
 		// 先頭が一致するならば次の単語に進む
-		if !r.conditions1.matchAnyTokenData(data) {
+		if !r.Conditions1.MatchAnyTokenData(data) {
 			continue
 		}
 		if len(tokens) <= i+1 {
@@ -160,7 +187,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		// result.WriteString(data.Surface) を実行しない。
 
 		// 2つ目は動詞のいずれかとマッチする。マッチしなければふりだしに戻る
-		if !r.conditions2.matchAnyTokenData(data) {
+		if !r.Conditions2.MatchAnyTokenData(data) {
 			continue
 		}
 		if len(tokens) <= i+1 {
@@ -171,7 +198,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 
 		// 助動詞があった場合は無視してトークンを進める。
 		// 別に無くても良い。
-		if r.auxiliaryVerb.matchAllTokenData(data) {
+		if r.AuxiliaryVerb.MatchAllTokenData(data) {
 			if len(tokens) <= i+1 {
 				continue
 			}
@@ -180,26 +207,17 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		}
 
 		// 最後、終助詞がどの意味分類に該当するかを取得
-		mt, ok := getMeaningType(r.sentenceEndingParticle, data)
+		mt, ok := converter.GetMeaningType(r.SentenceEndingParticle, data)
 		if !ok {
 			continue
 		}
 
 		// 意味分類に該当する変換候補の文字列を返す
 		// TODO: 現状1個だけなので決め打ちで最初の1つ目を返す。
-		result.WriteString(r.value[mt][0])
+		result.WriteString(r.Value[mt][0])
 		return result.String(), i, true
 	}
 	return "", -1, false
-}
-
-func getMeaningType(typeMap map[meaningType]convertConditions, data tokenizer.TokenData) (meaningType, bool) {
-	for k, cond := range typeMap {
-		if cond.matchAnyTokenData(data) {
-			return k, true
-		}
-	}
-	return meaningTypeUnknown, false
 }
 
 // convertContinuousConditions は連続する条件による変換ルールにマッチした変換結果を返す。
@@ -212,7 +230,7 @@ func getMeaningType(typeMap map[meaningType]convertConditions, data tokenizer.To
 //
 // 第三引数は変換ルールにマッチしたかどうかを返す。
 func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *ConvertOption) (string, int, bool) {
-	for _, mc := range continuousConditionsConvertRules {
+	for _, mc := range converter.ContinuousConditionsConvertRules {
 		if !matchContinuousConditions(tokens, tokenPos, mc.Conditions) {
 			continue
 		}
@@ -250,14 +268,14 @@ func convertContinuousConditions(tokens []tokenizer.Token, tokenPos int, opt *Co
 // matchContinuousConditions は tokens の tokenPos の位置からのトークンが、連続する条件にすべてマッチするかを判定する。
 //
 // 次のトークンが存在しなかったり、1つでも条件が不一致になった場合 false を返す。
-func matchContinuousConditions(tokens []tokenizer.Token, tokenPos int, ccs convertConditions) bool {
+func matchContinuousConditions(tokens []tokenizer.Token, tokenPos int, ccs converter.ConvertConditions) bool {
 	j := tokenPos
 	for _, conds := range ccs {
 		if len(tokens) <= j {
 			return false
 		}
 		data := tokenizer.NewTokenData(tokens[j])
-		if !conds.equalsTokenData(data) {
+		if !conds.EqualsTokenData(data) {
 			return false
 		}
 		j++
@@ -268,8 +286,8 @@ func matchContinuousConditions(tokens []tokenizer.Token, tokenPos int, ccs conve
 // matchExcludeRule は除外ルールと一致するものが存在するかを判定する。
 func matchExcludeRule(data tokenizer.TokenData) bool {
 excludeLoop:
-	for _, c := range excludeRules {
-		if !c.Conditions.matchAllTokenData(data) {
+	for _, c := range converter.ExcludeRules {
+		if !c.Conditions.MatchAllTokenData(data) {
 			continue excludeLoop
 		}
 		return true
@@ -280,7 +298,7 @@ excludeLoop:
 // convert は基本的な変換を行う。
 func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface string, nounKeep bool, opt *ConvertOption) (string, bool, int, bool) {
 	var ok bool
-	var c convertRule
+	var c converter.ConvertRule
 	if ok, c = matchConvertRule(data, tokens, i); !ok {
 		result := surface
 		result, nounKeep = appendPrefix(data, tokens, i, result, nounKeep)
@@ -306,7 +324,7 @@ func convert(data tokenizer.TokenData, tokens []tokenizer.Token, i int, surface 
 	return result, nounKeep, pos, c.EnableKutenToExclamation
 }
 
-func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int) (bool, convertRule) {
+func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int) (bool, converter.ConvertRule) {
 	var beforeToken tokenizer.TokenData
 	var beforeTokenOK bool
 	if 0 < i {
@@ -321,18 +339,18 @@ func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int)
 		afterTokenOK = true
 	}
 
-	for _, c := range convertRules {
-		if !c.Conditions.matchAllTokenData(data) {
+	for _, c := range converter.ConvertRules {
+		if !c.Conditions.MatchAllTokenData(data) {
 			continue
 		}
 
 		// 前に続く単語をみて変換を無視する
-		if beforeTokenOK && c.BeforeIgnoreConditions.matchAnyTokenData(beforeToken) {
+		if beforeTokenOK && c.BeforeIgnoreConditions.MatchAnyTokenData(beforeToken) {
 			break
 		}
 
 		// 次に続く単語をみて変換を無視する
-		if afterTokenOK && c.AfterIgnoreConditions.matchAnyTokenData(afterToken) {
+		if afterTokenOK && c.AfterIgnoreConditions.MatchAnyTokenData(afterToken) {
 			break
 		}
 
@@ -345,7 +363,7 @@ func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int)
 
 		return true, c
 	}
-	return false, convertRule{}
+	return false, converter.ConvertRule{}
 }
 
 func appendablePrefix(data tokenizer.TokenData) bool {

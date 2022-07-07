@@ -1,4 +1,4 @@
-package ojosama
+package tokendata
 
 import (
 	"testing"
@@ -36,7 +36,7 @@ func TestEqualsFeatures(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			assert := assert.New(t)
 
-			got := equalsFeatures(tt.a, tt.b)
+			got := EqualsFeatures(tt.a, tt.b)
 			assert.Equal(tt.want, got)
 		})
 	}
@@ -74,7 +74,7 @@ func TestContainsFeatures(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			assert := assert.New(t)
 
-			got := containsFeatures(tt.a, tt.b)
+			got := ContainsFeatures(tt.a, tt.b)
 			assert.Equal(tt.want, got)
 		})
 	}
@@ -105,7 +105,7 @@ func TestConatinsString(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			assert := assert.New(t)
 
-			got := containsString(tt.a, tt.b)
+			got := ContainsString(tt.a, tt.b)
 			assert.Equal(tt.want, got)
 		})
 	}
