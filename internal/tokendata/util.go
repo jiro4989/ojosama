@@ -1,5 +1,24 @@
 package tokendata
 
+import (
+	"strings"
+
+	"github.com/ikawaha/kagome/v2/tokenizer"
+)
+
+// FIXME: 二重管理になってる
+var featKuten = []string{"記号", "句点"} // 。
+
+func IsKuten(data tokenizer.TokenData) bool {
+	return EqualsFeatures(data.Features, featKuten) && data.Surface == "。"
+}
+
+// IsPoliteWord は丁寧語かどうかを判定する。
+// 読みがオで始まる言葉も true になる。
+func IsPoliteWord(data tokenizer.TokenData) bool {
+	return strings.HasPrefix(data.Reading, "オ")
+}
+
 // EqualsFeatures は Features が等しいかどうかを判定する。
 //
 // featuresが空の時は * が設定されているため、 * が出現したら以降は無視する。

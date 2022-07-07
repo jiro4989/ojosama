@@ -10,6 +10,7 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 	"github.com/jiro4989/ojosama/internal/chars"
 	"github.com/jiro4989/ojosama/internal/converter"
+	"github.com/jiro4989/ojosama/internal/tokendata"
 )
 
 // ConvertOption はお嬢様変換時のオプショナルな設定。
@@ -372,7 +373,7 @@ func appendablePrefix(data tokenizer.TokenData) bool {
 	}
 
 	// 丁寧語の場合は「お」を付けない
-	if isPoliteWord(data) {
+	if tokendata.IsPoliteWord(data) {
 		return false
 	}
 
@@ -530,12 +531,6 @@ func getContinuousExclamationMark(tokens []tokenizer.Token, i int, feq *chars.Ex
 	return result.String(), pos
 }
 
-// isPoliteWord は丁寧語かどうかを判定する。
-// 読みがオで始まる言葉も true になる。
-func isPoliteWord(data tokenizer.TokenData) bool {
-	return strings.HasPrefix(data.Reading, "オ")
-}
-
 // randomKutenToExclamation はランダムで句点を！に変換する。
 func randomKutenToExclamation(tokens []tokenizer.Token, tokenPos int, opt *ConvertOption) (bool, string, int) {
 	if opt != nil && opt.DisableKutenToExclamation {
@@ -548,7 +543,7 @@ func randomKutenToExclamation(tokens []tokenizer.Token, tokenPos int, opt *Conve
 	}
 
 	data := tokenizer.NewTokenData(tokens[pos])
-	if !isKuten(data) {
+	if !tokendata.IsKuten(data) {
 		return false, "", tokenPos
 	}
 
@@ -562,8 +557,4 @@ func randomKutenToExclamation(tokens []tokenizer.Token, tokenPos int, opt *Conve
 
 	rand.Shuffle(len(s), func(i, j int) { s[i], s[j] = s[j], s[i] })
 	return true, s[0], pos
-}
-
-func isKuten(data tokenizer.TokenData) bool {
-	return equalsFeatures(data.Features, featKuten) && data.Surface == "。"
 }
