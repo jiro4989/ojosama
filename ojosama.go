@@ -10,6 +10,7 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 	"github.com/jiro4989/ojosama/internal/chars"
 	"github.com/jiro4989/ojosama/internal/converter"
+	"github.com/jiro4989/ojosama/internal/pos"
 	"github.com/jiro4989/ojosama/internal/tokendata"
 )
 
@@ -48,32 +49,6 @@ var (
 	featToten = []string{"記号", "読点"} // 、
 
 	shuffleElementsKutenToExclamation = []string{"。", "。", "！", "❗"}
-)
-
-// FIXME: 一旦コピペで対応。二重管理になってるので直す
-/*
-英語 文法 品詞
-https://ja.wikibooks.org/wiki/%E8%8B%B1%E8%AA%9E/%E6%96%87%E6%B3%95/%E5%93%81%E8%A9%9E
-
-品詞 part of speech (pos)
-*/
-var (
-	posPronounGeneral            = []string{"名詞", "代名詞", "一般"}
-	posNounsGeneral              = []string{"名詞", "一般"}
-	posSpecificGeneral           = []string{"名詞", "固有名詞", "一般"}
-	posNotIndependenceGeneral    = []string{"名詞", "非自立", "一般"}
-	posAdnominalAdjective        = []string{"連体詞"}
-	posAdjectivesSelfSupporting  = []string{"形容詞", "自立"}
-	posInterjection              = []string{"感動詞"}
-	posVerbIndependence          = []string{"動詞", "自立"}
-	posVerbNotIndependence       = []string{"動詞", "非自立"}
-	posSentenceEndingParticle    = []string{"助詞", "終助詞"}
-	posSubPostpositionalParticle = []string{"助詞", "副助詞"}
-	posAssistantParallelParticle = []string{"助詞", "並立助詞"}
-	posSubParEndParticle         = []string{"助詞", "副助詞／並立助詞／終助詞"}
-	posConnAssistant             = []string{"助詞", "接続助詞"}
-	posAuxiliaryVerb             = []string{"助動詞"}
-	posNounsSaDynamic            = []string{"名詞", "サ変接続"}
 )
 
 func init() {
@@ -176,7 +151,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		}
 		s := data.Surface
 		// TODO: ベタ書きしててよくない
-		if tokendata.EqualsFeatures(data.Features, posNounsGeneral) || tokendata.EqualsFeatures(data.Features[:2], posNounsSaDynamic) {
+		if tokendata.EqualsFeatures(data.Features, pos.NounsGeneral) || tokendata.EqualsFeatures(data.Features[:2], pos.NounsSaDynamic) {
 			s = "お" + s
 		}
 		result.WriteString(s)

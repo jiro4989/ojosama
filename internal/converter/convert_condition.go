@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"github.com/ikawaha/kagome/v2/tokenizer"
+	"github.com/jiro4989/ojosama/internal/pos"
 	"github.com/jiro4989/ojosama/internal/tokendata"
 )
 
@@ -39,14 +40,14 @@ func newCondRe(features []string, surfaceRe *regexp.Regexp) ConvertCondition {
 
 func newCondSentenceEndingParticle(surface string) ConvertCondition {
 	return ConvertCondition{
-		Features: posSentenceEndingParticle,
+		Features: pos.SentenceEndingParticle,
 		Surface:  surface,
 	}
 }
 
 func newCondAuxiliaryVerb(surface string) ConvertCondition {
 	return ConvertCondition{
-		Features: posAuxiliaryVerb,
+		Features: pos.AuxiliaryVerb,
 		Surface:  surface,
 	}
 }
