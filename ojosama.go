@@ -176,7 +176,7 @@ func convertSentenceEndingParticle(tokens []tokenizer.Token, tokenPos int) (stri
 		}
 		s := data.Surface
 		// TODO: ベタ書きしててよくない
-		if equalsFeatures(data.Features, posNounsGeneral) || equalsFeatures(data.Features[:2], posNounsSaDynamic) {
+		if tokendata.EqualsFeatures(data.Features, posNounsGeneral) || tokendata.EqualsFeatures(data.Features[:2], posNounsSaDynamic) {
 			s = "お" + s
 		}
 		result.WriteString(s)
@@ -368,7 +368,7 @@ func matchConvertRule(data tokenizer.TokenData, tokens []tokenizer.Token, i int)
 }
 
 func appendablePrefix(data tokenizer.TokenData) bool {
-	if !equalsFeatures(data.Features, []string{"名詞", "一般"}) && !equalsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
+	if !tokendata.EqualsFeatures(data.Features, []string{"名詞", "一般"}) && !tokendata.EqualsFeatures(data.Features[:2], []string{"名詞", "固有名詞"}) {
 		return false
 	}
 
@@ -390,7 +390,7 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 	// 例: プレイする
 	if i+1 < len(tokens) {
 		data := tokenizer.NewTokenData(tokens[i+1])
-		if equalsFeatures(data.Features, []string{"動詞", "自立"}) {
+		if tokendata.EqualsFeatures(data.Features, []string{"動詞", "自立"}) {
 			return surface, nounKeep
 		}
 	}
@@ -404,13 +404,13 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 		data := tokenizer.NewTokenData(tokens[i-1])
 
 		// 手前のトークンが「お」の場合は付与しない
-		if equalsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
+		if tokendata.EqualsFeatures(data.Features, []string{"接頭詞", "名詞接続"}) {
 			return surface, false
 		}
 
 		// サ変接続が来ても付与しない。
 		// 例: 横断歩道、解体新書
-		if equalsFeatures(data.Features, []string{"名詞", "サ変接続"}) {
+		if tokendata.EqualsFeatures(data.Features, []string{"名詞", "サ変接続"}) {
 			return surface, false
 		}
 	}
@@ -420,7 +420,7 @@ func appendPrefix(data tokenizer.TokenData, tokens []tokenizer.Token, i int, sur
 
 // isAppendablePoliteWord は丁寧語を追加する。
 func isAppendablePoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, i int) bool {
-	if !equalsFeatures(data.Features, []string{"形容詞", "自立"}) {
+	if !tokendata.EqualsFeatures(data.Features, []string{"形容詞", "自立"}) {
 		return false
 	}
 
@@ -438,8 +438,8 @@ func isAppendablePoliteWord(data tokenizer.TokenData, tokens []tokenizer.Token, 
 
 // isSentenceSeparation は data が文の区切りに使われる token かどうかを判定する。
 func isSentenceSeparation(data tokenizer.TokenData) bool {
-	return containsFeatures([][]string{featKuten, featToten}, data.Features) ||
-		containsString([]string{"！", "!", "？", "?"}, data.Surface)
+	return tokendata.ContainsFeatures([][]string{featKuten, featToten}, data.Features) ||
+		tokendata.ContainsString([]string{"！", "!", "？", "?"}, data.Surface)
 }
 
 // newLongNote は次の token が感嘆符か疑問符の場合に波線、感嘆符、疑問符をランダムに生成する。
