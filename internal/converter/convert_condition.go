@@ -62,11 +62,11 @@ func newConds(surfaces []string) ConvertConditions {
 	return c
 }
 
-func neStr(a, b string) bool {
+func isNotEmptyStringAndDoesntEqualString(a, b string) bool {
 	return a != "" && a != b
 }
 
-func neRe(a *regexp.Regexp, b string) bool {
+func isNotNilAndDoesntMatchString(a *regexp.Regexp, b string) bool {
 	return a != nil && !a.MatchString(b)
 }
 
@@ -74,22 +74,22 @@ func (c *ConvertCondition) EqualsTokenData(data tokenizer.TokenData) bool {
 	if 0 < len(c.Features) && !tokendata.EqualsFeatures(data.Features, c.Features) {
 		return false
 	}
-	if neStr(c.Surface, data.Surface) {
+	if isNotEmptyStringAndDoesntEqualString(c.Surface, data.Surface) {
 		return false
 	}
-	if neStr(c.Reading, data.Reading) {
+	if isNotEmptyStringAndDoesntEqualString(c.Reading, data.Reading) {
 		return false
 	}
-	if neStr(c.BaseForm, data.BaseForm) {
+	if isNotEmptyStringAndDoesntEqualString(c.BaseForm, data.BaseForm) {
 		return false
 	}
-	if neRe(c.SurfaceRe, data.Surface) {
+	if isNotNilAndDoesntMatchString(c.SurfaceRe, data.Surface) {
 		return false
 	}
-	if neRe(c.ReadingRe, data.Reading) {
+	if isNotNilAndDoesntMatchString(c.ReadingRe, data.Reading) {
 		return false
 	}
-	if neRe(c.BaseFormRe, data.BaseForm) {
+	if isNotNilAndDoesntMatchString(c.BaseFormRe, data.BaseForm) {
 		return false
 	}
 
