@@ -1,16 +1,19 @@
-package ojosama
+package converter
 
 import (
 	"regexp"
+
+	"github.com/ikawaha/kagome/v2/tokenizer"
+	"github.com/jiro4989/ojosama/internal/pos"
 )
 
-// convertRule は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
+// ConvertRule は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
 //
 // 基本的な変換はこの型で定義する。
-type convertRule struct {
-	Conditions                   convertConditions // 起点になる変換条件
-	BeforeIgnoreConditions       convertConditions // 前のTokenで条件にマッチした場合は無視する
-	AfterIgnoreConditions        convertConditions // 次のTokenで条件にマッチした場合は無視する
+type ConvertRule struct {
+	Conditions                   ConvertConditions // 起点になる変換条件
+	BeforeIgnoreConditions       ConvertConditions // 前のTokenで条件にマッチした場合は無視する
+	AfterIgnoreConditions        ConvertConditions // 次のTokenで条件にマッチした場合は無視する
 	EnableWhenSentenceSeparation bool              // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
 	AppendLongNote               bool              // 波線を追加する
 	DisablePrefix                bool              // 「お」を手前に付与しない
@@ -18,91 +21,62 @@ type convertRule struct {
 	Value                        string // この文字列に置換する
 }
 
-/*
-英語 文法 品詞
-https://ja.wikibooks.org/wiki/%E8%8B%B1%E8%AA%9E/%E6%96%87%E6%B3%95/%E5%93%81%E8%A9%9E
-
-品詞 part of speech (pos)
-*/
-var (
-	posPronounGeneral            = []string{"名詞", "代名詞", "一般"}
-	posNounsGeneral              = []string{"名詞", "一般"}
-	posSpecificGeneral           = []string{"名詞", "固有名詞", "一般"}
-	posNotIndependenceGeneral    = []string{"名詞", "非自立", "一般"}
-	posAdnominalAdjective        = []string{"連体詞"}
-	posAdjectivesSelfSupporting  = []string{"形容詞", "自立"}
-	posInterjection              = []string{"感動詞"}
-	posVerbIndependence          = []string{"動詞", "自立"}
-	posVerbNotIndependence       = []string{"動詞", "非自立"}
-	posSentenceEndingParticle    = []string{"助詞", "終助詞"}
-	posSubPostpositionalParticle = []string{"助詞", "副助詞"}
-	posAssistantParallelParticle = []string{"助詞", "並立助詞"}
-	posSubParEndParticle         = []string{"助詞", "副助詞／並立助詞／終助詞"}
-	posConnAssistant             = []string{"助詞", "接続助詞"}
-	posAuxiliaryVerb             = []string{"助動詞"}
-	posNounsSaDynamic            = []string{"名詞", "サ変接続"}
-)
-
-func newRule(features []string, surface, value string) convertRule {
-	return convertRule{
-		Conditions: convertConditions{
+func newRule(features []string, surface, value string) ConvertRule {
+	return ConvertRule{
+		Conditions: ConvertConditions{
 			newCond(features, surface),
 		},
 		Value: value,
 	}
 }
 
-func newRulePronounGeneral(surface, value string) convertRule {
-	return newRule(posPronounGeneral, surface, value)
+func newRulePronounGeneral(surface, value string) ConvertRule {
+	return newRule(pos.PronounGeneral, surface, value)
 }
 
-func newRuleNounsGeneral(surface, value string) convertRule {
-	return newRule(posNounsGeneral, surface, value)
+func newRuleNounsGeneral(surface, value string) ConvertRule {
+	return newRule(pos.NounsGeneral, surface, value)
 }
 
-func newRuleAdnominalAdjective(surface, value string) convertRule {
-	return newRule(posAdnominalAdjective, surface, value)
+func newRuleAdnominalAdjective(surface, value string) ConvertRule {
+	return newRule(pos.AdnominalAdjective, surface, value)
 }
 
-func newRuleAdjectivesSelfSupporting(surface, value string) convertRule {
-	return newRule(posAdjectivesSelfSupporting, surface, value)
+func newRuleAdjectivesSelfSupporting(surface, value string) ConvertRule {
+	return newRule(pos.AdjectivesSelfSupporting, surface, value)
 }
 
-func newRuleInterjection(surface, value string) convertRule {
-	return newRule(posInterjection, surface, value)
+func newRuleInterjection(surface, value string) ConvertRule {
+	return newRule(pos.Interjection, surface, value)
 }
 
-func (c convertRule) disablePrefix(v bool) convertRule {
+func (c ConvertRule) disablePrefix(v bool) ConvertRule {
 	c.DisablePrefix = v
 	return c
 }
 
-// continuousConditionsConvertRule は連続する条件がすべてマッチしたときに変換するルール。
-type continuousConditionsConvertRule struct {
-	Conditions               convertConditions
+// ContinuousConditionsConvertRule は連続する条件がすべてマッチしたときに変換するルール。
+type ContinuousConditionsConvertRule struct {
+	Conditions               ConvertConditions
 	AppendLongNote           bool
 	EnableKutenToExclamation bool
 	Value                    string
 }
 
-// sentenceEndingParticleConvertRule は「名詞」＋「動詞」＋「終助詞」の組み合わせによる変換ルール。
-type sentenceEndingParticleConvertRule struct {
-	conditions1            convertConditions                 // 一番最初に評価されるルール
-	conditions2            convertConditions                 // 二番目に評価されるルール
-	auxiliaryVerb          convertConditions                 // 助動詞。マッチしなくても次にすすむ
-	sentenceEndingParticle map[meaningType]convertConditions // 終助詞
-	value                  map[meaningType][]string
+// SentenceEndingParticleConvertRule は「名詞」＋「動詞」＋「終助詞」の組み合わせによる変換ルール。
+type SentenceEndingParticleConvertRule struct {
+	Conditions1            ConvertConditions                 // 一番最初に評価されるルール
+	Conditions2            ConvertConditions                 // 二番目に評価されるルール
+	AuxiliaryVerb          ConvertConditions                 // 助動詞。マッチしなくても次にすすむ
+	SentenceEndingParticle map[MeaningType]ConvertConditions // 終助詞
+	Value                  map[MeaningType][]string
 }
 
-// meaningType は言葉の意味分類。
-type meaningType int
+// MeaningType は言葉の意味分類。
+type MeaningType int
 
 const (
-	convertTypeSurface convertType = iota + 1
-	convertTypeFeatures
-	convertTypeBaseForm
-
-	meaningTypeUnknown     meaningType = iota
+	meaningTypeUnknown     MeaningType = iota
 	meaningTypeHope                    // 希望
 	meaningTypePoem                    // 詠嘆
 	meaningTypeProhibition             // 禁止
@@ -110,17 +84,17 @@ const (
 )
 
 var (
-	sentenceEndingParticleConvertRules = []sentenceEndingParticleConvertRule{
+	SentenceEndingParticleConvertRules = []SentenceEndingParticleConvertRule{
 		{
-			conditions1: convertConditions{
-				{Features: posNounsGeneral},
-				{Features: posNounsSaDynamic},
+			Conditions1: ConvertConditions{
+				{Features: pos.NounsGeneral},
+				{Features: pos.NounsSaDynamic},
 			},
-			conditions2: convertConditions{
-				{Features: posVerbIndependence, BaseForm: "する"},
-				{Features: posVerbIndependence, BaseForm: "やる"},
+			Conditions2: ConvertConditions{
+				{Features: pos.VerbIndependence, BaseForm: "する"},
+				{Features: pos.VerbIndependence, BaseForm: "やる"},
 			},
-			sentenceEndingParticle: map[meaningType]convertConditions{
+			SentenceEndingParticle: map[MeaningType]ConvertConditions{
 				meaningTypeHope: {
 					newCondSentenceEndingParticle("ぜ"),
 					newCondSentenceEndingParticle("よ"),
@@ -138,10 +112,10 @@ var (
 					newCondSentenceEndingParticle("の"),
 				},
 			},
-			auxiliaryVerb: convertConditions{
+			AuxiliaryVerb: ConvertConditions{
 				newCondAuxiliaryVerb("う"),
 			},
-			value: map[meaningType][]string{
+			Value: map[MeaningType][]string{
 				meaningTypeHope: {
 					"をいたしませんこと",
 				},
@@ -158,14 +132,14 @@ var (
 		},
 	}
 
-	condNounsGeneral    = convertCondition{Features: posNounsGeneral}
-	condPronounsGeneral = convertCondition{Features: posPronounGeneral}
+	condNounsGeneral    = ConvertCondition{Features: pos.NounsGeneral}
+	condPronounsGeneral = ConvertCondition{Features: pos.PronounGeneral}
 
 	// continuousConditionsConvertRules は連続する条件がすべてマッチしたときに変換するルール。
 	//
 	// 例えば「壱百満天原サロメ」や「横断歩道」のように、複数のTokenがこの順序で連続
 	// して初めて1つの意味になるような条件を定義する。
-	continuousConditionsConvertRules = []continuousConditionsConvertRule{
+	ContinuousConditionsConvertRules = []ContinuousConditionsConvertRule{
 		{
 			Value:      "壱百満天原サロメ",
 			Conditions: newConds([]string{"壱", "百", "満天", "原", "サロメ"}),
@@ -184,7 +158,7 @@ var (
 		{
 			Value:          "いたしますわ",
 			AppendLongNote: true,
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				newCond([]string{"動詞", "自立"}, "し"),
 				newCond([]string{"助動詞"}, "ます"),
 			},
@@ -193,7 +167,7 @@ var (
 
 		{
 			Value: "ですので",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				newCond([]string{"助動詞"}, "だ"),
 				newCond([]string{"助詞", "接続助詞"}, "から"),
 			},
@@ -202,7 +176,7 @@ var (
 
 		{
 			Value: "なんですの",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				newCond([]string{"助動詞"}, "な"),
 				newCond([]string{"名詞", "非自立", "一般"}, "ん"),
 				newCond([]string{"助動詞"}, "だ"),
@@ -212,7 +186,7 @@ var (
 
 		{
 			Value: "ですわ",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				newCond([]string{"助動詞"}, "だ"),
 				newCond([]string{"助詞", "終助詞"}, "よ"),
 			},
@@ -221,99 +195,99 @@ var (
 
 		{
 			Value: "なんですの",
-			Conditions: convertConditions{
-				newCond(posPronounGeneral, "なん"),
-				newCond(posSubPostpositionalParticle, "じゃ"),
+			Conditions: ConvertConditions{
+				newCond(pos.PronounGeneral, "なん"),
+				newCond(pos.SubPostpositionalParticle, "じゃ"),
 			},
 			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "なんですの",
-			Conditions: convertConditions{
-				newCond(posPronounGeneral, "なん"),
-				newCond(posAuxiliaryVerb, "だ"),
+			Conditions: ConvertConditions{
+				newCond(pos.PronounGeneral, "なん"),
+				newCond(pos.AuxiliaryVerb, "だ"),
 			},
 			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "なんですの",
-			Conditions: convertConditions{
-				newCond(posPronounGeneral, "なん"),
-				newCond(posAssistantParallelParticle, "や"),
+			Conditions: ConvertConditions{
+				newCond(pos.PronounGeneral, "なん"),
+				newCond(pos.AssistantParallelParticle, "や"),
 			},
 			EnableKutenToExclamation: true,
 		},
 
 		{
 			Value: "@1ですの",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				condNounsGeneral,
-				newCond(posAuxiliaryVerb, "じゃ"),
+				newCond(pos.AuxiliaryVerb, "じゃ"),
 			},
 			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "@1ですの",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				condNounsGeneral,
-				newCond(posAuxiliaryVerb, "だ"),
+				newCond(pos.AuxiliaryVerb, "だ"),
 			},
 			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "@1ですの",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				condNounsGeneral,
-				newCond(posAuxiliaryVerb, "や"),
+				newCond(pos.AuxiliaryVerb, "や"),
 			},
 			EnableKutenToExclamation: true,
 		},
 
 		{
 			Value: "@1ですの",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				condPronounsGeneral,
-				newCond(posAuxiliaryVerb, "じゃ"),
+				newCond(pos.AuxiliaryVerb, "じゃ"),
 			},
 			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "@1ですの",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				condPronounsGeneral,
-				newCond(posAuxiliaryVerb, "だ"),
+				newCond(pos.AuxiliaryVerb, "だ"),
 			},
 			EnableKutenToExclamation: true,
 		},
 		{
 			Value: "@1ですの",
-			Conditions: convertConditions{
+			Conditions: ConvertConditions{
 				condPronounsGeneral,
-				newCond(posAuxiliaryVerb, "や"),
+				newCond(pos.AuxiliaryVerb, "や"),
 			},
 			EnableKutenToExclamation: true,
 		},
 	}
 
-	// excludeRules は変換処理を無視するルール。
-	// このルールは convertRules よりも優先して評価される。
-	excludeRules = []convertRule{
+	// ExcludeRules は変換処理を無視するルール。
+	// このルールは ConvertRules よりも優先して評価される。
+	ExcludeRules = []ConvertRule{
 		{
-			Conditions: convertConditions{
-				newCond(posSpecificGeneral, "カス"),
+			Conditions: ConvertConditions{
+				newCond(pos.SpecificGeneral, "カス"),
 			},
 		},
 		{
-			Conditions: convertConditions{
-				newCondRe(posNounsGeneral, regexp.MustCompile(`^(ー+|～+)$`)),
+			Conditions: ConvertConditions{
+				newCondRe(pos.NounsGeneral, regexp.MustCompile(`^(ー+|～+)$`)),
 			},
 		},
 	}
 
-	// convertRules は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
+	// ConvertRules は 単独のTokenに対して、Conditionsがすべてマッチしたときに変換するルール。
 	//
 	// 基本的な変換はここに定義する。
-	convertRules = []convertRule{
+	ConvertRules = []ConvertRule{
 		// 一人称
 		newRulePronounGeneral("俺", "私"),
 		newRulePronounGeneral("オレ", "ワタクシ"),
@@ -339,19 +313,19 @@ var (
 		// 三人称
 		// TODO: AfterIgnore系も簡単に定義できるようにしたい
 		{
-			Conditions: convertConditions{
-				newCond(posNounsGeneral, "パパ"),
+			Conditions: ConvertConditions{
+				newCond(pos.NounsGeneral, "パパ"),
 			},
-			AfterIgnoreConditions: convertConditions{
+			AfterIgnoreConditions: ConvertConditions{
 				{Surface: "上"},
 			},
 			Value: "パパ上",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posNounsGeneral, "ママ"),
+			Conditions: ConvertConditions{
+				newCond(pos.NounsGeneral, "ママ"),
 			},
-			AfterIgnoreConditions: convertConditions{
+			AfterIgnoreConditions: ConvertConditions{
 				{Surface: "上"},
 			},
 			Value: "ママ上",
@@ -378,36 +352,36 @@ var (
 		newRuleAdnominalAdjective("どんな", "どのような"),
 
 		{
-			Conditions: convertConditions{
-				newCond(posNotIndependenceGeneral, "もん"),
+			Conditions: ConvertConditions{
+				newCond(pos.NotIndependenceGeneral, "もん"),
 			},
 			Value: "もの",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posAuxiliaryVerb, "です"),
+			Conditions: ConvertConditions{
+				newCond(pos.AuxiliaryVerb, "です"),
 			},
-			AfterIgnoreConditions: convertConditions{
-				{Features: posSubParEndParticle},
-			},
-			AppendLongNote:           true,
-			EnableKutenToExclamation: true,
-			Value:                    "ですわ",
-		},
-		{
-			Conditions: convertConditions{
-				newCond(posAuxiliaryVerb, "だ"),
-			},
-			AfterIgnoreConditions: convertConditions{
-				{Features: posSubParEndParticle},
+			AfterIgnoreConditions: ConvertConditions{
+				{Features: pos.SubParEndParticle},
 			},
 			AppendLongNote:           true,
 			EnableKutenToExclamation: true,
 			Value:                    "ですわ",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posVerbIndependence, "する"),
+			Conditions: ConvertConditions{
+				newCond(pos.AuxiliaryVerb, "だ"),
+			},
+			AfterIgnoreConditions: ConvertConditions{
+				{Features: pos.SubParEndParticle},
+			},
+			AppendLongNote:           true,
+			EnableKutenToExclamation: true,
+			Value:                    "ですわ",
+		},
+		{
+			Conditions: ConvertConditions{
+				newCond(pos.VerbIndependence, "する"),
 			},
 			EnableWhenSentenceSeparation: true,
 			AppendLongNote:               true,
@@ -415,8 +389,8 @@ var (
 			Value:                        "いたしますわ",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posVerbIndependence, "なる"),
+			Conditions: ConvertConditions{
+				newCond(pos.VerbIndependence, "なる"),
 			},
 			EnableWhenSentenceSeparation: true,
 			AppendLongNote:               true,
@@ -424,81 +398,81 @@ var (
 			Value:                        "なりますわ",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posVerbIndependence, "ある"),
+			Conditions: ConvertConditions{
+				newCond(pos.VerbIndependence, "ある"),
 			},
 			Value: "あります",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posSubPostpositionalParticle, "じゃ"),
+			Conditions: ConvertConditions{
+				newCond(pos.SubPostpositionalParticle, "じゃ"),
 			},
 			Value: "では",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posSubParEndParticle, "か"),
+			Conditions: ConvertConditions{
+				newCond(pos.SubParEndParticle, "か"),
 			},
 			Value: "の",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posSentenceEndingParticle, "わ"),
+			Conditions: ConvertConditions{
+				newCond(pos.SentenceEndingParticle, "わ"),
 			},
 			AppendLongNote:           true,
 			EnableKutenToExclamation: true,
 			Value:                    "ですわ",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posSentenceEndingParticle, "な"),
+			Conditions: ConvertConditions{
+				newCond(pos.SentenceEndingParticle, "な"),
 			},
 			Value: "ね",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posSentenceEndingParticle, "さ"),
+			Conditions: ConvertConditions{
+				newCond(pos.SentenceEndingParticle, "さ"),
 			},
 			Value: "",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posConnAssistant, "から"),
+			Conditions: ConvertConditions{
+				newCond(pos.ConnAssistant, "から"),
 			},
 			Value: "ので",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posConnAssistant, "けど"),
+			Conditions: ConvertConditions{
+				newCond(pos.ConnAssistant, "けど"),
 			},
 			Value: "けれど",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posConnAssistant, "し"),
+			Conditions: ConvertConditions{
+				newCond(pos.ConnAssistant, "し"),
 			},
 			Value: "ですし",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posAuxiliaryVerb, "まし"),
+			Conditions: ConvertConditions{
+				newCond(pos.AuxiliaryVerb, "まし"),
 			},
-			BeforeIgnoreConditions: convertConditions{
-				{Features: posVerbIndependence},
+			BeforeIgnoreConditions: ConvertConditions{
+				{Features: pos.VerbIndependence},
 			},
 			Value: "おりまし",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posAuxiliaryVerb, "ます"),
+			Conditions: ConvertConditions{
+				newCond(pos.AuxiliaryVerb, "ます"),
 			},
 			AppendLongNote:           true,
 			EnableKutenToExclamation: true,
 			Value:                    "ますわ",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posAuxiliaryVerb, "た"),
+			Conditions: ConvertConditions{
+				newCond(pos.AuxiliaryVerb, "た"),
 			},
 			EnableWhenSentenceSeparation: true,
 			AppendLongNote:               true,
@@ -506,30 +480,30 @@ var (
 			Value:                        "たわ",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posAuxiliaryVerb, "だろ"),
+			Conditions: ConvertConditions{
+				newCond(pos.AuxiliaryVerb, "だろ"),
 			},
 			Value: "でしょう",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posAuxiliaryVerb, "ない"),
+			Conditions: ConvertConditions{
+				newCond(pos.AuxiliaryVerb, "ない"),
 			},
-			BeforeIgnoreConditions: convertConditions{
-				{Features: posVerbIndependence},
+			BeforeIgnoreConditions: ConvertConditions{
+				{Features: pos.VerbIndependence},
 			},
 			Value: "ありません",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posVerbNotIndependence, "ください"),
+			Conditions: ConvertConditions{
+				newCond(pos.VerbNotIndependence, "ください"),
 			},
 			EnableKutenToExclamation: true,
 			Value:                    "くださいまし",
 		},
 		{
-			Conditions: convertConditions{
-				newCond(posVerbNotIndependence, "くれ"),
+			Conditions: ConvertConditions{
+				newCond(pos.VerbNotIndependence, "くれ"),
 			},
 			EnableKutenToExclamation: true,
 			Value:                    "くださいまし",
@@ -538,8 +512,8 @@ var (
 		newRuleInterjection("じゃぁ", "それでは"),
 		newRuleInterjection("じゃあ", "それでは"),
 		{
-			Conditions: convertConditions{
-				newCond(posVerbNotIndependence, "くれる"),
+			Conditions: ConvertConditions{
+				newCond(pos.VerbNotIndependence, "くれる"),
 			},
 			Value: "くれます",
 		},
@@ -553,3 +527,12 @@ var (
 		newRuleInterjection("ふふふ", "ほほほ"),
 	}
 )
+
+func GetMeaningType(typeMap map[MeaningType]ConvertConditions, data tokenizer.TokenData) (MeaningType, bool) {
+	for k, cond := range typeMap {
+		if cond.MatchAnyTokenData(data) {
+			return k, true
+		}
+	}
+	return meaningTypeUnknown, false
+}
