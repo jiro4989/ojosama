@@ -17,8 +17,8 @@ type ConvertRule struct {
 	EnableWhenSentenceSeparation bool              // 文の区切り（単語の後に句点か読点がくる、あるいは何もない）場合だけ有効にする
 	AppendLongNote               bool              // 波線を追加する
 	DisablePrefix                bool              // 「お」を手前に付与しない
-	EnableKutenToExclamation     bool
-	Value                        string // この文字列に置換する
+	EnableKutenToExclamation     bool              // 直後に句点が来たとき確率で！に変換する
+	Value                        string            // この文字列に置換する
 }
 
 func newRule(features []string, surface, value string) ConvertRule {
