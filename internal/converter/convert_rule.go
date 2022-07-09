@@ -267,6 +267,30 @@ var (
 			},
 			EnableKutenToExclamation: true,
 		},
+
+		// 名詞＋した＋終助詞は文の終わり
+		{
+			Value: "@1をいたしましたわ",
+			Conditions: ConvertConditions{
+				condNounsGeneral,
+				newCond(pos.VerbIndependence, "し"),
+				newCond(pos.AuxiliaryVerb, "た"),
+				ConvertCondition{Features: pos.SentenceEndingParticle},
+			},
+			EnableKutenToExclamation: true,
+		},
+
+		// 名詞＋やる＋終助詞は文の終わり
+		{
+			Value: "@1をいたしましたわ",
+			Conditions: ConvertConditions{
+				condNounsGeneral,
+				newCond(pos.VerbIndependence, "やっ"),
+				newCond(pos.AuxiliaryVerb, "た"),
+				ConvertCondition{Features: pos.SentenceEndingParticle},
+			},
+			EnableKutenToExclamation: true,
+		},
 	}
 
 	// ExcludeRules は変換処理を無視するルール。
