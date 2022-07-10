@@ -261,8 +261,8 @@ func TestConvert(t *testing.T) {
 
 		{
 			desc:    "正常系: （動詞）ないはそのままですわ",
-			src:     "限らない、飾らない、数えない、くだらない",
-			want:    "限らない、飾らない、数えない、くだらない",
+			src:     "限らない、飾らない、数えない",
+			want:    "限らない、飾らない、数えない",
 			opt:     opt,
 			wantErr: false,
 		},
