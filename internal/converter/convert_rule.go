@@ -549,6 +549,17 @@ var (
 		newRuleInterjection("うふふ", "おほほ"),
 		newRuleInterjection("う", "お"),
 		newRuleInterjection("ふふふ", "ほほほ"),
+
+		// 形容詞文。形容詞で文が終わる時に変換する
+		{
+			Conditions: ConvertConditions{
+				{Features: pos.AdjectivesSelfSupporting},
+			},
+			EnableWhenSentenceSeparation: true,
+			EnableKutenToExclamation:     true,
+			AppendLongNote:               true,
+			Value:                        "@1ですわ",
+		},
 	}
 )
 
