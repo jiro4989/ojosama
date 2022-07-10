@@ -16,4 +16,4 @@ install: go.* *.go cmd/* internal/*
 
 .PHONY: setup-tools
 setup-tools:
-	go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+	go install github.com/fzipp/gocyclo/cmd/gocyclo@v0.6.0
