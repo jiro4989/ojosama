@@ -47,6 +47,16 @@ jobs:
       - run: go test -cover ./...
       - run: ./ojosama README.adoc
 
+  cyclomatic-complexity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.goversion }}
+      - run: make setup-tools
+      - run: ./scripts/test_cyclomatic_complexity.sh
+
   coverage:
     runs-on: ubuntu-latest
     steps:
