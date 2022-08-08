@@ -14,7 +14,7 @@ _{{APPNAME}}_module() {
 
   case "${cword}" in
     1)
-      local opts="-h -t -o -charcode -v -completions"
+      local opts="-h -help -t -o -charcode -v -completions"
       COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
       ;;
     2)
