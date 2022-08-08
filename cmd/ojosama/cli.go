@@ -22,9 +22,9 @@ func ParseArgs() (*CmdArgs, error) {
 	flag.Usage = flagHelpMessage
 	flag.StringVar(&opts.Text, "t", "", "input text")
 	flag.StringVar(&opts.OutFile, "o", "", "output file")
-	flag.StringVar(&opts.CharCode, "charcode", "utf8", "input text file encoding. (utf8 or sjis)")
+	flag.StringVar(&opts.CharCode, "charcode", "utf8", "input text file encoding. (utf8, sjis)")
 	flag.BoolVar(&opts.Version, "v", false, "print version")
-	flag.StringVar(&opts.Completions, "completions", "", "print completions file. (bash)")
+	flag.StringVar(&opts.Completions, "completions", "", "print completions file. (bash, zsh)")
 	flag.Parse()
 	opts.Args = flag.Args()
 

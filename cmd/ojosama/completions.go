@@ -27,7 +27,7 @@ _{{APPNAME}}_module() {
           COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
           ;;
         -completions)
-          local opts="bash"
+          local opts="bash zsh"
           COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
           ;;
       esac
@@ -37,8 +37,37 @@ _{{APPNAME}}_module() {
 
 complete -F _{{APPNAME}}_module {{APPNAME}}`, "{{APPNAME}}", appName)
 
+	completionsZsh = strings.ReplaceAll(`#compdef {{APPNAME}}
+
+_{{APPNAME}}() {
+  _arguments \
+    {-h,-help}'[print help]: :->etc' \
+    {-t}'[input text]: :->etc' \
+    {-o}'[output file]:file:_files' \
+    {-charcode}'[input text file encoding. (utf8, sjis)]: :->charcode' \
+    {-v}'[print version]: :->etc' \
+    {-completions}'[print completions file. (bash, zsh)]: :->completions'
+
+  case "$state" in
+    charcode)
+      _values 'charcode' utf8 sjis
+      ;;
+    completions)
+      _values 'completions' bash zsh
+      ;;
+    etc)
+      # nothing to do
+      ;;
+  esac
+}
+
+compdef _{{APPNAME}} {{APPNAME}}
+
+# vim: ft=zsh`, "{{APPNAME}}", appName)
+
 	completionsMap = map[string]string{
 		"bash": completionsBash,
+		"zsh": completionsZsh,
 	}
 )
 
