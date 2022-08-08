@@ -35,8 +35,7 @@ _{{APPNAME}}_module() {
   esac
 }
 
-complete -F _{{APPNAME}}_module {{APPNAME}}
-`, "{{APPNAME}}", appName)
+complete -F _{{APPNAME}}_module {{APPNAME}}`, "{{APPNAME}}", appName)
 
 	completionsMap = map[string]string{
 		"bash": completionsBash,
