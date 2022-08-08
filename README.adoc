@@ -138,6 +138,18 @@ https://github.com/jiro4989/ojosama/releases[Releases]から実行可能ファ�
 $ go install github.com/jiro4989/ojosama/cmd/ojosama@latest
 ----
 
+=== タブ補完の有効化
+
+==== Bash
+
+`bash-completion` がインストール済みであれば、
+以下のコマンドでタブ補完を使えるようになります。
+
+[source,bash]
+----
+$ ojosama -completions bash | sudo tee /usr/share/bash-completion/completions/ojosama
+----
+
 == 注意事項
 
 === 変換結果について
