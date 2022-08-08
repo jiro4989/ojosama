@@ -42,11 +42,11 @@ complete -F _{{APPNAME}}_module {{APPNAME}}`, "{{APPNAME}}", appName)
 _{{APPNAME}}() {
   _arguments \
     {-h,-help}'[`+helpMsgHelp+`]: :->etc' \
-    {-t}'[`+helpMsgText+`]: :->etc' \
-    {-o}'[`+helpMsgOutFile+`]:file:_files' \
-    {-charcode}'[`+helpMsgCharCode+`]: :->charcode' \
-    {-v}'[`+helpMsgVersion+`]: :->etc' \
-    {-completions}'[`+helpMsgCompletions+`]: :->completions'
+    -t'[`+helpMsgText+`]: :->etc' \
+    -o'[`+helpMsgOutFile+`]:file:_files' \
+    -charcode'[`+helpMsgCharCode+`]: :->charcode' \
+    -v'[`+helpMsgVersion+`]: :->etc' \
+    -completions'[`+helpMsgCompletions+`]: :->completions'
 
   case "$state" in
     charcode)
