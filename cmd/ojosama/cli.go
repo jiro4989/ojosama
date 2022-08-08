@@ -16,15 +16,24 @@ type CmdArgs struct {
 	Args        []string
 }
 
+const (
+	helpMsgHelp        = "print help"
+	helpMsgText        = "input text"
+	helpMsgOutFile     = "output file"
+	helpMsgCharCode    = "input text file encoding. default is utf8. (utf8, sjis)"
+	helpMsgVersion     = "print version"
+	helpMsgCompletions = "print completions file. (bash, zsh)"
+)
+
 func ParseArgs() (*CmdArgs, error) {
 	opts := CmdArgs{}
 
 	flag.Usage = flagHelpMessage
-	flag.StringVar(&opts.Text, "t", "", "input text")
-	flag.StringVar(&opts.OutFile, "o", "", "output file")
-	flag.StringVar(&opts.CharCode, "charcode", "utf8", "input text file encoding. (utf8, sjis)")
-	flag.BoolVar(&opts.Version, "v", false, "print version")
-	flag.StringVar(&opts.Completions, "completions", "", "print completions file. (bash, zsh)")
+	flag.StringVar(&opts.Text, "t", "", helpMsgText)
+	flag.StringVar(&opts.OutFile, "o", "", helpMsgOutFile)
+	flag.StringVar(&opts.CharCode, "charcode", "utf8", helpMsgCharCode)
+	flag.BoolVar(&opts.Version, "v", false, helpMsgVersion)
+	flag.StringVar(&opts.Completions, "completions", "", helpMsgCompletions)
 	flag.Parse()
 	opts.Args = flag.Args()
 

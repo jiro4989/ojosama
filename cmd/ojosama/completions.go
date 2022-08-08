@@ -41,12 +41,12 @@ complete -F _{{APPNAME}}_module {{APPNAME}}`, "{{APPNAME}}", appName)
 
 _{{APPNAME}}() {
   _arguments \
-    {-h,-help}'[print help]: :->etc' \
-    {-t}'[input text]: :->etc' \
-    {-o}'[output file]:file:_files' \
-    {-charcode}'[input text file encoding. (utf8, sjis)]: :->charcode' \
-    {-v}'[print version]: :->etc' \
-    {-completions}'[print completions file. (bash, zsh)]: :->completions'
+    {-h,-help}'[`+helpMsgHelp+`]: :->etc' \
+    {-t}'[`+helpMsgText+`]: :->etc' \
+    {-o}'[`+helpMsgOutFile+`]:file:_files' \
+    {-charcode}'[`+helpMsgCharCode+`]: :->charcode' \
+    {-v}'[`+helpMsgVersion+`]: :->etc' \
+    {-completions}'[`+helpMsgCompletions+`]: :->completions'
 
   case "$state" in
     charcode)
