@@ -27,7 +27,7 @@ _{{APPNAME}}_module() {
           COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
           ;;
         -completions)
-          local opts="bash"
+          local opts="bash zsh"
           COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
           ;;
       esac
@@ -37,12 +37,42 @@ _{{APPNAME}}_module() {
 
 complete -F _{{APPNAME}}_module {{APPNAME}}`, "{{APPNAME}}", appName)
 
+	completionsZsh = strings.ReplaceAll(`#compdef {{APPNAME}}
+
+_{{APPNAME}}() {
+  _arguments \
+    {-h,-help}'[`+helpMsgHelp+`]: :->etc' \
+    -t'[`+helpMsgText+`]: :->etc' \
+    -o'[`+helpMsgOutFile+`]:file:_files' \
+    -charcode'[`+helpMsgCharCode+`]: :->charcode' \
+    -v'[`+helpMsgVersion+`]: :->etc' \
+    -completions'[`+helpMsgCompletions+`]: :->completions'
+
+  case "$state" in
+    charcode)
+      _values 'charcode' utf8 sjis
+      ;;
+    completions)
+      _values 'completions' bash zsh
+      ;;
+    etc)
+      # nothing to do
+      ;;
+  esac
+}
+
+compdef _{{APPNAME}} {{APPNAME}}
+
+# vim: ft=zsh`, "{{APPNAME}}", appName)
+
 	completionsMap = map[string]string{
 		"bash": completionsBash,
+		"zsh":  completionsZsh,
 	}
 )
 
 func isSupportedCompletions(sh string) bool {
+	sh = strings.ToLower(sh)
 	_, ok := completionsMap[sh]
 	return ok
 }
