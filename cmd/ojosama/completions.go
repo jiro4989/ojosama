@@ -72,6 +72,7 @@ compdef _{{APPNAME}} {{APPNAME}}
 )
 
 func isSupportedCompletions(sh string) bool {
+	sh = strings.ToLower(sh)
 	_, ok := completionsMap[sh]
 	return ok
 }
