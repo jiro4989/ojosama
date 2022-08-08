@@ -67,7 +67,7 @@ compdef _{{APPNAME}} {{APPNAME}}
 
 	completionsMap = map[string]string{
 		"bash": completionsBash,
-		"zsh": completionsZsh,
+		"zsh":  completionsZsh,
 	}
 )
 
