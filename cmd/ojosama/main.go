@@ -10,6 +10,10 @@ import (
 	"golang.org/x/text/transform"
 )
 
+const (
+	appName = "ojosama"
+)
+
 // CIでビルド時に値を埋め込む。
 // 埋め込む値の設定は .goreleaser.yaml を参照。
 var (
@@ -33,12 +37,17 @@ func main() {
 	}
 
 	if args.Version {
-		msg := fmt.Sprintf("ojosama %s (%s)", version, revision)
+		msg := fmt.Sprintf("%s %s (%s)", appName, version, revision)
 		fmt.Println(msg)
 		fmt.Println("")
 		fmt.Println("author:     jiro")
 		fmt.Println("repository: https://github.com/jiro4989/ojosama")
 		os.Exit(exitStatusOK)
+	}
+
+	if args.Completions != "" {
+		printCompletions(args.Completions)
+		return
 	}
 
 	if args.Text != "" {
