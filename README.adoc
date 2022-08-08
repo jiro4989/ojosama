@@ -150,6 +150,13 @@ $ go install github.com/jiro4989/ojosama/cmd/ojosama@latest
 $ ojosama -completions bash | sudo tee /usr/share/bash-completion/completions/ojosama
 ----
 
+==== Zsh
+
+[source,bash]
+----
+$ ojosama -completions zsh | sudo tee /usr/share/zsh/functions/Completion/_ojosama
+----
+
 == 注意事項
 
 === 変換結果について
