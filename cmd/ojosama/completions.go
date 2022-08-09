@@ -6,6 +6,9 @@ import (
 )
 
 var (
+	paramCharCodes = "utf8 sjis"
+	paramCompletions = "bash zsh fish"
+
 	completionsBash = strings.ReplaceAll(`# {{APPNAME}}(1) completion                                       -*- shell-script -*-
 
 _{{APPNAME}}_module() {
@@ -23,11 +26,11 @@ _{{APPNAME}}_module() {
           COMPREPLY=($(compgen -f -- "${cur}"))
           ;;
         -charcode)
-          local opts="utf8 sjis"
+          local opts="`+paramCharCodes+`"
           COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
           ;;
         -completions)
-          local opts="bash zsh fish"
+          local opts="`+paramCompletions+`"
           COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
           ;;
       esac
@@ -50,10 +53,10 @@ _{{APPNAME}}() {
 
   case "$state" in
     charcode)
-      _values 'charcode' utf8 sjis
+      _values 'charcode' `+paramCharCodes+`
       ;;
     completions)
-      _values 'completions' bash zsh fish
+      _values 'completions' `+paramCompletions+`
       ;;
     etc)
       # nothing to do
@@ -75,9 +78,9 @@ complete -c {{APPNAME}} -o h -d '`+helpMsgHelp+`'
 complete -c {{APPNAME}} -o help -d '`+helpMsgHelp+`'
 complete -c {{APPNAME}} -o t -x -d '`+helpMsgText+`'
 complete -c {{APPNAME}} -o o -r -d '`+helpMsgOutFile+`'
-complete -c {{APPNAME}} -o charcode -x -a 'utf8 sjis' -d '`+helpMsgCharCode+`'
+complete -c {{APPNAME}} -o charcode -x -a '`+paramCharCodes+`' -d '`+helpMsgCharCode+`'
 complete -c {{APPNAME}} -o v -d '`+helpMsgVersion+`'
-complete -c {{APPNAME}} -o completions -x -a 'bash zsh fish' -d '`+helpMsgCompletions+`'`,
+complete -c {{APPNAME}} -o completions -x -a '`+paramCompletions+`' -d '`+helpMsgCompletions+`'`,
 		"{{APPNAME}}", appName)
 
 	completionsMap = map[string]string{
