@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	paramCharCodes = "utf8 sjis"
+	paramCharCodes   = "utf8 sjis"
 	paramCompletions = "bash zsh fish"
 
 	completionsBash = strings.ReplaceAll(`# {{APPNAME}}(1) completion                                       -*- shell-script -*-
