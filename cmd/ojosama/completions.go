@@ -65,15 +65,15 @@ compdef _{{APPNAME}} {{APPNAME}}
 
 # vim: ft=zsh`, "{{APPNAME}}", appName)
 
-	completionsFish = strings.ReplaceAll(`complete -c {{APPNAME}} -x
+	completionsFish = strings.ReplaceAll(`complete -c {{APPNAME}} -r
 
 complete -c {{APPNAME}} -o h -d '`+helpMsgHelp+`'
 complete -c {{APPNAME}} -o help -d '`+helpMsgHelp+`'
-complete -c {{APPNAME}} -o t -r -d '`+helpMsgText+`'
+complete -c {{APPNAME}} -o t -x -d '`+helpMsgText+`'
 complete -c {{APPNAME}} -o o -r -d '`+helpMsgOutFile+`'
-complete -c {{APPNAME}} -o charcode -a 'utf8 sjis' -d '`+helpMsgCharCode+`'
+complete -c {{APPNAME}} -o charcode -x -a 'utf8 sjis' -d '`+helpMsgCharCode+`'
 complete -c {{APPNAME}} -o v -d '`+helpMsgVersion+`'
-complete -c {{APPNAME}} -o completions -a 'bash zsh fish' -d '`+helpMsgCompletions+`'`,
+complete -c {{APPNAME}} -o completions -x -a 'bash zsh fish' -d '`+helpMsgCompletions+`'`,
 		"{{APPNAME}}", appName)
 
 	completionsMap = map[string]string{
