@@ -65,6 +65,10 @@ compdef _{{APPNAME}} {{APPNAME}}
 
 # vim: ft=zsh`, "{{APPNAME}}", appName)
 
+	// -x 引数を受け取るけれどファイルを指定できない
+	// -r 引数としてファイルを指定する
+	// -a 入力可能な文字列を指定する
+	// -o 古いロングオプション(-helpとか)を指定
 	completionsFish = strings.ReplaceAll(`complete -c {{APPNAME}} -r
 
 complete -c {{APPNAME}} -o h -d '`+helpMsgHelp+`'
