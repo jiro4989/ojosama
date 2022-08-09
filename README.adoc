@@ -157,6 +157,13 @@ $ ojosama -completions bash | sudo tee /usr/share/bash-completion/completions/oj
 $ ojosama -completions zsh | sudo tee /usr/share/zsh/functions/Completion/_ojosama
 ----
 
+==== Fish
+
+[source,bash]
+----
+$ ojosama -completions fish | tee $HOME/.config/fish/completions/ojosama.fish
+----
+
 == 注意事項
 
 === 変換結果について
