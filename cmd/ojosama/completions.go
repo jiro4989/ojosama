@@ -67,13 +67,13 @@ compdef _{{APPNAME}} {{APPNAME}}
 
 	completionsFish = strings.ReplaceAll(`complete -c {{APPNAME}} -x
 
-complete -c {{APPNAME}} -s h -d '`+helpMsgHelp+`'
-complete -c {{APPNAME}} -s help -d '`+helpMsgHelp+`'
-complete -c {{APPNAME}} -s t -d '`+helpMsgText+`'
-complete -c {{APPNAME}} -s o -d '`+helpMsgOutFile+`'
-complete -c {{APPNAME}} -s charcode -a 'utf8 sjis' -d '`+helpMsgCharCode+`'
-complete -c {{APPNAME}} -s v -d '`+helpMsgVersion+`'
-complete -c {{APPNAME}} -s completions -a 'bash zsh fish' -d '`+helpMsgCompletions+`'`,
+complete -c {{APPNAME}} -o h -d '`+helpMsgHelp+`'
+complete -c {{APPNAME}} -o help -d '`+helpMsgHelp+`'
+complete -c {{APPNAME}} -o t -r -d '`+helpMsgText+`'
+complete -c {{APPNAME}} -o o -r -d '`+helpMsgOutFile+`'
+complete -c {{APPNAME}} -o charcode -a 'utf8 sjis' -d '`+helpMsgCharCode+`'
+complete -c {{APPNAME}} -o v -d '`+helpMsgVersion+`'
+complete -c {{APPNAME}} -o completions -a 'bash zsh fish' -d '`+helpMsgCompletions+`'`,
 	"{{APPNAME}}", appName)
 
 	completionsMap = map[string]string{
