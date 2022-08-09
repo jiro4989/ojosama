@@ -27,7 +27,7 @@ _{{APPNAME}}_module() {
           COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
           ;;
         -completions)
-          local opts="bash zsh"
+          local opts="bash zsh fish"
           COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
           ;;
       esac
@@ -53,7 +53,7 @@ _{{APPNAME}}() {
       _values 'charcode' utf8 sjis
       ;;
     completions)
-      _values 'completions' bash zsh
+      _values 'completions' bash zsh fish
       ;;
     etc)
       # nothing to do
@@ -65,9 +65,20 @@ compdef _{{APPNAME}} {{APPNAME}}
 
 # vim: ft=zsh`, "{{APPNAME}}", appName)
 
+	completionsFish = strings.ReplaceAll(`complete -c {{APPNAME}} -x
+
+complete -c {{APPNAME}} -s h -d '`+helpMsgHelp+`'
+complete -c {{APPNAME}} -s help -d '`+helpMsgHelp+`'
+complete -c {{APPNAME}} -s t -d '`+helpMsgText+`'
+complete -c {{APPNAME}} -s o -d '`+helpMsgOutFile+`'
+complete -c {{APPNAME}} -s charcode -a 'utf8 sjis' -d '`+helpMsgCharCode+`'
+complete -c {{APPNAME}} -s v -d '`+helpMsgVersion+`'
+complete -c {{APPNAME}} -s completions -a 'bash zsh fish' -d '`+helpMsgCompletions+`'`, "{{APPNAME}}", appName)
+
 	completionsMap = map[string]string{
 		"bash": completionsBash,
 		"zsh":  completionsZsh,
+		"fish": completionsFish,
 	}
 )
 
