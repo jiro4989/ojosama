@@ -73,7 +73,8 @@ complete -c {{APPNAME}} -s t -d '`+helpMsgText+`'
 complete -c {{APPNAME}} -s o -d '`+helpMsgOutFile+`'
 complete -c {{APPNAME}} -s charcode -a 'utf8 sjis' -d '`+helpMsgCharCode+`'
 complete -c {{APPNAME}} -s v -d '`+helpMsgVersion+`'
-complete -c {{APPNAME}} -s completions -a 'bash zsh fish' -d '`+helpMsgCompletions+`'`, "{{APPNAME}}", appName)
+complete -c {{APPNAME}} -s completions -a 'bash zsh fish' -d '`+helpMsgCompletions+`'`,
+	"{{APPNAME}}", appName)
 
 	completionsMap = map[string]string{
 		"bash": completionsBash,
