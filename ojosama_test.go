@@ -1,11 +1,26 @@
 package ojosama
 
 import (
+	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/jiro4989/ojosama/internal/chars"
 	"github.com/stretchr/testify/assert"
 )
+
+func ExampleConvert() {
+	rand.Seed(time.Now().UnixNano())
+	got, err := Convert("ハーブです", nil)
+
+	fmt.Println("got: " + got)
+	fmt.Println(fmt.Sprintf("err: %v", err))
+
+	// Output:
+	// got: おハーブですわ
+	// err: <nil>
+}
 
 func TestConvert(t *testing.T) {
 	opt := &ConvertOption{

@@ -107,23 +107,29 @@ $ ojosama -charcode sjis testdata/sample1_sjis.txt
 
 Goのコードとして使う場合は以下のように使用します。
 
+一部変換ロジックの中でランダムな選択を行うため、乱数のシード値を設定します。
+
 [source,go]
 ----
 package main
 
 import (
-  "fmt"
+	"fmt"
+	"math/rand"
+	"time"
 
-  "github.com/jiro4989/ojosama"
+	"github.com/jiro4989/ojosama"
 )
 
 func main() {
-  s := "ハーブがありました！"
-  text, err := ojosama.Convert(s, nil)
-  if err != nil {
-    panic(err)
-  }
-  fmt.Println(text)
+	rand.Seed(time.Now().UnixNano())
+
+	s := "ハーブがありました！"
+	text, err := ojosama.Convert(s, nil)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(text)
 }
 ----
 
