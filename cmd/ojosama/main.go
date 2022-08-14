@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/jiro4989/ojosama"
 	"golang.org/x/text/encoding/japanese"
@@ -113,6 +115,8 @@ func main() {
 }
 
 func run(s string, args *CmdArgs) (int, error) {
+	rand.Seed(time.Now().UnixNano())
+
 	text, err := ojosama.Convert(s, nil)
 	if err != nil {
 		return exitStatusConvertError, err

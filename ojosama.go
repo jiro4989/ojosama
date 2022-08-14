@@ -41,7 +41,6 @@ import (
 	"math/rand"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/ikawaha/kagome-dict/ipa"
 	"github.com/ikawaha/kagome/v2/tokenizer"
@@ -86,17 +85,16 @@ var (
 	shuffleElementsKutenToExclamation = []string{"。", "。", "！", "❗"}
 )
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
 // Convert はテキストを壱百満天原サロメお嬢様風の口調に変換して返却する。
 //
 // 簡単に説明すると「ハーブですわ！」を「おハーブですわ～～！！！」と変換する。
 // それ以外にもいくつかバリエーションがある。
 //
-// opt は挙動を微調整するためのオプショナルなパラメータ。不要であれば nil を渡せ
-// ば良い。
+// opt は挙動を微調整するためのオプショナルなパラメータ。
+// 不要であれば nil を渡せば良い。
+//
+// 一部変換の途中でランダムに要素を選択するため、
+// 呼び出し側で乱数のシードの初期化を行うこと。
 func Convert(src string, opt *ConvertOption) (string, error) {
 	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
