@@ -107,6 +107,8 @@ $ ojosama -charcode sjis testdata/sample1_sjis.txt
 
 Goのコードとして使う場合は以下のように使用します。
 
+一部変換ロジックの中でランダムな選択を行うため、乱数のシード値を設定します。
+
 [source,go]
 ----
 package main
