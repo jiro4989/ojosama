@@ -53,9 +53,9 @@ import (
 
 // ConvertOption はお嬢様変換時のオプショナルな設定。
 type ConvertOption struct {
-	// 句点を！に変換する機能をOFFにする。句点を！に変換してしまうと変換元の文章
-	// のニュアンスを破壊する可能性があるため、オプションパラメータで無効にでき
-	// るようにする。
+	// 句点を！に変換する機能をOFFにする。
+	// 句点を！に変換してしまうと変換元の文章のニュアンスを破壊する可能性があるため、
+	// オプションパラメータで無効にできるようにする。
 	DisableKutenToExclamation bool
 
 	forceAppendLongNote     forceAppendLongNote // 単体テスト用のパラメータ
