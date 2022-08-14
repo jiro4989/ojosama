@@ -112,18 +112,22 @@ Goのコードとして使う場合は以下のように使用します。
 package main
 
 import (
-  "fmt"
+	"fmt"
+	"math/rand"
+	"time"
 
-  "github.com/jiro4989/ojosama"
+	"github.com/jiro4989/ojosama"
 )
 
 func main() {
-  s := "ハーブがありました！"
-  text, err := ojosama.Convert(s, nil)
-  if err != nil {
-    panic(err)
-  }
-  fmt.Println(text)
+	rand.Seed(time.Now().UnixNano())
+
+	s := "ハーブがありました！"
+	text, err := ojosama.Convert(s, nil)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(text)
 }
 ----
 
