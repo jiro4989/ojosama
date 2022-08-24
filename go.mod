@@ -3,8 +3,8 @@ module github.com/jiro4989/ojosama
 go 1.18
 
 require (
-	github.com/ikawaha/kagome-dict/ipa v1.0.5
-	github.com/ikawaha/kagome/v2 v2.8.1
+	github.com/ikawaha/kagome-dict/ipa v1.0.6
+	github.com/ikawaha/kagome/v2 v2.8.2
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/text v0.3.7
 )
