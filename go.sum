@@ -3,8 +3,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/ikawaha/kagome-dict v1.0.5 h1:7eUhaCuktTBVduV1/GwsEAR55ewBRJ2dDHtrzQHOnKc=
 github.com/ikawaha/kagome-dict v1.0.5/go.mod h1:IMAq6d/YI2kDegn2smxhOjejGX4aes5JgCeFik6zFXI=
-github.com/ikawaha/kagome-dict/ipa v1.0.5 h1:cdZn0uTu30b6gNDuE4gYj4kAeV7lVga2nHkZtK7UfxE=
-github.com/ikawaha/kagome-dict/ipa v1.0.5/go.mod h1:TkvBLrjWBNyp4STPzxTqd2KAPkNhXf20z/GS5p5bqv8=
+github.com/ikawaha/kagome-dict/ipa v1.0.6 h1:+v9o37pjnlZGVm2Jv98jxuZ+RJO3ZCEWa+ownJL6AMg=
+github.com/ikawaha/kagome-dict/ipa v1.0.6/go.mod h1:+ydIDyvA+g6weyS362m1Q4xT19kJUlF2ciBqbnOQ7WE=
 github.com/ikawaha/kagome/v2 v2.8.1 h1:0JQu8/qCzSjDOvGTu3NiYoovA2pGtfKGMA5/GuT9nk8=
 github.com/ikawaha/kagome/v2 v2.8.1/go.mod h1:EdcHRfDSYk+iUgoehTfj7nxQpml216qVjm6szW4/Ipg=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
