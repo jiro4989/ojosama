@@ -68,7 +68,7 @@ image:./docs/demo.gif[]
 
 Web版提供してます。特にツールのインストールは不要です。
 
-* https://ojosama.herokuapp.com
+* https://ojosama.jiro4989.com
 
 Web版のソースコードは以下です。
 
