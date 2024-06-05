@@ -6,7 +6,7 @@ require (
 	github.com/ikawaha/kagome-dict/ipa v1.0.11
 	github.com/ikawaha/kagome/v2 v2.9.8
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/text v0.15.0
+	golang.org/x/text v0.16.0
 )
 
 require (
