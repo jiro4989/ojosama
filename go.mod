@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/ikawaha/kagome-dict/ipa v1.2.0
-	github.com/ikawaha/kagome/v2 v2.9.11
+	github.com/ikawaha/kagome/v2 v2.10.0
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/text v0.16.0
 )
