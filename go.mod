@@ -1,12 +1,12 @@
 module github.com/jiro4989/ojosama
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/ikawaha/kagome-dict/ipa v1.2.5
 	github.com/ikawaha/kagome/v2 v2.10.2
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/text v0.28.0
+	golang.org/x/text v0.29.0
 )
 
 require (
